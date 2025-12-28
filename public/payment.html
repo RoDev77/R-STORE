@@ -187,39 +187,39 @@ async function sendToDiscord(payload) {
    SUBMIT FINAL
 ================================ */
 sendBtn.onclick = async () => {
-  const username = document.getElementById("username").value.trim();
-  if (!username) return alert("Username Roblox wajib diisi");
-  if (!proofBlob) return alert("Upload bukti transfer");
-
-  sendBtn.disabled = true;
+  if (!username.value) return alert("Username wajib");
+  if (!proofImage) return alert("Upload bukti");
 
   const orderId = "RBX-" + Date.now();
+
   const payload = {
     orderId,
-    username,
+    username: username.value,
     amount,
     price,
     deliveryType,
     poInfo,
-    status: "pending",
-    createdAt: new Date().toISOString()
+    proofImage,
   };
 
+  sendBtn.disabled = true;
+
   try {
-    // 1️⃣ FIRESTORE (Vercel API)
+    // 1️⃣ SIMPAN KE FIRESTORE
     await fetch("/api/order", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
 
     // 2️⃣ DISCORD (ANTI HAPUS)
     await sendToDiscord(payload);
 
-    // 3️⃣ SUCCESS
-    location.href = "process.html?orderId=" + orderId;
+    // 3️⃣ REDIRECT
+    location.href = `process.html?orderId=${orderId}`;
+
   } catch (e) {
-    alert("Gagal mengirim pesanan");
+    alert("Gagal memproses pesanan");
     sendBtn.disabled = false;
   }
 };

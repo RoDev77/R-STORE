@@ -106,11 +106,31 @@ if (!orderId) location.href = "index.html";
    FETCH ORDER (FIRESTORE)
 ================================ */
 async function loadOrder() {
-  const res = await fetch("/api/order?id=" + orderId);
-  if (!res.ok) throw new Error("Order tidak ditemukan");
-  return await res.json();
+  try {
+    const res = await fetch(`/api/order?id=${orderId}`);
+
+    if (res.status === 404) {
+      showPending();
+      return;
+    }
+
+    const data = await res.json();
+
+    document.getElementById("orderId").textContent = data.orderId;
+    document.getElementById("orderUsername").textContent = data.username;
+    document.getElementById("orderRobux").textContent =
+      Number(data.amount).toLocaleString("id-ID");
+    document.getElementById("orderAmount").textContent = data.price;
+    document.getElementById("orderStatus").textContent = data.status;
+
+    showSuccess();
+
+  } catch {
+    showError();
+  }
 }
 
+loadOrder();
 /* ===============================
    SEND DISCORD (1x ONLY)
 ================================ */

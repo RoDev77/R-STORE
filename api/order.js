@@ -1,35 +1,41 @@
-import admin from "firebase-admin";
-
-if (!admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.cert(
-      JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
-    )
-  });
-}
-
-const db = admin.firestore();
+import { db } from "./_firebase";
 
 export default async function handler(req, res) {
   try {
-    const { id } = req.query;
-    if (!id) {
-      return res.status(400).json({ error: "Order ID wajib" });
+    if (req.method === "POST") {
+      const data = req.body;
+
+      if (!data.orderId) {
+        return res.status(400).json({ error: "Order ID wajib" });
+      }
+
+      await db.collection("orders").doc(data.orderId).set({
+        ...data,
+        status: "PENDING",
+        createdAt: Date.now(),
+      });
+
+      return res.json({ success: true });
     }
 
-    const doc = await db.collection("orders").doc(id).get();
+    if (req.method === "GET") {
+      const { id } = req.query;
+      if (!id) {
+        return res.status(400).json({ error: "ID kosong" });
+      }
 
-    if (!doc.exists) {
-      return res.status(404).json({ error: "Order tidak ditemukan" });
+      const snap = await db.collection("orders").doc(id).get();
+
+      if (!snap.exists) {
+        return res.status(404).json({ error: "Order tidak ditemukan" });
+      }
+
+      return res.json(snap.data());
     }
 
-    return res.status(200).json(doc.data());
-
+    res.status(405).end();
   } catch (err) {
     console.error("API ERROR:", err);
-    return res.status(500).json({
-      error: "Internal Server Error",
-      message: err.message
-    });
+    res.status(500).json({ error: "Internal Server Error" });
   }
 }
