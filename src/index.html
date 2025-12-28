@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Beli Robux</title>
+
+<link href="https://fonts.googleapis.com/css2?family=HK+Grotesk:wght@400;600;700;900&display=swap" rel="stylesheet">
+
+<style>
+body {
+  margin: 0;
+  font-family: 'HK Grotesk', sans-serif;
+  background: #232527;
+  color: #fff;
+}
+
+.navbar {
+  background: #393b3d;
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 900;
+  font-size: 20px;
+}
+
+.btn-track {
+  background: #00b06f;
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.hero {
+  padding: 48px 24px;
+  text-align: center;
+  background: linear-gradient(180deg, #393b3d, #232527);
+}
+
+.hero h1 {
+  font-size: 42px;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg,#00b06f,#00d4a0);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.main {
+  max-width: 900px;
+  margin: auto;
+  padding: 32px 24px;
+}
+
+.stock-alert {
+  background: #393b3d;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+  border: 2px solid #4a4c4f;
+}
+
+.stock-alert.available { border-color: #00b06f }
+.stock-alert.low { border-color: #ffa116 }
+.stock-alert.out { border-color: #ff4444 }
+
+.card {
+  background: #393b3d;
+  border-radius: 16px;
+  padding: 32px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width:768px) {
+  .grid { grid-template-columns: 1fr }
+}
+
+input {
+  width: 100%;
+  padding: 16px;
+  border-radius: 8px;
+  border: 2px solid #4a4c4f;
+  background: #232527;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+input:focus {
+  outline: none;
+  border-color: #00b06f;
+}
+
+.summary {
+  background: linear-gradient(135deg,#00b06f,#00d4a0);
+  border-radius: 12px;
+  padding: 24px;
+  margin: 24px 0;
+}
+
+.summary h2 {
+  font-size: 40px;
+  margin: 0;
+}
+
+.btn-buy {
+  width: 100%;
+  padding: 18px;
+  background: #00b06f;
+  border: none;
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: 800;
+  color: #fff;
+  cursor: pointer;
+}
+
+.footer {
+  text-align: center;
+  padding: 32px;
+  color: #6c7075;
+}
+</style>
+</head>
+
+<body>
+
+<nav class="navbar">
+  <div class="nav-logo">R STORE – ROBUX</div>
+  <a href="track.html" class="btn-track">Lacak Pesanan</a>
+</nav>
+
+<section class="hero">
+  <h1>Beli Robux</h1>
+  <p>Masukkan jumlah Robux yang ingin dibeli</p>
+</section>
+
+<main class="main">
+
+<div id="stockAlert" class="stock-alert available">
+  <strong id="stockTitle">Stock Tersedia</strong>
+  <div id="stockDesc">Pengiriman instant tersedia</div>
+</div>
+
+<div class="card">
+  <div class="grid">
+    <div>
+      <label>Jumlah Robux</label>
+      <input type="number" id="robuxInput" min="100" step="10" placeholder="100">
+    </div>
+    <div>
+      <label>Harga / Robux</label>
+      <input type="text" value="Rp 115" disabled>
+    </div>
+  </div>
+
+  <div class="summary">
+    <div>Total Pembayaran</div>
+    <h2 id="totalPrice">Rp 0</h2>
+    <div id="deliveryInfo">⚡ Pengiriman Instant</div>
+  </div>
+
+  <button class="btn-buy" onclick="submitOrder()">Lanjutkan Pembayaran</button>
+</div>
+
+</main>
+
+<footer class="footer">
+  © 2025 Roblox Store — Unofficial
+</footer>
+
+<script>
+
+/* ===== CONFIG (NANTI BISA DARI FIRESTORE) ===== */
+const PRICE_PER_ROBUX = 115;
+const CURRENT_STOCK = 0;
+const CURRENT_PO = 0;
+const PO_LIMIT = 10000;
+
+/* ===== ELEMENT ===== */
+const robuxInput = document.getElementById('robuxInput');
+const totalPrice = document.getElementById('totalPrice');
+const deliveryInfo = document.getElementById('deliveryInfo');
+const stockAlert = document.getElementById('stockAlert');
+const stockTitle = document.getElementById('stockTitle');
+const stockDesc = document.getElementById('stockDesc');
+
+/* ===== UPDATE UI ===== */
+function updateUI() {
+  const robux = Number(robuxInput.value || 0);
+  const total = robux * PRICE_PER_ROBUX;
+  totalPrice.textContent = 'Rp ' + total.toLocaleString('id-ID');
+
+  if (CURRENT_STOCK <= 0) {
+    deliveryInfo.textContent = '📦 Pre-Order 15 hari kerja';
+    stockAlert.className = 'stock-alert out';
+    stockTitle.textContent = 'Pre-Order';
+    stockDesc.textContent = 'Stock habis – pesanan masuk PO';
+  } else if (robux > CURRENT_STOCK) {
+    deliveryInfo.textContent = `⚡ ${CURRENT_STOCK} Instant + 📦 ${robux - CURRENT_STOCK} PO`;
+    stockAlert.className = 'stock-alert low';
+  } else {
+    deliveryInfo.textContent = '⚡ Pengiriman Instant';
+    stockAlert.className = 'stock-alert available';
+  }
+}
+
+/* ===== SUBMIT ===== */
+function submitOrder() {
+  const robux = Number(robuxInput.value);
+  if (robux < 100) {
+    alert('Minimal pembelian 100 Robux');
+    return;
+  }
+
+  const total = robux * PRICE_PER_ROBUX;
+
+  const params = new URLSearchParams({
+    amount: robux,
+    price: 'Rp ' + total.toLocaleString('id-ID'),
+    delivery: deliveryInfo.textContent
+  });
+
+  window.location.href = 'payment.html?' + params.toString();
+}
+
+robuxInput.addEventListener('input', updateUI);
+updateUI();
+</script>
+
+</body>
+</html>

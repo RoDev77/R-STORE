@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Processing - Roblox Store</title>
+
+<style>
+body {
+  font-family: system-ui, -apple-system, Segoe UI, sans-serif;
+  background: linear-gradient(135deg,#667eea,#764ba2);
+  min-height: 100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+.box {
+  background:#fff;
+  border-radius:20px;
+  padding:50px 40px;
+  max-width:500px;
+  width:100%;
+  text-align:center;
+  box-shadow:0 20px 60px rgba(0,0,0,.25);
+}
+.icon {
+  font-size:96px;
+  animation:pulse 1.5s infinite;
+}
+@keyframes pulse {
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.1)}
+}
+h1 {
+  font-size:34px;
+  font-weight:900;
+  margin:16px 0;
+}
+p {
+  color:#666;
+  font-size:18px;
+}
+.detail {
+  display:none;
+  margin-top:24px;
+  background:#f8f9fa;
+  border-radius:12px;
+  padding:20px;
+  text-align:left;
+}
+.row {
+  display:flex;
+  justify-content:space-between;
+  padding:8px 0;
+  border-bottom:1px solid #ddd;
+}
+.row:last-child {border:none}
+.label {color:#666;font-weight:600}
+.value {font-weight:700}
+.btn {
+  display:none;
+  margin-top:24px;
+  padding:14px;
+  border-radius:12px;
+  text-decoration:none;
+  color:#fff;
+  font-weight:800;
+  background:linear-gradient(135deg,#667eea,#764ba2);
+}
+</style>
+</head>
+
+<body>
+<div class="box">
+  <div class="icon" id="icon">⏳</div>
+  <h1 id="title">Memproses...</h1>
+  <p id="msg">Pesanan kamu sedang diproses</p>
+
+  <div class="detail" id="detail">
+    <div class="row"><span class="label">Order ID</span><span class="value" id="oid">-</span></div>
+    <div class="row"><span class="label">Username</span><span class="value" id="user">-</span></div>
+    <div class="row"><span class="label">Robux</span><span class="value" id="rbx">-</span></div>
+    <div class="row"><span class="label">Total</span><span class="value" id="price">-</span></div>
+    <div class="row"><span class="label">Status</span><span class="value" id="status">-</span></div>
+  </div>
+
+  <a href="index.html" class="btn" id="btn">Kembali ke Store</a>
+</div>
+
+<script>
+/* ===============================
+   DISCORD WEBHOOK (ANTI HAPUS)
+================================ */
+const DISCORD_WEBHOOK_URL =
+  "https://discord.com/api/webhooks/XXXX/XXXX";
+
+/* ===============================
+   GET ORDER ID
+================================ */
+const params = new URLSearchParams(location.search);
+const orderId = params.get("orderId");
+if (!orderId) location.href = "index.html";
+
+/* ===============================
+   FETCH ORDER (FIRESTORE)
+================================ */
+async function loadOrder() {
+  const res = await fetch("/api/order?id=" + orderId);
+  if (!res.ok) throw new Error("Order tidak ditemukan");
+  return await res.json();
+}
+
+/* ===============================
+   SEND DISCORD (1x ONLY)
+================================ */
+async function sendDiscord(order) {
+  if (localStorage.getItem("discord_"+orderId)) return;
+
+  const embed = {
+    title: "🧾 Pesanan Robux Baru",
+    color: 5763719,
+    fields: [
+      { name: "Order ID", value: order.orderId },
+      { name: "Username", value: order.username, inline:true },
+      { name: "Robux", value: order.amount.toLocaleString("id-ID"), inline:true },
+      { name: "Total", value: order.price },
+      { name: "Delivery", value: order.deliveryType || "-" }
+    ],
+    footer:{text:"R STORE - ROBUX"},
+    timestamp:new Date()
+  };
+
+  await fetch(DISCORD_WEBHOOK_URL,{
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({
+      content:"🔔 Pesanan Robux baru masuk",
+      embeds:[embed]
+    })
+  });
+
+  localStorage.setItem("discord_"+orderId,"sent");
+}
+
+/* ===============================
+   SUCCESS UI
+================================ */
+function show(order) {
+  icon.textContent = "✅";
+  title.textContent = "Pesanan Terkirim";
+  msg.innerHTML = `
+    Pesanan kamu berhasil dikirim ke admin.<br>
+    Robux akan dikirim ke <b>${order.username}</b>
+  `;
+
+  oid.textContent = order.orderId;
+  user.textContent = order.username;
+  rbx.textContent = order.amount.toLocaleString("id-ID");
+  price.textContent = order.price;
+  status.textContent = "PENDING";
+  status.style.color="#ffa726";
+
+  detail.style.display="block";
+  btn.style.display="inline-block";
+}
+
+/* ===============================
+   ERROR UI
+================================ */
+function errorUI() {
+  icon.textContent="❌";
+  title.textContent="Gagal";
+  msg.textContent="Terjadi kesalahan memproses pesanan";
+  btn.style.display="inline-block";
+}
+
+/* ===============================
+   INIT
+================================ */
+(async()=>{
+  try{
+    const order = await loadOrder();
+    await sendDiscord(order);
+    show(order);
+  }catch(e){
+    console.error(e);
+    errorUI();
+  }
+})();
+</script>
+</body>
+</html>

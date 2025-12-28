@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lacak Pesanan - Robux Store</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=HK+Grotesk:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'HK Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #232527;
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: #393b3d;
+            padding: 16px 0;
+            border-bottom: 1px solid #4a4c4f;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-logo-icon {
+            width: 40px;
+            height: 40px;
+        }
+
+        .nav-logo-text {
+            font-size: 24px;
+            font-weight: 900;
+            color: #fff;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-buy {
+            background: #00b06f;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .btn-buy:hover {
+            background: #019a5f;
+        }
+
+        /* Hero */
+        .hero {
+            background: linear-gradient(180deg, #393b3d 0%, #232527 100%);
+            padding: 60px 24px;
+            text-align: center;
+            border-bottom: 1px solid #4a4c4f;
+        }
+
+        .hero-title {
+            font-size: 48px;
+            font-weight: 900;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #00b06f 0%, #00d4a0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 18px;
+            color: #b0b3b8;
+            font-weight: 500;
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 48px 24px;
+        }
+
+        /* Stock Info */
+        .stock-info {
+            background: #393b3d;
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 32px;
+            border: 1px solid #4a4c4f;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+        }
+
+        .stock-item {
+            text-align: center;
+        }
+
+        .stock-label {
+            font-size: 14px;
+            color: #b0b3b8;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .stock-value {
+            font-size: 32px;
+            font-weight: 900;
+            color: #00b06f;
+        }
+
+        .stock-value.warning {
+            color: #ffa116;
+        }
+
+        .stock-value.danger {
+            color: #ff4444;
+        }
+
+        /* Admin Panel */
+        .admin-panel {
+            background: #393b3d;
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 32px;
+            border: 2px solid #4a4c4f;
+        }
+
+        .admin-title {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 24px;
+            color: #ffa116;
+        }
+
+        .admin-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .control-label {
+            font-size: 14px;
+            font-weight: 700;
+            color: #b0b3b8;
+        }
+
+        .control-input {
+            background: #232527;
+            border: 2px solid #4a4c4f;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            font-family: inherit;
+        }
+
+        .control-input:focus {
+            outline: none;
+            border-color: #00b06f;
+        }
+
+        .btn-update {
+            background: #00b06f;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 16px;
+        }
+
+        .btn-update:hover {
+            background: #019a5f;
+        }
+
+        .btn-reset {
+            background: #ff4444;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 16px;
+            margin-left: 8px;
+        }
+
+        .btn-reset:hover {
+            background: #cc0000;
+        }
+
+        /* Orders */
+        .orders-section {
+            background: #393b3d;
+            border-radius: 16px;
+            padding: 32px;
+            border: 1px solid #4a4c4f;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 24px;
+        }
+
+        .order-card {
+            background: #232527;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 16px;
+            border: 2px solid #4a4c4f;
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .order-id {
+            font-size: 16px;
+            font-weight: 700;
+            color: #00b06f;
+        }
+
+        .order-badge {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .order-badge.instant {
+            background: rgba(0, 176, 111, 0.2);
+            color: #00b06f;
+        }
+
+        .order-badge.po {
+            background: rgba(255, 161, 22, 0.2);
+            color: #ffa116;
+        }
+
+        .order-badge.mixed {
+            background: rgba(100, 149, 237, 0.2);
+            color: #6495ed;
+        }
+
+        .order-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+        }
+
+        .order-detail {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: #6c7075;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .detail-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 24px;
+            color: #6c7075;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        .empty-text {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 36px;
+            }
+
+            .stock-info {
+                grid-template-columns: 1fr;
+            }
+
+            .admin-controls {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <div class="nav-logo-icon">🎮</div>
+                <span class="nav-logo-text">R STORE - ROBUX</span>
+            </div>
+            <div class="nav-actions">
+                <a href="index.html" class="btn-buy">Beli Robux</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <h1 class="hero-title">Lacak Pesanan</h1>
+        <p class="hero-subtitle">Monitor stock dan kelola pesanan Robux</p>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Stock Info -->
+        <div class="stock-info">
+            <div class="stock-item">
+                <div class="stock-label">Stock Ready</div>
+                <div class="stock-value" id="displayStock">0</div>
+            </div>
+            <div class="stock-item">
+                <div class="stock-label">Total PO</div>
+                <div class="stock-value warning" id="displayPO">0</div>
+            </div>
+            <div class="stock-item">
+                <div class="stock-label">Sisa Kuota PO</div>
+                <div class="stock-value" id="displayPORemaining">10,000</div>
+            </div>
+            <div class="stock-item">
+                <div class="stock-label">Total Pesanan</div>
+                <div class="stock-value" id="displayOrderCount">0</div>
+            </div>
+        </div>
+
+        <!-- Admin Panel -->
+        <div class="admin-panel">
+            <h2 class="admin-title">⚙️ Admin Panel</h2>
+            <div class="admin-controls">
+                <div class="control-group">
+                    <label class="control-label">Update Stock Ready</label>
+                    <input type="number" id="newStock" class="control-input" placeholder="Masukkan jumlah stock" min="0">
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Update PO</label>
+                    <input type="number" id="newPO" class="control-input" placeholder="Masukkan jumlah PO" min="0">
+                </div>
+            </div>
+            <div>
+                <button class="btn-update" onclick="updateStock()">💾 Update Stock</button>
+                <button class="btn-reset" onclick="resetStock()">🔄 Reset ke Default</button>
+            </div>
+        </div>
+
+        <!-- Orders Section -->
+        <div class="orders-section">
+            <h2 class="section-title">📦 Daftar Pesanan</h2>
+            <div id="ordersList">
+                <div class="empty-state">
+                    <div class="empty-icon">📭</div>
+                    <div class="empty-text">Belum ada pesanan</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const PO_LIMIT = 10000;
+
+        // Load and display stock data
+        async function loadStockData() {
+            try {
+                const stockData = await window.storage.get('robux-stock-data', true);
+                if (stockData) {
+                    const data = JSON.parse(stockData.value);
+                    updateStockDisplay(data.currentStock || 0, data.currentPO || 0);
+                } else {
+                    updateStockDisplay(0, 0);
+                }
+            } catch (error) {
+                console.log('No stock data found');
+                updateStockDisplay(0, 0);
+            }
+        }
+
+        // Update stock display
+        function updateStockDisplay(stock, po) {
+            document.getElementById('displayStock').textContent = stock.toLocaleString('id-ID');
+            document.getElementById('displayPO').textContent = po.toLocaleString('id-ID');
+            document.getElementById('displayPORemaining').textContent = (PO_LIMIT - po).toLocaleString('id-ID');
+            
+            // Update colors
+            const stockEl = document.getElementById('displayStock');
+            const poRemainingEl = document.getElementById('displayPORemaining');
+            
+            if (stock === 0) {
+                stockEl.className = 'stock-value danger';
+            } else if (stock < 1000) {
+                stockEl.className = 'stock-value warning';
+            } else {
+                stockEl.className = 'stock-value';
+            }
+
+            const remaining = PO_LIMIT - po;
+            if (remaining === 0) {
+                poRemainingEl.className = 'stock-value danger';
+            } else if (remaining < 2000) {
+                poRemainingEl.className = 'stock-value warning';
+            } else {
+                poRemainingEl.className = 'stock-value';
+            }
+        }
+
+        // Update stock manually
+        async function updateStock() {
+            const newStock = parseInt(document.getElementById('newStock').value);
+            const newPO = parseInt(document.getElementById('newPO').value);
+
+            if (isNaN(newStock) && isNaN(newPO)) {
+                alert('Masukkan nilai stock atau PO yang valid!');
+                return;
+            }
+
+            try {
+                // Get current data
+                const stockData = await window.storage.get('robux-stock-data', true);
+                const currentData = stockData ? JSON.parse(stockData.value) : { currentStock: 0, currentPO: 0 };
+
+                // Update with new values (only update if input is provided)
+                const updatedData = {
+                    currentStock: isNaN(newStock) ? currentData.currentStock : newStock,
+                    currentPO: isNaN(newPO) ? currentData.currentPO : newPO,
+                    lastUpdated: new Date().toISOString()
+                };
+
+                await window.storage.set('robux-stock-data', JSON.stringify(updatedData), true);
+                updateStockDisplay(updatedData.currentStock, updatedData.currentPO);
+                
+                alert('✅ Stock berhasil diupdate!');
+                document.getElementById('newStock').value = '';
+                document.getElementById('newPO').value = '';
+            } catch (error) {
+                console.error('Failed to update stock:', error);
+                alert('❌ Gagal mengupdate stock!');
+            }
+        }
+
+        // Reset stock to default
+        async function resetStock() {
+            if (!confirm('⚠️ Reset stock ke 0? Semua data stock akan dihapus!')) {
+                return;
+            }
+
+            try {
+                const resetData = {
+                    currentStock: 0,
+                    currentPO: 0,
+                    lastUpdated: new Date().toISOString()
+                };
+                await window.storage.set('robux-stock-data', JSON.stringify(resetData), true);
+                updateStockDisplay(0, 0);
+                alert('✅ Stock berhasil direset!');
+            } catch (error) {
+                console.error('Failed to reset stock:', error);
+                alert('❌ Gagal mereset stock!');
+            }
+        }
+
+        // Load orders
+        async function loadOrders() {
+            try {
+                const orderKeys = await window.storage.list('order:', true);
+                if (!orderKeys || orderKeys.keys.length === 0) {
+                    document.getElementById('ordersList').innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">📭</div>
+                            <div class="empty-text">Belum ada pesanan</div>
+                        </div>
+                    `;
+                    document.getElementById('displayOrderCount').textContent = '0';
+                    return;
+                }
+
+                const orders = [];
+                for (const key of orderKeys.keys) {
+                    try {
+                        const orderData = await window.storage.get(key, true);
+                        if (orderData) {
+                            orders.push(JSON.parse(orderData.value));
+                        }
+                    } catch (e) {
+                        console.log('Error loading order:', key);
+                    }
+                }
+
+                // Sort by date (newest first)
+                orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+                // Display orders
+                const ordersHTML = orders.map(order => `
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div class="order-id">Order #${order.orderId}</div>
+                            <div class="order-badge ${order.deliveryType.toLowerCase()}">${order.deliveryType}</div>
+                        </div>
+                        <div class="order-details">
+                            <div class="order-detail">
+                                <div class="detail-label">Jumlah Robux</div>
+                                <div class="detail-value">${order.amount.toLocaleString('id-ID')}</div>
+                            </div>
+                            <div class="order-detail">
+                                <div class="detail-label">Total Harga</div>
+                                <div class="detail-value">${order.price}</div>
+                            </div>
+                            <div class="order-detail">
+                                <div class="detail-label">Waktu Order</div>
+                                <div class="detail-value">${new Date(order.createdAt).toLocaleString('id-ID')}</div>
+                            </div>
+                            <div class="order-detail">
+                                <div class="detail-label">Info Pengiriman</div>
+                                <div class="detail-value" style="font-size: 12px;">${order.poInfo}</div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                document.getElementById('ordersList').innerHTML = ordersHTML;
+                document.getElementById('displayOrderCount').textContent = orders.length.toLocaleString('id-ID');
+            } catch (error) {
+                console.error('Failed to load orders:', error);
+            }
+        }
+
+        // Initialize
+        loadStockData();
+        loadOrders();
+
+        // Auto-refresh every 10 seconds
+        setInterval(() => {
+            loadStockData();
+            loadOrders();
+        }, 10000);
+    </script>
+</body>
+</html>

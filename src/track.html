@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pantau Pesanan - Roblox Store</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            padding: 20px 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .logo h1 {
+            color: white;
+            font-size: 32px;
+            font-weight: 900;
+        }
+
+        .back-button {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        .track-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .track-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .track-header h2 {
+            color: #333;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .track-header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .search-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .search-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .order-result {
+            display: none;
+        }
+
+        .order-result.show {
+            display: block;
+        }
+
+        .status-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            color: white;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .status-pending {
+            background: #ffa726;
+        }
+
+        .status-processing {
+            background: #29b6f6;
+        }
+
+        .status-completed {
+            background: #43e97b;
+        }
+
+        .status-rejected {
+            background: #ef5350;
+        }
+
+        .status-card h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .status-card p {
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .order-details {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .order-details h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: #666;
+            font-weight: 600;
+        }
+
+        .detail-value {
+            color: #333;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .timeline {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .timeline h3 {
+            color: #333;
+            margin-bottom: 25px;
+            font-size: 20px;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 20px;
+            padding-bottom: 25px;
+            position: relative;
+        }
+
+        .timeline-item:not(:last-child):before {
+            content: '';
+            position: absolute;
+            left: 19px;
+            top: 40px;
+            width: 2px;
+            height: calc(100% - 20px);
+            background: #e0e0e0;
+        }
+
+        .timeline-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            flex-shrink: 0;
+            z-index: 1;
+        }
+
+        .timeline-icon.inactive {
+            background: #e0e0e0;
+        }
+
+        .timeline-content {
+            flex: 1;
+            padding-top: 5px;
+        }
+
+        .timeline-title {
+            color: #333;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .timeline-time {
+            color: #999;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .timeline-desc {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .no-result {
+            text-align: center;
+            padding: 40px;
+            display: none;
+        }
+
+        .no-result.show {
+            display: block;
+        }
+
+        .no-result-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        .no-result h3 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .no-result p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            display: none;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .track-container {
+                padding: 20px;
+            }
+
+            .search-box {
+                flex-direction: column;
+            }
+
+            .detail-row {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .detail-value {
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">⬛</div>
+                <h1>ROBLOX</h1>
+            </div>
+            <a href="index.html" class="back-button">← Kembali</a>
+        </div>
+
+        <div class="track-container">
+            <div class="track-header">
+                <h2>📦 Pantau Pesanan</h2>
+                <p>Masukkan Order ID untuk melacak status pesanan Anda</p>
+            </div>
+
+            <div class="search-box">
+                <input type="text" class="search-input" id="orderIdInput" placeholder="Masukkan Order ID (contoh: RBX1234567890)">
+                <button class="search-button" onclick="searchOrder()">Cari Pesanan</button>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="loading-spinner"></div>
+                <p style="color: #666;">Mencari pesanan...</p>
+            </div>
+
+            <div class="no-result" id="noResult">
+                <div class="no-result-icon">🔍</div>
+                <h3>Pesanan Tidak Ditemukan</h3>
+                <p>Order ID yang Anda masukkan tidak ditemukan. Pastikan ID yang dimasukkan benar.</p>
+            </div>
+
+            <div class="order-result" id="orderResult">
+                <div class="status-card">
+                    <span class="status-badge" id="statusBadge">PENDING</span>
+                    <h3 id="statusTitle">Menunggu Verifikasi</h3>
+                    <p id="statusMessage">Pesanan Anda sedang dalam proses verifikasi pembayaran. Mohon tunggu 1-24 jam.</p>
+                </div>
+
+                <div class="order-details">
+                    <h3>📋 Detail Pesanan</h3>
+                    <div class="detail-row">
+                        <span class="detail-label">Order ID</span>
+                        <span class="detail-value" id="detailOrderId">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Username Roblox</span>
+                        <span class="detail-value" id="detailUsername">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Jumlah Robux</span>
+                        <span class="detail-value" id="detailRobux">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Total Pembayaran</span>
+                        <span class="detail-value" id="detailAmount">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Tipe Pengiriman</span>
+                        <span class="detail-value" id="detailDelivery">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Waktu Pemesanan</span>
+                        <span class="detail-value" id="detailTime">-</span>
+                    </div>
+                </div>
+
+                <div class="timeline">
+                    <h3>⏱️ Status Timeline</h3>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-icon" id="icon1">📝</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">Pesanan Dibuat</div>
+                            <div class="timeline-time" id="time1">-</div>
+                            <div class="timeline-desc">Pesanan berhasil dibuat dan menunggu verifikasi</div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-icon inactive" id="icon2">🔍</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">Verifikasi Pembayaran</div>
+                            <div class="timeline-time" id="time2">-</div>
+                            <div class="timeline-desc">Admin sedang memverifikasi bukti pembayaran Anda</div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-icon inactive" id="icon3">⚙️</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">Proses Pengiriman</div>
+                            <div class="timeline-time" id="time3">-</div>
+                            <div class="timeline-desc">Robux sedang diproses untuk dikirim ke akun Anda</div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-icon inactive" id="icon4">✅</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">Selesai</div>
+                            <div class="timeline-time" id="time4">-</div>
+                            <div class="timeline-desc">Robux telah berhasil dikirim ke akun Roblox Anda</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function searchOrder() {
+            const orderId = document.getElementById('orderIdInput').value.trim();
+            
+            if (!orderId) {
+                alert('❌ Masukkan Order ID terlebih dahulu!');
+                return;
+            }
+
+            document.getElementById('loading').classList.add('show');
+            document.getElementById('orderResult').classList.remove('show');
+            document.getElementById('noResult').classList.remove('show');
+
+            try {
+                const orderData = await window.storage.get(`order:${orderId}`, true);
+                
+                document.getElementById('loading').classList.remove('show');
+
+                if (orderData) {
+                    const order = JSON.parse(orderData.value);
+                    displayOrder(order);
+                } else {
+                    document.getElementById('noResult').classList.add('show');
+                }
+            } catch (error) {
+                console.log('Order not found:', error);
+                document.getElementById('loading').classList.remove('show');
+                document.getElementById('noResult').classList.add('show');
+            }
+        }
+
+        function displayOrder(order) {
+            document.getElementById('orderResult').classList.add('show');
+
+            const statusBadge = document.getElementById('statusBadge');
+            const statusTitle = document.getElementById('statusTitle');
+            const statusMessage = document.getElementById('statusMessage');
+
+            if (order.status === 'pending') {
+                statusBadge.className = 'status-badge status-pending';
+                statusBadge.textContent = 'PENDING';
+                statusTitle.textContent = 'Menunggu Verifikasi';
+                statusMessage.textContent = 'Pesanan Anda sedang dalam proses verifikasi pembayaran. Mohon tunggu 1-24 jam.';
+            } else if (order.status === 'processing') {
+                statusBadge.className = 'status-badge status-processing';
+                statusBadge.textContent = 'PROCESSING';
+                statusTitle.textContent = 'Sedang Diproses';
+                statusMessage.textContent = 'Pembayaran telah diverifikasi. Robux sedang diproses untuk dikirim ke akun Anda.';
+            } else if (order.status === 'completed') {
+                statusBadge.className = 'status-badge status-completed';
+                statusBadge.textContent = 'COMPLETED';
+                statusTitle.textContent = 'Pesanan Selesai';
+                statusMessage.textContent = `Robux telah berhasil dikirim ke akun ${order.username}. Jangan lupa tetap join grup minimal 15 hari!`;
+            } else if (order.status === 'rejected') {
+                statusBadge.className = 'status-badge status-rejected';
+                statusBadge.textContent = 'REJECTED';
+                statusTitle.textContent = 'Pesanan Ditolak';
+                statusMessage.textContent = 'Pembayaran tidak valid atau bukti transfer tidak sesuai. Silakan hubungi admin untuk informasi lebih lanjut.';
+            }
+
+            document.getElementById('detailOrderId').textContent = order.orderId;
+            document.getElementById('detailUsername').textContent = order.username;
+            document.getElementById('detailRobux').textContent = order.amount.toLocaleString('id-ID') + ' Robux';
+            document.getElementById('detailAmount').textContent = order.price;
+            document.getElementById('detailDelivery').textContent = order.deliveryType || '-';
+            document.getElementById('detailTime').textContent = new Date(order.timestamp).toLocaleString('id-ID');
+
+            const icon1 = document.getElementById('icon1');
+            const icon2 = document.getElementById('icon2');
+            const icon3 = document.getElementById('icon3');
+            const icon4 = document.getElementById('icon4');
+
+            const time1 = document.getElementById('time1');
+            const time2 = document.getElementById('time2');
+            const time3 = document.getElementById('time3');
+            const time4 = document.getElementById('time4');
+
+            time1.textContent = new Date(order.timeline.created).toLocaleString('id-ID');
+            icon1.classList.remove('inactive');
+
+            if (order.timeline.verified) {
+                time2.textContent = new Date(order.timeline.verified).toLocaleString('id-ID');
+                icon2.classList.remove('inactive');
+            } else {
+                time2.textContent = '-';
+                icon2.classList.add('inactive');
+            }
+
+            if (order.timeline.processing) {
+                time3.textContent = new Date(order.timeline.processing).toLocaleString('id-ID');
+                icon3.classList.remove('inactive');
+            } else {
+                time3.textContent = '-';
+                icon3.classList.add('inactive');
+            }
+
+            if (order.timeline.completed) {
+                time4.textContent = new Date(order.timeline.completed).toLocaleString('id-ID');
+                icon4.classList.remove('inactive');
+            } else {
+                time4.textContent = '-';
+                icon4.classList.add('inactive');
+            }
+        }
+
+        document.getElementById('orderIdInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchOrder();
+            }
+        });
+    </script>
+</body>
+</html>
