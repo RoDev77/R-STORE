@@ -94,49 +94,9 @@ p {
 ================================ */
 const DISCORD_WEBHOOK_URL =
   "https://discord.com/api/webhooks/1451905582117425215/2ZkLzr6avvdxXx-kd8gMNbJ2F11VyADWFji9gx-TAf6pOm5zCfth1wslEigh6S1ttBWE";
+  
 
-/* ===============================
-   GET ORDER ID
-================================ */
-const params = new URLSearchParams(location.search);
-const orderId = params.get("orderId");
-if (!orderId) location.href = "index.html";
-
-/* ===============================
-   FETCH ORDER (FIRESTORE)
-================================ */
-async function loadOrder() {
-  try {
-    const res = await fetch(`/api/order?id=${orderId}`);
-
-    if (res.status === 404) {
-      showPending();
-      return;
-    }
-
-    const data = await res.json();
-
-    document.getElementById("orderId").textContent = data.orderId;
-    document.getElementById("orderUsername").textContent = data.username;
-    document.getElementById("orderRobux").textContent =
-      Number(data.amount).toLocaleString("id-ID");
-    document.getElementById("orderAmount").textContent = data.price;
-    document.getElementById("orderStatus").textContent = data.status;
-
-    showSuccess();
-
-  } catch {
-    showError();
-  }
-}
-
-loadOrder();
-/* ===============================
-   SEND DISCORD (1x ONLY)
-================================ */
 async function sendDiscord(order) {
-  if (localStorage.getItem("discord_"+orderId)) return;
-
   const embed = {
     title: "🧾 Pesanan Robux Baru",
     color: 5763719,
@@ -145,69 +105,23 @@ async function sendDiscord(order) {
       { name: "Username", value: order.username, inline:true },
       { name: "Robux", value: order.amount.toLocaleString("id-ID"), inline:true },
       { name: "Total", value: order.price },
-      { name: "Delivery", value: order.deliveryType || "-" }
+      { name: "Status", value: "PENDING" }
     ],
-    footer:{text:"R STORE - ROBUX"},
-    timestamp:new Date()
+    footer:{ text:"R STORE" },
+    timestamp: new Date()
   };
 
-  await fetch(DISCORD_WEBHOOK_URL,{
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({
-      content:"🔔 Pesanan Robux baru masuk",
-      embeds:[embed]
+  await fetch(DISCORD_WEBHOOK_URL, {
+    method: "POST",
+    headers: { "Content-Type":"application/json" },
+    body: JSON.stringify({
+      content: "🔔 Pesanan Robux Baru",
+      embeds: [embed]
     })
   });
-
-  localStorage.setItem("discord_"+orderId,"sent");
 }
-
-/* ===============================
-   SUCCESS UI
-================================ */
-function show(order) {
-  icon.textContent = "✅";
-  title.textContent = "Pesanan Terkirim";
-  msg.innerHTML = `
-    Pesanan kamu berhasil dikirim ke admin.<br>
-    Robux akan dikirim ke <b>${order.username}</b>
-  `;
-
-  oid.textContent = order.orderId;
-  user.textContent = order.username;
-  rbx.textContent = order.amount.toLocaleString("id-ID");
-  price.textContent = order.price;
-  status.textContent = "PENDING";
-  status.style.color="#ffa726";
-
-  detail.style.display="block";
-  btn.style.display="inline-block";
-}
-
-/* ===============================
-   ERROR UI
-================================ */
-function errorUI() {
-  icon.textContent="❌";
-  title.textContent="Gagal";
-  msg.textContent="Terjadi kesalahan memproses pesanan";
-  btn.style.display="inline-block";
-}
-
-/* ===============================
-   INIT
-================================ */
-(async()=>{
-  try{
-    const order = await loadOrder();
-    await sendDiscord(order);
-    show(order);
-  }catch(e){
-    console.error(e);
-    errorUI();
-  }
-})();
 </script>
+
+
 </body>
 </html>
