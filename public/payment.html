@@ -187,39 +187,45 @@ async function sendToDiscord(payload) {
    SUBMIT FINAL
 ================================ */
 sendBtn.onclick = async () => {
-  if (!username.value) return alert("Username wajib");
-  if (!proofImage) return alert("Upload bukti");
+  const username = document.getElementById("username").value.trim();
+
+  if (!username) {
+    alert("Username Roblox wajib diisi");
+    return;
+  }
+
+  if (!proofBlob) {
+    alert("Upload bukti transfer dulu");
+    return;
+  }
+
+  sendBtn.disabled = true;
 
   const orderId = "RBX-" + Date.now();
 
-  const payload = {
+  const order = {
     orderId,
-    username: username.value,
+    username,
     amount,
     price,
     deliveryType,
     poInfo,
-    proofImage,
+    status: "PENDING",
+    createdAt: new Date().toISOString()
   };
 
-  sendBtn.disabled = true;
-
   try {
-    // 1️⃣ SIMPAN KE FIRESTORE
     await fetch("/api/order", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(order)
     });
 
-    // 2️⃣ DISCORD (ANTI HAPUS)
-    await sendToDiscord(payload);
+    await sendDiscord(order);
 
-    // 3️⃣ REDIRECT
     location.href = `process.html?orderId=${orderId}`;
-
   } catch (e) {
-    alert("Gagal memproses pesanan");
+    alert("Gagal mengirim pesanan");
     sendBtn.disabled = false;
   }
 };
