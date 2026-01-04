@@ -3,125 +3,126 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Processing - Roblox Store</title>
-
+<title>Processing Order - R Store</title>
+<link href="https://fonts.googleapis.com/css2?family=HK+Grotesk:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
-body {
-  font-family: system-ui, -apple-system, Segoe UI, sans-serif;
-  background: linear-gradient(135deg,#667eea,#764ba2);
-  min-height: 100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:20px;
-}
-.box {
-  background:#fff;
-  border-radius:20px;
-  padding:50px 40px;
-  max-width:500px;
-  width:100%;
-  text-align:center;
-  box-shadow:0 20px 60px rgba(0,0,0,.25);
-}
-.icon {
-  font-size:96px;
-  animation:pulse 1.5s infinite;
-}
-@keyframes pulse {
-  0%,100%{transform:scale(1)}
-  50%{transform:scale(1.1)}
-}
-h1 {
-  font-size:34px;
-  font-weight:900;
-  margin:16px 0;
-}
-p {
-  color:#666;
-  font-size:18px;
-}
-.detail {
-  display:none;
-  margin-top:24px;
-  background:#f8f9fa;
-  border-radius:12px;
-  padding:20px;
-  text-align:left;
-}
-.row {
-  display:flex;
-  justify-content:space-between;
-  padding:8px 0;
-  border-bottom:1px solid #ddd;
-}
-.row:last-child {border:none}
-.label {color:#666;font-weight:600}
-.value {font-weight:700}
-.btn {
-  display:none;
-  margin-top:24px;
-  padding:14px;
-  border-radius:12px;
-  text-decoration:none;
-  color:#fff;
-  font-weight:800;
-  background:linear-gradient(135deg,#667eea,#764ba2);
+*{box-sizing:border-box}
+body{margin:0;font-family:'HK Grotesk',sans-serif;background:linear-gradient(135deg,#667eea,#764ba2);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.box{background:#fff;border-radius:20px;padding:50px 40px;max-width:500px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.25);animation:slideUp .5s ease-out}
+@keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.icon{font-size:96px;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+h1{font-size:34px;font-weight:900;margin:16px 0;color:#333}
+.message{color:#666;font-size:18px;line-height:1.6;margin:16px 0}
+.detail{margin-top:32px;background:#f8f9fa;border-radius:12px;padding:24px;text-align:left}
+.row{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #e0e0e0}
+.row:last-child{border:none}
+.label{color:#666;font-weight:600}
+.value{font-weight:700;color:#333;text-align:right;word-break:break-all}
+.status-badge{display:inline-block;padding:6px 12px;border-radius:20px;font-size:14px;font-weight:700;background:linear-gradient(135deg,#ffa116,#ff6b6b);color:#fff}
+.btn-container{margin-top:32px;display:flex;gap:12px}
+.btn{flex:1;padding:16px;border-radius:12px;text-decoration:none;color:#fff;font-weight:800;font-size:16px;transition:all .3s;text-align:center;border:none;cursor:pointer;font-family:'HK Grotesk',sans-serif}
+.btn-primary{background:linear-gradient(135deg,#667eea,#764ba2)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(102,126,234,.4)}
+.btn-secondary{background:#6c757d}
+.btn-secondary:hover{background:#5a6268;transform:translateY(-2px)}
+.info-box{margin-top:24px;padding:16px;background:#fff3cd;border-left:4px solid #ffa116;border-radius:8px;text-align:left}
+.info-box p{margin:8px 0;font-size:14px;color:#856404}
+.copy-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:#667eea;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;transition:all .3s;margin-left:8px}
+.copy-btn:hover{background:#764ba2;transform:scale(1.05)}
+@media(max-width:768px){
+.box{padding:40px 24px}
+h1{font-size:28px}
+.icon{font-size:72px}
+.btn-container{flex-direction:column}
+.value{font-size:14px}
 }
 </style>
 </head>
-
 <body>
 <div class="box">
-  <div class="icon" id="icon">⏳</div>
-  <h1 id="title">Memproses...</h1>
-  <p id="msg">Pesanan kamu sedang diproses</p>
-
-  <div class="detail" id="detail">
-    <div class="row"><span class="label">Order ID</span><span class="value" id="oid">-</span></div>
-    <div class="row"><span class="label">Username</span><span class="value" id="user">-</span></div>
-    <div class="row"><span class="label">Robux</span><span class="value" id="rbx">-</span></div>
-    <div class="row"><span class="label">Total</span><span class="value" id="price">-</span></div>
-    <div class="row"><span class="label">Status</span><span class="value" id="status">-</span></div>
-  </div>
-
-  <a href="index.html" class="btn" id="btn">Kembali ke Store</a>
+<div class="icon">⏳</div>
+<h1>Pesanan Sedang Diproses</h1>
+<p class="message">Terima kasih! Pesanan kamu sudah diterima dan sedang dalam proses verifikasi pembayaran.</p>
+<div class="detail">
+<div class="row">
+<span class="label">Order ID</span>
+<span class="value">
+<span id="orderId">-</span>
+<button class="copy-btn" onclick="copyOrderId()">📋 Copy</button>
+</span>
 </div>
-
+<div class="row">
+<span class="label">Username</span>
+<span class="value" id="username">-</span>
+</div>
+<div class="row">
+<span class="label">Jumlah Robux</span>
+<span class="value" id="amount">-</span>
+</div>
+<div class="row">
+<span class="label">Total Bayar</span>
+<span class="value" id="price">-</span>
+</div>
+<div class="row">
+<span class="label">Status</span>
+<span class="value"><span class="status-badge">⏳ PENDING</span></span>
+</div>
+</div>
+<div class="info-box">
+<p><strong>ℹ️ Informasi:</strong></p>
+<p>• Pembayaran akan diverifikasi dalam 5-15 menit</p>
+<p>• Robux akan dikirim otomatis setelah verifikasi</p>
+<p>• Simpan Order ID untuk tracking pesanan</p>
+</div>
+<div class="btn-container">
+<a href="index.html" class="btn btn-secondary">← Kembali</a>
+<button class="btn btn-primary" id="trackBtn">🔍 Track Order</button>
+</div>
+</div>
 <script>
-/* ===============================
-   DISCORD WEBHOOK (ANTI HAPUS)
-================================ */
-const DISCORD_WEBHOOK_URL =
-  "https://discord.com/api/webhooks/1451905582117425215/2ZkLzr6avvdxXx-kd8gMNbJ2F11VyADWFji9gx-TAf6pOm5zCfth1wslEigh6S1ttBWE";
-  
+const params=new URLSearchParams(location.search);
+const orderId=params.get("orderId")||"-";
+const username=params.get("username")||"-";
+const amount=params.get("amount")||"0";
+const price=params.get("price")||"Rp 0";
 
-async function sendDiscord(order) {
-  const embed = {
-    title: "🧾 Pesanan Robux Baru",
-    color: 5763719,
-    fields: [
-      { name: "Order ID", value: order.orderId },
-      { name: "Username", value: order.username, inline:true },
-      { name: "Robux", value: order.amount.toLocaleString("id-ID"), inline:true },
-      { name: "Total", value: order.price },
-      { name: "Status", value: "PENDING" }
-    ],
-    footer:{ text:"R STORE" },
-    timestamp: new Date()
-  };
+document.getElementById('orderId').textContent=orderId;
+document.getElementById('username').textContent=decodeURIComponent(username);
+document.getElementById('amount').textContent=Number(amount).toLocaleString("id-ID")+" Robux";
+document.getElementById('price').textContent=decodeURIComponent(price);
 
-  await fetch(DISCORD_WEBHOOK_URL, {
-    method: "POST",
-    headers: { "Content-Type":"application/json" },
-    body: JSON.stringify({
-      content: "🔔 Pesanan Robux Baru",
-      embeds: [embed]
-    })
-  });
+function copyOrderId(){
+const orderIdText=document.getElementById('orderId').textContent;
+navigator.clipboard.writeText(orderIdText).then(()=>{
+const btn=document.querySelector('.copy-btn');
+const originalText=btn.innerHTML;
+btn.innerHTML='✅ Copied!';
+btn.style.background='#43e97b';
+setTimeout(()=>{
+btn.innerHTML=originalText;
+btn.style.background='#667eea';
+},2000);
+}).catch(()=>{
+alert('Gagal copy. Order ID: '+orderIdText);
+});
 }
+
+document.getElementById('trackBtn').onclick=function(){
+if(orderId&&orderId!=='-'){
+window.location.href=`track.html?search=${orderId}`;
+}else{
+window.location.href='track.html';
+}
+};
+
+setTimeout(()=>{
+document.querySelector('.icon').textContent='✅';
+document.querySelector('h1').textContent='Pesanan Diterima!';
+document.querySelector('.message').textContent='Admin akan segera memverifikasi pembayaran kamu. Robux akan dikirim dalam 5-15 menit.';
+document.querySelector('.status-badge').innerHTML='✅ RECEIVED';
+document.querySelector('.status-badge').style.background='linear-gradient(135deg,#43e97b,#38f9d7)';
+},2000);
 </script>
-
-
 </body>
 </html>

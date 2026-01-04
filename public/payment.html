@@ -3,231 +3,175 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Payment - Roblox Store</title>
-
+<title>Payment - R Store</title>
+<link href="https://fonts.googleapis.com/css2?family=HK+Grotesk:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
-body {
-  margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: linear-gradient(135deg,#667eea,#764ba2);
-  min-height: 100vh;
-  padding: 20px;
+*{box-sizing:border-box}
+body{margin:0;font-family:'HK Grotesk',sans-serif;background:linear-gradient(135deg,#667eea,#764ba2);min-height:100vh;padding:20px}
+.container{max-width:700px;margin:auto}
+.card{background:#fff;border-radius:20px;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+h2{text-align:center;margin-bottom:12px;font-size:28px}
+.payment-info{background:linear-gradient(135deg,#00b06f,#00d4a0);color:#fff;border-radius:14px;padding:24px;text-align:center;margin-bottom:24px}
+.payment-info>div:first-child{font-size:14px;opacity:.9;margin-bottom:8px}
+.payment-info .amount{font-size:42px;font-weight:900;margin:12px 0}
+.payment-info .total{font-size:18px;font-weight:700;margin-bottom:8px}
+.payment-info .delivery{font-size:14px;opacity:.9}
+.section{margin-bottom:24px}
+label{font-weight:700;display:block;margin-bottom:8px;font-size:16px}
+input[type="text"]{width:100%;padding:16px;border-radius:10px;border:2px solid #e0e0e0;font-size:16px;font-family:'HK Grotesk',sans-serif;transition:all .3s}
+input:focus{outline:none;border-color:#667eea;box-shadow:0 0 0 3px rgba(102,126,234,.1)}
+.qris{text-align:center}
+.qris h3{margin-bottom:16px}
+.qris img{max-width:280px;width:100%;border-radius:12px;border:3px solid #667eea;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.qris p{color:#666;margin-top:12px}
+.upload-box{border:2px dashed #667eea;padding:32px 24px;border-radius:12px;text-align:center;cursor:pointer;transition:all .3s;background:#f8f9fa}
+.upload-box:hover{border-color:#764ba2;background:#f0f0f0}
+.upload-box.done{border-color:#28a745;border-style:solid;background:#e9f8ee}
+.upload-box-text{font-weight:600;color:#666;margin-bottom:8px}
+.preview{max-width:100%;max-height:300px;margin-top:16px;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.actions{display:flex;gap:12px;margin-top:32px}
+.actions a,.actions button{flex:1;padding:18px;border-radius:12px;border:none;font-weight:800;font-size:16px;cursor:pointer;text-align:center;text-decoration:none;font-family:'HK Grotesk',sans-serif;transition:all .3s}
+.back{background:#6c757d;color:#fff}
+.back:hover{background:#5a6268;transform:translateY(-2px)}
+.send{background:linear-gradient(135deg,#43e97b,#38f9d7);color:#fff}
+.send:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 20px rgba(67,233,123,.4)}
+.send:disabled{opacity:.5;cursor:not-allowed;transform:none}
+@media(max-width:768px){
+.card{padding:24px}
+h2{font-size:24px}
+.payment-info .amount{font-size:36px}
+.actions{flex-direction:column}
 }
-.container { max-width: 700px; margin: auto; }
-.card { background: #fff; border-radius: 20px; padding: 32px; }
-h2 { text-align: center; margin-bottom: 12px; }
-
-.payment-info {
-  background: linear-gradient(135deg,#667eea,#764ba2);
-  color: #fff;
-  border-radius: 14px;
-  padding: 20px;
-  text-align: center;
-  margin-bottom: 24px;
-}
-.payment-info .amount { font-size: 40px; font-weight: 900; }
-
-.section { margin-bottom: 24px; }
-label { font-weight: 600; display: block; margin-bottom: 6px; }
-
-input[type="text"] {
-  width: 100%;
-  padding: 14px;
-  border-radius: 10px;
-  border: 2px solid #ddd;
-  font-size: 16px;
-}
-input:focus { outline: none; border-color: #667eea; }
-
-.qris { text-align: center; }
-.qris img {
-  max-width: 280px;
-  border-radius: 12px;
-  border: 3px solid #667eea;
-}
-
-.upload-box {
-  border: 2px dashed #667eea;
-  padding: 24px;
-  border-radius: 12px;
-  text-align: center;
-  cursor: pointer;
-}
-.upload-box.done { border-color: #28a745; background: #e9f8ee; }
-.preview { max-width: 100%; margin-top: 12px; border-radius: 10px; }
-
-.actions { display: flex; gap: 12px; }
-.actions a, .actions button {
-  flex: 1;
-  padding: 16px;
-  border-radius: 12px;
-  border: none;
-  font-weight: 800;
-  cursor: pointer;
-  text-align: center;
-  text-decoration: none;
-}
-.back { background: #6c757d; color: #fff; }
-.send { background: linear-gradient(135deg,#43e97b,#38f9d7); color: #fff; }
-.send:disabled { opacity: .6; cursor: not-allowed; }
 </style>
 </head>
-
 <body>
 <div class="container">
-  <div class="card">
-
-    <h2>💳 Pembayaran Robux</h2>
-
-    <div class="payment-info">
-      <div>Anda membeli</div>
-      <div class="amount">💎 <span id="amountText">-</span></div>
-      <div>Total: <span id="priceText">-</span></div>
-      <div id="deliveryText"></div>
-    </div>
-
-    <div class="section">
-      <label>👤 Username Roblox</label>
-      <input type="text" id="username" placeholder="Masukkan username Roblox">
-    </div>
-
-    <div class="section qris">
-      <h3>📱 Scan QRIS</h3>
-      <img src="/Qris.jpeg" alt="QRIS">
-      <p>Scan menggunakan aplikasi pembayaran</p>
-    </div>
-
-    <div class="section">
-      <label>📸 Upload Bukti Transfer</label>
-      <div class="upload-box" id="uploadBox">
-        Klik untuk upload bukti
-        <input type="file" id="fileInput" accept="image/*" hidden>
-        <img id="preview" class="preview" style="display:none">
-      </div>
-    </div>
-
-    <div class="actions">
-      <a href="index.html" class="back">Kembali</a>
-      <button class="send" id="sendBtn">Kirim Pesanan</button>
-    </div>
-
-  </div>
+<div class="card">
+<h2>💳 Pembayaran Robux</h2>
+<div class="payment-info">
+<div>Anda membeli</div>
+<div class="amount">💎 <span id="amountText">-</span> Robux</div>
+<div class="total">Total: <span id="priceText">-</span></div>
+<div class="delivery" id="deliveryText"></div>
 </div>
-
+<div class="section">
+<label>👤 Username Roblox</label>
+<input type="text" id="username" placeholder="Masukkan username Roblox kamu">
+</div>
+<div class="section qris">
+<h3>📱 Scan QRIS untuk Pembayaran</h3>
+<img src="/Qris.jpeg" alt="QRIS Payment" onerror="this.src='https://via.placeholder.com/280x280?text=QRIS+Not+Found'">
+<p>Scan menggunakan aplikasi pembayaran (GoPay, OVO, DANA, dll)</p>
+</div>
+<div class="section">
+<label>📸 Upload Bukti Transfer</label>
+<div class="upload-box" id="uploadBox">
+<div class="upload-box-text">📁 Klik untuk upload bukti pembayaran</div>
+<div style="font-size:12px;color:#999">Format: JPG, PNG (Max 5MB)</div>
+<input type="file" id="fileInput" accept="image/*" hidden>
+<img id="preview" class="preview" style="display:none">
+</div>
+</div>
+<div class="actions">
+<a href="index.html" class="back">← Kembali</a>
+<button class="send" id="sendBtn">Kirim Pesanan →</button>
+</div>
+</div>
+</div>
 <script>
-/* ===============================
-   DISCORD WEBHOOK (ANTI HAPUS)
-================================ */
-const DISCORD_WEBHOOK_URL =
-  "https://discord.com/api/webhooks/1451905582117425215/2ZkLzr6avvdxXx-kd8gMNbJ2F11VyADWFji9gx-TAf6pOm5zCfth1wslEigh6S1ttBWE";
-
-/* ===============================
-   PARAMETER URL
-================================ */
-const params = new URLSearchParams(location.search);
-const amount = Number(params.get("amount"));
-const price = params.get("price");
-const deliveryType = params.get("delivery");
-const poInfo = params.get("poInfo") || "";
-
-/* ===============================
-   TAMPILKAN KE UI (FIX FINAL)
-================================ */
-amountText.textContent = amount ? amount.toLocaleString("id-ID") : "-";
-priceText.textContent = price || "-";
-deliveryText.textContent = deliveryType ? deliveryType.replace(/\+/g, " ") : "";
-
-/* ===============================
-   STATE UPLOAD
-================================ */
-let proofBlob = null;
-
-uploadBox.onclick = () => fileInput.click();
-
-fileInput.onchange = () => {
-  const file = fileInput.files[0];
-  if (!file) return;
-
-  preview.src = URL.createObjectURL(file);
-  preview.style.display = "block";
-  uploadBox.classList.add("done");
-  proofBlob = file;
-};
-
-/* ===============================
-   SEND DISCORD (FILE ATTACHMENT)
-================================ */
-async function sendToDiscord(payload) {
-  const embed = {
-    title: "🧾 Pesanan Robux Baru",
-    color: 5763719,
-    fields: [
-      { name: "Order ID", value: payload.orderId },
-      { name: "Username", value: payload.username, inline: true },
-      { name: "Robux", value: payload.amount.toLocaleString("id-ID"), inline: true },
-      { name: "Total", value: payload.price },
-      { name: "Delivery", value: payload.deliveryType || "-" },
-      { name: "PO Info", value: payload.poInfo || "-" }
-    ],
-    footer: { text: "R STORE - ROBUX" },
-    timestamp: new Date()
-  };
-
-  const fd = new FormData();
-  fd.append("payload_json", JSON.stringify({
-    content: "🔔 Pesanan Robux baru masuk",
-    embeds: [embed]
-  }));
-  fd.append("file", proofBlob, "bukti_transfer.jpg");
-
-  await fetch(DISCORD_WEBHOOK_URL, { method: "POST", body: fd });
+const DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/1451905582117425215/2ZkLzr6avvdxXx-kd8gMNbJ2F11VyADWFji9gx-TAf6pOm5zCfth1wslEigh6S1ttBWE";
+const params=new URLSearchParams(location.search);
+const amount=Number(params.get("amount"))||0;
+const price=params.get("price")||"Rp 0";
+const delivery=params.get("delivery")||"Instant";
+document.getElementById('amountText').textContent=amount.toLocaleString("id-ID");
+document.getElementById('priceText').textContent=price;
+document.getElementById('deliveryText').textContent=delivery.replace(/\+/g," ");
+let proofBlob=null;
+const uploadBox=document.getElementById('uploadBox');
+const fileInput=document.getElementById('fileInput');
+const preview=document.getElementById('preview');
+uploadBox.onclick=()=>fileInput.click();
+fileInput.onchange=()=>{
+const file=fileInput.files[0];
+if(!file)return;
+if(file.size>5*1024*1024){
+alert('⚠️ File terlalu besar! Maksimal 5MB');
+return;
 }
-
-/* ===============================
-   SUBMIT FINAL
-================================ */
-sendBtn.onclick = async () => {
-  const username = document.getElementById("username").value.trim();
-
-  if (!username) {
-    alert("Username Roblox wajib diisi");
-    return;
-  }
-
-  if (!proofBlob) {
-    alert("Upload bukti transfer dulu");
-    return;
-  }
-
-  sendBtn.disabled = true;
-
-  const orderId = "RBX-" + Date.now();
-
-  const order = {
-    orderId,
-    username,
-    amount,
-    price,
-    deliveryType,
-    poInfo,
-    status: "PENDING",
-    createdAt: new Date().toISOString()
-  };
-
-  try {
-    await fetch("/api/order", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(order)
-    });
-
-    await sendDiscord(order);
-
-    location.href = `process.html?orderId=${orderId}`;
-  } catch (e) {
-    alert("Gagal mengirim pesanan");
-    sendBtn.disabled = false;
-  }
+const reader=new FileReader();
+reader.onload=(e)=>{
+preview.src=e.target.result;
+preview.style.display="block";
+uploadBox.classList.add("done");
+document.querySelector('.upload-box-text').textContent='✅ Bukti berhasil diupload';
+};
+reader.readAsDataURL(file);
+proofBlob=file;
+};
+async function sendToDiscord(order){
+const embed={
+title:"🧾 Pesanan Robux Baru",
+color:5763719,
+fields:[
+{name:"Order ID",value:order.orderId,inline:false},
+{name:"Username Roblox",value:order.username,inline:true},
+{name:"Jumlah Robux",value:order.amount.toLocaleString("id-ID"),inline:true},
+{name:"Total Pembayaran",value:order.price,inline:false},
+{name:"Tipe Pengiriman",value:order.delivery,inline:true},
+{name:"Status",value:"⏳ PENDING",inline:true},
+{name:"Waktu Order",value:new Date().toLocaleString('id-ID'),inline:false}
+],
+footer:{text:"R STORE - Robux Store"},
+timestamp:new Date().toISOString()
+};
+const formData=new FormData();
+formData.append("payload_json",JSON.stringify({
+content:"🔔 **PESANAN BARU MASUK!**",
+embeds:[embed]
+}));
+if(proofBlob){
+formData.append("file",proofBlob,`bukti_${order.orderId}.jpg`);
+}
+try{
+const response=await fetch(DISCORD_WEBHOOK_URL,{method:"POST",body:formData});
+if(!response.ok)throw new Error('Discord webhook failed');
+}catch(error){
+console.error('Error sending to Discord:',error);
+}
+}
+document.getElementById('sendBtn').onclick=async()=>{
+const username=document.getElementById("username").value.trim();
+if(!username){
+alert("❌ Username Roblox wajib diisi!");
+document.getElementById("username").focus();
+return;
+}
+if(!proofBlob){
+alert("❌ Upload bukti transfer terlebih dahulu!");
+return;
+}
+const sendBtn=document.getElementById('sendBtn');
+sendBtn.disabled=true;
+sendBtn.textContent="⏳ Memproses...";
+const orderId="RBX-"+Date.now();
+const order={orderId,username,amount,price,delivery,status:"PENDING",createdAt:new Date().toISOString()};
+try{
+await sendToDiscord(order);
+try{
+const saveResponse=await fetch("/api/order",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(order)});
+if(saveResponse.ok){
+console.log('Order saved to Firebase');
+}
+}catch(e){
+console.log('Firebase save failed (optional):',e);
+}
+location.href=`process.html?orderId=${orderId}&username=${encodeURIComponent(username)}&amount=${amount}&price=${encodeURIComponent(price)}`;
+}catch(error){
+alert("❌ Gagal mengirim pesanan. Coba lagi!");
+sendBtn.disabled=false;
+sendBtn.textContent="Kirim Pesanan →";
+}
 };
 </script>
 </body>

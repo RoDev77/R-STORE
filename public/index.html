@@ -3,11 +3,15 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Beli Robux</title>
+<title>Beli Robux - R Store</title>
 
 <link href="https://fonts.googleapis.com/css2?family=HK+Grotesk:wght@400;600;700;900&display=swap" rel="stylesheet">
 
 <style>
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   font-family: 'HK Grotesk', sans-serif;
@@ -21,6 +25,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
 }
 
 .nav-logo {
@@ -38,6 +43,12 @@ body {
   border-radius: 8px;
   text-decoration: none;
   font-weight: 700;
+  transition: all 0.3s;
+}
+
+.btn-track:hover {
+  background: #00d4a0;
+  transform: translateY(-2px);
 }
 
 .hero {
@@ -52,6 +63,12 @@ body {
   background: linear-gradient(135deg,#00b06f,#00d4a0);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero p {
+  color: #a0a0a0;
+  font-size: 16px;
 }
 
 .main {
@@ -66,26 +83,64 @@ body {
   padding: 20px;
   margin-bottom: 24px;
   border: 2px solid #4a4c4f;
+  transition: all 0.3s;
 }
 
-.stock-alert.available { border-color: #00b06f }
-.stock-alert.low { border-color: #ffa116 }
-.stock-alert.out { border-color: #ff4444 }
+.stock-alert.available { 
+  border-color: #00b06f;
+  background: rgba(0, 176, 111, 0.1);
+}
+
+.stock-alert.low { 
+  border-color: #ffa116;
+  background: rgba(255, 161, 22, 0.1);
+}
+
+.stock-alert.out { 
+  border-color: #ff4444;
+  background: rgba(255, 68, 68, 0.1);
+}
+
+.stock-alert strong {
+  display: block;
+  font-size: 18px;
+  margin-bottom: 4px;
+}
+
+#stockDesc {
+  color: #a0a0a0;
+  font-size: 14px;
+}
 
 .card {
   background: #393b3d;
   border-radius: 16px;
   padding: 32px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
 }
 
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
+  margin-bottom: 24px;
 }
 
 @media (max-width:768px) {
   .grid { grid-template-columns: 1fr }
+  .hero h1 { font-size: 32px }
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.input-group label {
+  font-weight: 600;
+  font-size: 14px;
+  color: #a0a0a0;
 }
 
 input {
@@ -97,11 +152,18 @@ input {
   color: #fff;
   font-size: 18px;
   font-weight: 700;
+  font-family: 'HK Grotesk', sans-serif;
+  transition: all 0.3s;
 }
 
 input:focus {
   outline: none;
   border-color: #00b06f;
+}
+
+input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .summary {
@@ -111,9 +173,20 @@ input:focus {
   margin: 24px 0;
 }
 
+.summary > div:first-child {
+  font-size: 14px;
+  opacity: 0.9;
+  margin-bottom: 4px;
+}
+
 .summary h2 {
   font-size: 40px;
-  margin: 0;
+  margin: 0 0 12px 0;
+}
+
+#deliveryInfo {
+  font-size: 14px;
+  opacity: 0.95;
 }
 
 .btn-buy {
@@ -126,12 +199,64 @@ input:focus {
   font-weight: 800;
   color: #fff;
   cursor: pointer;
+  transition: all 0.3s;
+  font-family: 'HK Grotesk', sans-serif;
+}
+
+.btn-buy:hover:not(:disabled) {
+  background: #00d4a0;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 176, 111, 0.4);
+}
+
+.btn-buy:active {
+  transform: translateY(0);
+}
+
+.btn-buy:disabled {
+  background: #666;
+  cursor: not-allowed;
+  transform: none;
+  opacity: 0.5;
+}
+
+.stock-info {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 16px;
+  padding: 16px;
+  background: #232527;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.stock-info div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stock-info strong {
+  font-size: 20px;
+  color: #00d4a0;
 }
 
 .footer {
   text-align: center;
   padding: 32px;
   color: #6c7075;
+  font-size: 14px;
+}
+
+.error {
+  color: #ff4444;
+  font-size: 14px;
+  margin-top: 8px;
+  display: none;
+}
+
+.error.show {
+  display: block;
 }
 </style>
 </head>
@@ -139,31 +264,43 @@ input:focus {
 <body>
 
 <nav class="navbar">
-  <div class="nav-logo">R STORE – ROBUX</div>
+  <div class="nav-logo">🎮 R STORE – ROBUX</div>
   <a href="track.html" class="btn-track">Lacak Pesanan</a>
 </nav>
 
 <section class="hero">
-  <h1>Beli Robux</h1>
-  <p>Masukkan jumlah Robux yang ingin dibeli</p>
+  <h1>Beli Robux Murah</h1>
+  <p>Pengiriman instant & harga terbaik untuk Robux kamu</p>
 </section>
 
 <main class="main">
 
 <div id="stockAlert" class="stock-alert available">
-  <strong id="stockTitle">Stock Tersedia</strong>
+  <strong id="stockTitle">✅ Stock Tersedia</strong>
   <div id="stockDesc">Pengiriman instant tersedia</div>
 </div>
 
 <div class="card">
   <div class="grid">
-    <div>
+    <div class="input-group">
       <label>Jumlah Robux</label>
-      <input type="number" id="robuxInput" min="100" step="10" placeholder="100">
+      <input type="number" id="robuxInput" min="100" step="10" placeholder="Minimal 100">
+      <div id="robuxError" class="error">Minimal pembelian 100 Robux</div>
+    </div>
+    <div class="input-group">
+      <label>Harga / Robux</label>
+      <input type="text" id="pricePerRobux" value="Rp 115" disabled>
+    </div>
+  </div>
+
+  <div class="stock-info">
+    <div>
+      <span>Stock Ready</span>
+      <strong id="stockReady">10,000</strong>
     </div>
     <div>
-      <label>Harga / Robux</label>
-      <input type="text" value="Rp 115" disabled>
+      <span>Pre-Order Available</span>
+      <strong id="poAvailable">5,000</strong>
     </div>
   </div>
 
@@ -173,73 +310,16 @@ input:focus {
     <div id="deliveryInfo">⚡ Pengiriman Instant</div>
   </div>
 
-  <button class="btn-buy" onclick="submitOrder()">Lanjutkan Pembayaran</button>
+  <button class="btn-buy" id="btnBuy">Lanjutkan Pembayaran</button>
 </div>
 
 </main>
 
 <footer class="footer">
-  © 2025 Roblox Store — Unofficial
+  © 2025 R Store — Unofficial Roblox Store
 </footer>
 
-<script>
-
-/* ===== CONFIG (NANTI BISA DARI FIRESTORE) ===== */
-const PRICE_PER_ROBUX = 115;
-const CURRENT_STOCK = 0;
-const CURRENT_PO = 0;
-const PO_LIMIT = 10000;
-
-/* ===== ELEMENT ===== */
-const robuxInput = document.getElementById('robuxInput');
-const totalPrice = document.getElementById('totalPrice');
-const deliveryInfo = document.getElementById('deliveryInfo');
-const stockAlert = document.getElementById('stockAlert');
-const stockTitle = document.getElementById('stockTitle');
-const stockDesc = document.getElementById('stockDesc');
-
-/* ===== UPDATE UI ===== */
-function updateUI() {
-  const robux = Number(robuxInput.value || 0);
-  const total = robux * PRICE_PER_ROBUX;
-  totalPrice.textContent = 'Rp ' + total.toLocaleString('id-ID');
-
-  if (CURRENT_STOCK <= 0) {
-    deliveryInfo.textContent = '📦 Pre-Order 15 hari kerja';
-    stockAlert.className = 'stock-alert out';
-    stockTitle.textContent = 'Pre-Order';
-    stockDesc.textContent = 'Stock habis – pesanan masuk PO';
-  } else if (robux > CURRENT_STOCK) {
-    deliveryInfo.textContent = `⚡ ${CURRENT_STOCK} Instant + 📦 ${robux - CURRENT_STOCK} PO`;
-    stockAlert.className = 'stock-alert low';
-  } else {
-    deliveryInfo.textContent = '⚡ Pengiriman Instant';
-    stockAlert.className = 'stock-alert available';
-  }
-}
-
-/* ===== SUBMIT ===== */
-function submitOrder() {
-  const robux = Number(robuxInput.value);
-  if (robux < 100) {
-    alert('Minimal pembelian 100 Robux');
-    return;
-  }
-
-  const total = robux * PRICE_PER_ROBUX;
-
-  const params = new URLSearchParams({
-    amount: robux,
-    price: 'Rp ' + total.toLocaleString('id-ID'),
-    delivery: deliveryInfo.textContent
-  });
-
-  window.location.href = 'payment.html?' + params.toString();
-}
-
-robuxInput.addEventListener('input', updateUI);
-updateUI();
-</script>
+<script src="./index.js"></script>
 
 </body>
 </html>
