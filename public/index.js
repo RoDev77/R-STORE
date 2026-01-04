@@ -3,7 +3,7 @@
 /* ===== CONFIG (LOADED FROM FIRESTORE) ===== */
 let PRICE_PER_ROBUX = 115;
 let CURRENT_STOCK = 0;
-let CURRENT_PO = 5000;
+let CURRENT_PO = 10000;
 let PO_LIMIT = 10000;
 
 /* ===== ELEMENT ===== */
