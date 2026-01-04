@@ -1,6 +1,5 @@
-/* order.js */
-
 import { db } from "./_firebase.js";
+import admin from "firebase-admin";
 
 export default async function handler(req, res) {
   // Set CORS headers
@@ -36,13 +35,23 @@ export default async function handler(req, res) {
 
       const orderData = orderDoc.data();
 
+      // Normalize field names for compatibility
       return res.status(200).json({
         success: true,
         data: {
           id: orderDoc.id,
-          ...orderData,
-          createdAt: orderData.createdAt?.toDate?.()?.toISOString() || null,
-          updatedAt: orderData.updatedAt?.toDate?.()?.toISOString() || null,
+          orderId: orderData.orderId || orderDoc.id,
+          username: orderData.username || orderData.userName || "-",
+          amount: orderData.amount || 0,
+          price: orderData.price || "Rp 0",
+          delivery: orderData.delivery || orderData.deliveryType || "Instant",
+          deliveryType: orderData.deliveryType || orderData.delivery || "Instant",
+          status: (orderData.status || "pending").toLowerCase(),
+          createdAt: orderData.createdAt || new Date().toISOString(),
+          verifiedAt: orderData.verifiedAt || null,
+          processingAt: orderData.processingAt || null,
+          completedAt: orderData.completedAt || null,
+          pricePerRobux: orderData.pricePerRobux || 115
         }
       });
     } catch (error) {
@@ -58,36 +67,45 @@ export default async function handler(req, res) {
   // POST: Create new order
   if (req.method === "POST") {
     try {
-      const { amount, price, username, delivery } = req.body;
+      const { orderId, amount, price, username, delivery, deliveryType, userName } = req.body;
 
-      if (!amount || !price || !username) {
+      if (!orderId || !amount || !price || (!username && !userName)) {
         return res.status(400).json({
           success: false,
-          error: "Missing required fields: amount, price, username"
+          error: "Missing required fields: orderId, amount, price, username"
         });
       }
 
+      const finalUsername = username || userName;
+
       const orderData = {
+        orderId: orderId,
         amount: parseInt(amount),
         price: price,
-        username: username,
-        delivery: delivery || "instant",
-        status: "pending",
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        username: finalUsername,
+        userName: finalUsername,
+        delivery: delivery || deliveryType || "instant",
+        deliveryType: deliveryType || delivery || "instant",
+        status: "PENDING",
+        createdAt: new Date().toISOString(),
+        verifiedAt: null,
+        processingAt: null,
+        completedAt: null,
+        pricePerRobux: 115
       };
 
-      const orderRef = await db.collection("orders").add(orderData);
+      // Use orderId as document ID for easy lookup
+      await db.collection("orders").doc(orderId).set(orderData);
+
+      console.log(`✅ Order created: ${orderId}`);
 
       return res.status(201).json({
         success: true,
-        data: {
-          id: orderRef.id,
-          ...orderData
-        }
+        message: "Order created successfully",
+        data: orderData
       });
     } catch (error) {
-      console.error("Error creating order:", error);
+      console.error("❌ Error creating order:", error);
       return res.status(500).json({
         success: false,
         error: "Failed to create order",
@@ -96,7 +114,51 @@ export default async function handler(req, res) {
     }
   }
 
-  // Method not allowed
+  // PUT: Update order status
+  if (req.method === "PUT") {
+    const { id } = req.query;
+    
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        error: "Order ID is required"
+      });
+    }
+
+    try {
+      const { status } = req.body;
+      
+      const updateData = {
+        status: status
+      };
+
+      // Add timestamp based on status
+      if (status === "processing") {
+        updateData.verifiedAt = new Date().toISOString();
+        updateData.processingAt = new Date().toISOString();
+      } else if (status === "completed") {
+        updateData.completedAt = new Date().toISOString();
+      }
+
+      await db.collection("orders").doc(id).update(updateData);
+
+      console.log(`✅ Order updated: ${id} -> ${status}`);
+
+      return res.status(200).json({
+        success: true,
+        message: "Order updated successfully"
+      });
+    } catch (error) {
+      console.error("❌ Error updating order:", error);
+      return res.status(500).json({
+        success: false,
+        error: "Failed to update order",
+        message: error.message
+      });
+    }
+  }
+
+  // Method not allowed ada
   return res.status(405).json({ 
     success: false,
     error: "Method not allowed" 
