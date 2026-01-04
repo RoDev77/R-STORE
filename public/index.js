@@ -71,7 +71,7 @@ function updateUI() {
   robuxError.classList.remove('show');
 
   // Disable button if invalid
-  if (robux < 100) {
+  if (robux < 10) {
     btnBuy.disabled = true;
     if (robux > 0) {
       robuxError.classList.add('show');
@@ -125,8 +125,8 @@ function updateUI() {
 function submitOrder() {
   const robux = Number(robuxInput.value);
   
-  if (robux < 100) {
-    alert('❌ Minimal pembelian 100 Robux');
+  if (robux < 10) {
+    alert('❌ Minimal pembelian 10 Robux');
     return;
   }
 
