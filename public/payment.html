@@ -183,6 +183,14 @@ try{
 const saveResponse=await fetch("/api/order",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(order)});
 const saveResult=await saveResponse.json();
 console.log('Firebase save result:',saveResult);
+if(saveResult.success){
+// Update stock after successful order
+await fetch("/api/config/update-stock",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({amount:parseInt(amount)})
+});
+}
 if(!saveResult.success){
 console.error('Firebase save failed:',saveResult);
 }

@@ -254,7 +254,7 @@ return`<button class="btn" disabled style="background:#ef5350;color:#fff">❌ Or
 
 async function updateOrderStatus(orderId,newStatus){
 const confirmMsg=newStatus==='rejected'?
-'Are you sure you want to REJECT this order?':
+'Are you sure you want to REJECT this order? Stock will be restored.':
 newStatus==='completed'?
 'Confirm that Robux has been sent to customer?':
 'Approve this order and start processing?';
@@ -267,6 +267,17 @@ body:JSON.stringify({status:newStatus})
 });
 const data=await response.json();
 if(data.success){
+// Restore stock if order is rejected
+if(newStatus==='rejected'){
+const order=allOrders.find(o=>(o.orderId||o.id)===orderId);
+if(order&&order.amount){
+await fetch('https://r-store-rho.vercel.app/api/config/restore-stock',{
+method:'POST',
+headers:{'Content-Type':'application/json'},
+body:JSON.stringify({amount:order.amount})
+});
+}
+}
 await sendDiscordNotification(orderId,newStatus);
 alert(`✅ Order ${orderId} updated to ${newStatus.toUpperCase()}`);
 loadOrders();

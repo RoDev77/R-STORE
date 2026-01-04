@@ -152,6 +152,13 @@ function submitOrder() {
 robuxInput.addEventListener('input', updateUI);
 btnBuy.addEventListener('click', submitOrder);
 
+/* ===== AUTO REFRESH CONFIG ===== */
+// Refresh config every 30 seconds to sync with Firestore
+setInterval(() => {
+  loadConfig();
+  console.log('🔄 Auto-refreshing config...');
+}, 30000);
+
 /* ===== INITIALIZE ===== */
 // Load config from Firestore first, then update UI
 loadConfig();
