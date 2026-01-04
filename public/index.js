@@ -2,7 +2,7 @@
 
 /* ===== CONFIG (LOADED FROM FIRESTORE) ===== */
 let PRICE_PER_ROBUX = 115;
-let CURRENT_STOCK = 10000;
+let CURRENT_STOCK = 0;
 let CURRENT_PO = 5000;
 let PO_LIMIT = 10000;
 
@@ -27,7 +27,7 @@ async function loadConfig() {
     
     if (data.success) {
       PRICE_PER_ROBUX = data.data.pricePerRobux || 115;
-      CURRENT_STOCK = data.data.currentStock || 10000;
+      CURRENT_STOCK = data.data.currentStock || 0;
       CURRENT_PO = data.data.currentPO || 0;
       PO_LIMIT = data.data.poLimit || 10000;
       
