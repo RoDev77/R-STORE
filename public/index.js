@@ -3,8 +3,8 @@
 /* ===== CONFIG (LOADED FROM FIRESTORE) ===== */
 let PRICE_PER_ROBUX = 115;
 let CURRENT_STOCK = 0;
-let CURRENT_PO = 10000;
-let PO_LIMIT = 10000;
+let CURRENT_PO = 0;
+let PO_LIMIT = 0;
 
 /* ===== ELEMENT ===== */
 const robuxInput = document.getElementById('robuxInput');
@@ -29,7 +29,7 @@ async function loadConfig() {
       PRICE_PER_ROBUX = data.data.pricePerRobux || 115;
       CURRENT_STOCK = data.data.currentStock || 0;
       CURRENT_PO = data.data.currentPO || 0;
-      PO_LIMIT = data.data.poLimit || 10000;
+      PO_LIMIT = data.data.poLimit || 0;
       
       // Update UI with loaded config
       pricePerRobuxInput.value = 'Rp ' + formatNumber(PRICE_PER_ROBUX);

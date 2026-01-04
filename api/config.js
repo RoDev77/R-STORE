@@ -22,8 +22,8 @@ export default async function handler(req, res) {
           success: true,
           data: {
             currentPO: 0,
-            currentStock: 10000,
-            poLimit: 10000,
+            currentStock: 0,
+            poLimit: 0,
             pricePerRobux: 115
           }
         });
@@ -52,8 +52,8 @@ export default async function handler(req, res) {
         success: true,
         data: {
           currentPO: 0,
-          currentStock: 10000,
-          poLimit: 10000,
+          currentStock: 0,
+          poLimit: 0,
           pricePerRobux: 115
         }
       });
