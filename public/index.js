@@ -83,11 +83,11 @@ function updateUI() {
   // Update delivery info and stock alert
   if (CURRENT_STOCK <= 0) {
     // No stock, all PO
-    if (robux <= CURRENT_PO) {
+    if (robux <= PO_LIMIT) {
       deliveryInfo.textContent = '📦 Pre-Order (15 hari kerja)';
       stockAlert.className = 'stock-alert out';
       stockTitle.textContent = '📦 Pre-Order Mode';
-      stockDesc.textContent = `Stock habis – Sisa PO: ${formatNumber(CURRENT_PO)} Robux`;
+      stockDesc.textContent = `Stock habis – Sisa PO: ${formatNumber(PO_LIMIT)} Robux`;
     } else {
       deliveryInfo.textContent = '❌ Melebihi kapasitas PO';
       stockAlert.className = 'stock-alert out';
