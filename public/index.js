@@ -1,10 +1,10 @@
 /* index.js */
 
-/* ===== CONFIG ===== */
-const PRICE_PER_ROBUX = 115;
+/* ===== CONFIG (LOADED FROM FIRESTORE) ===== */
+let PRICE_PER_ROBUX = 115;
 let CURRENT_STOCK = 10000;
 let CURRENT_PO = 5000;
-const PO_LIMIT = 10000;
+let PO_LIMIT = 10000;
 
 /* ===== ELEMENT ===== */
 const robuxInput = document.getElementById('robuxInput');
@@ -17,6 +17,36 @@ const stockReady = document.getElementById('stockReady');
 const poAvailable = document.getElementById('poAvailable');
 const btnBuy = document.getElementById('btnBuy');
 const robuxError = document.getElementById('robuxError');
+const pricePerRobuxInput = document.getElementById('pricePerRobux');
+
+/* ===== LOAD CONFIG FROM FIRESTORE ===== */
+async function loadConfig() {
+  try {
+    const response = await fetch('https://r-store-rho.vercel.app/api/config');
+    const data = await response.json();
+    
+    if (data.success) {
+      PRICE_PER_ROBUX = data.data.pricePerRobux || 115;
+      CURRENT_STOCK = data.data.currentStock || 10000;
+      CURRENT_PO = data.data.currentPO || 0;
+      PO_LIMIT = data.data.poLimit || 10000;
+      
+      // Update UI with loaded config
+      pricePerRobuxInput.value = 'Rp ' + formatNumber(PRICE_PER_ROBUX);
+      updateStockDisplay();
+      updateUI();
+      
+      console.log('✅ Config loaded:', data.data);
+    } else {
+      console.warn('⚠️ Failed to load config, using defaults');
+    }
+  } catch (error) {
+    console.error('❌ Failed to load config:', error);
+    // Use default values if fetch fails
+    updateStockDisplay();
+    updateUI();
+  }
+}
 
 /* ===== FORMAT NUMBER ===== */
 function formatNumber(num) {
@@ -120,10 +150,8 @@ function submitOrder() {
 
 /* ===== EVENT LISTENERS ===== */
 robuxInput.addEventListener('input', updateUI);
-
-// Add click event listener to button
 btnBuy.addEventListener('click', submitOrder);
 
-// Initialize
-updateStockDisplay();
-updateUI();
+/* ===== INITIALIZE ===== */
+// Load config from Firestore first, then update UI
+loadConfig();
