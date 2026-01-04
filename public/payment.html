@@ -155,16 +155,39 @@ const sendBtn=document.getElementById('sendBtn');
 sendBtn.disabled=true;
 sendBtn.textContent="⏳ Memproses...";
 const orderId="RBX-"+Date.now();
-const order={orderId,username,amount,price,delivery,status:"PENDING",createdAt:new Date().toISOString()};
+
+// Convert proof to base64 for storage
+const reader=new FileReader();
+reader.onload=async function(e){
+const proofBase64=e.target.result;
+
+const order={
+orderId:orderId,
+userName:username,
+username:username,
+amount:parseInt(amount),
+price:price,
+delivery:delivery,
+deliveryType:delivery,
+status:"PENDING",
+createdAt:new Date().toISOString(),
+verifiedAt:null,
+processingAt:null,
+completedAt:null,
+pricePerRobux:115,
+proofUrl:proofBase64
+};
 try{
 await sendToDiscord(order);
 try{
 const saveResponse=await fetch("/api/order",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(order)});
-if(saveResponse.ok){
-console.log('Order saved to Firebase');
+const saveResult=await saveResponse.json();
+console.log('Firebase save result:',saveResult);
+if(!saveResult.success){
+console.error('Firebase save failed:',saveResult);
 }
 }catch(e){
-console.log('Firebase save failed (optional):',e);
+console.error('Firebase save error:',e);
 }
 location.href=`process.html?orderId=${orderId}&username=${encodeURIComponent(username)}&amount=${amount}&price=${encodeURIComponent(price)}`;
 }catch(error){
@@ -172,6 +195,8 @@ alert("❌ Gagal mengirim pesanan. Coba lagi!");
 sendBtn.disabled=false;
 sendBtn.textContent="Kirim Pesanan →";
 }
+};
+reader.readAsDataURL(proofBlob);
 };
 </script>
 </body>
