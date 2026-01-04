@@ -40,18 +40,22 @@ export default async function handler(req, res) {
 
       let newStock = currentStock;
       let newPO = currentPO;
+      let usedStock = 0;
+      let usedPO = 0;
 
       // Deduct from stock first
       if (amount <= currentStock) {
         // All from stock
         newStock = currentStock - amount;
+        usedStock = amount;
+        usedPO = 0;
       } else {
-        // Partial from stock, rest from PO
-        const fromStock = currentStock;
-        const fromPO = amount - fromStock;
+        // Use all stock, then use PO
+        usedStock = currentStock;
+        usedPO = amount - currentStock;
         
         newStock = 0;
-        newPO = Math.max(0, currentPO - fromPO);
+        newPO = Math.max(0, currentPO - usedPO);
       }
 
       // Update Firestore
@@ -59,10 +63,12 @@ export default async function handler(req, res) {
         currentStock: newStock,
         currentPO: newPO,
         lastOrderAmount: amount,
+        lastOrderStock: usedStock,
+        lastOrderPO: usedPO,
         lastUpdated: admin.firestore.FieldValue.serverTimestamp()
       });
 
-      console.log(`✅ Stock updated: Stock ${currentStock} → ${newStock}, PO ${currentPO} → ${newPO}`);
+      console.log(`✅ Stock updated: Stock ${currentStock}→${newStock} (-${usedStock}), PO ${currentPO}→${newPO} (-${usedPO})`);
 
       return res.status(200).json({
         success: true,
@@ -72,7 +78,9 @@ export default async function handler(req, res) {
           newStock: newStock,
           previousPO: currentPO,
           newPO: newPO,
-          deducted: amount
+          deducted: amount,
+          fromStock: usedStock,
+          fromPO: usedPO
         }
       });
     } catch (error) {

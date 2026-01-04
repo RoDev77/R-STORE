@@ -2,7 +2,7 @@
 
 /* ===== CONFIG (LOADED FROM FIRESTORE) ===== */
 let PRICE_PER_ROBUX = 115;
-let CURRENT_STOCK = 0;
+let CURRENT_STOCK = 10000;
 let CURRENT_PO = 5000;
 let PO_LIMIT = 10000;
 
@@ -27,7 +27,7 @@ async function loadConfig() {
     
     if (data.success) {
       PRICE_PER_ROBUX = data.data.pricePerRobux || 115;
-      CURRENT_STOCK = data.data.currentStock || 0;
+      CURRENT_STOCK = data.data.currentStock || 10000;
       CURRENT_PO = data.data.currentPO || 0;
       PO_LIMIT = data.data.poLimit || 10000;
       
@@ -56,7 +56,7 @@ function formatNumber(num) {
 /* ===== UPDATE STOCK DISPLAY ===== */
 function updateStockDisplay() {
   stockReady.textContent = formatNumber(CURRENT_STOCK);
-  poAvailable.textContent = formatNumber(PO_LIMIT);
+  poAvailable.textContent = formatNumber(CURRENT_PO);
 }
 
 /* ===== UPDATE UI ===== */
@@ -83,16 +83,16 @@ function updateUI() {
   // Update delivery info and stock alert
   if (CURRENT_STOCK <= 0) {
     // No stock, all PO
-    if (robux <= PO_LIMIT) {
+    if (robux <= CURRENT_PO) {
       deliveryInfo.textContent = '📦 Pre-Order (15 hari kerja)';
       stockAlert.className = 'stock-alert out';
       stockTitle.textContent = '📦 Pre-Order Mode';
-      stockDesc.textContent = `Stock habis – Sisa PO: ${formatNumber(PO_LIMIT)} Robux`;
+      stockDesc.textContent = `Stock habis – Sisa PO: ${formatNumber(CURRENT_PO)} Robux`;
     } else {
       deliveryInfo.textContent = '❌ Melebihi kapasitas PO';
       stockAlert.className = 'stock-alert out';
       stockTitle.textContent = '❌ Tidak Tersedia';
-      stockDesc.textContent = `Maksimal PO: ${formatNumber(PO_LIMIT)} Robux`;
+      stockDesc.textContent = `Maksimal PO: ${formatNumber(CURRENT_PO)} Robux`;
       btnBuy.disabled = true;
     }
   } else if (robux > CURRENT_STOCK) {
@@ -100,7 +100,7 @@ function updateUI() {
     const instantPart = CURRENT_STOCK;
     const poPart = robux - CURRENT_STOCK;
     
-    if (poPart <= PO_LIMIT) {
+    if (poPart <= CURRENT_PO) {
       deliveryInfo.textContent = `⚡ ${formatNumber(instantPart)} Instant + 📦 ${formatNumber(poPart)} PO`;
       stockAlert.className = 'stock-alert low';
       stockTitle.textContent = '⚠️ Stock Terbatas';
@@ -109,7 +109,7 @@ function updateUI() {
       deliveryInfo.textContent = '❌ Melebihi kapasitas';
       stockAlert.className = 'stock-alert out';
       stockTitle.textContent = '❌ Tidak Tersedia';
-      stockDesc.textContent = `Maksimal: ${formatNumber(CURRENT_STOCK + PO_LIMIT)} Robux`;
+      stockDesc.textContent = `Maksimal: ${formatNumber(CURRENT_STOCK + CURRENT_PO)} Robux`;
       btnBuy.disabled = true;
     }
   } else {
@@ -131,7 +131,7 @@ function submitOrder() {
   }
 
   const total = robux * PRICE_PER_ROBUX;
-  const maxAvailable = CURRENT_STOCK + PO_LIMIT;
+  const maxAvailable = CURRENT_STOCK + CURRENT_PO;
 
   if (robux > maxAvailable) {
     alert(`❌ Maksimal pembelian saat ini: ${formatNumber(maxAvailable)} Robux`);
