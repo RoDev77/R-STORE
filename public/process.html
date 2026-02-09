@@ -83,45 +83,19 @@ p {
     <div class="row"><span class="label">Robux</span><span class="value" id="rbx">-</span></div>
     <div class="row"><span class="label">Total</span><span class="value" id="price">-</span></div>
     <div class="row"><span class="label">Status</span><span class="value" id="status">-</span></div>
+    <div class="row"><span class="label">Delivery</span><span class="value" id="delivery">-</span></div>
+    <div class="row"><span class="label">Rate</span><span class="value" id="rate">-</span></div>
+    <!-- bukti transfer -->
+    <div style="margin-top:14px; display:none;" id="proofWrap">
+      <div class="label" style="margin-bottom:8px;">Bukti Transfer</div>
+      <img id="proofImg" alt="Bukti Transfer" style="width:100%; border-radius:12px; border:1px solid #ddd;">
+    </div>
   </div>
 
   <a href="index.html" class="btn" id="btn">Kembali ke Store</a>
 </div>
 
-<script>
-/* ===============================
-   DISCORD WEBHOOK (ANTI HAPUS)
-================================ */
-const DISCORD_WEBHOOK_URL =
-  "https://discord.com/api/webhooks/1451905582117425215/2ZkLzr6avvdxXx-kd8gMNbJ2F11VyADWFji9gx-TAf6pOm5zCfth1wslEigh6S1ttBWE";
-  
-
-async function sendDiscord(order) {
-  const embed = {
-    title: "🧾 Pesanan Robux Baru",
-    color: 5763719,
-    fields: [
-      { name: "Order ID", value: order.orderId },
-      { name: "Username", value: order.username, inline:true },
-      { name: "Robux", value: order.amount.toLocaleString("id-ID"), inline:true },
-      { name: "Total", value: order.price },
-      { name: "Status", value: "PENDING" }
-    ],
-    footer:{ text:"R STORE" },
-    timestamp: new Date()
-  };
-
-  await fetch(DISCORD_WEBHOOK_URL, {
-    method: "POST",
-    headers: { "Content-Type":"application/json" },
-    body: JSON.stringify({
-      content: "🔔 Pesanan Robux Baru",
-      embeds: [embed]
-    })
-  });
-}
-</script>
-
+<script type="module" src="./process.js"></script>
 
 </body>
 </html>

@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Refund Policy - R STORE</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 40px 20px;
+  }
+  
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 40px;
+    animation: fadeInDown 0.8s ease-out;
+  }
+  
+  .header h1 {
+    color: white;
+    font-size: 48px;
+    font-weight: 900;
+    margin-bottom: 12px;
+    text-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  }
+  
+  .header .subtitle {
+    color: rgba(255,255,255,0.95);
+    font-size: 16px;
+    font-weight: 600;
+  }
+  
+  .header .last-updated {
+    color: rgba(255,255,255,0.85);
+    font-size: 14px;
+    margin-top: 8px;
+    font-weight: 500;
+  }
+  
+  /* Content Card */
+  .content-card {
+    background: white;
+    border-radius: 24px;
+    padding: 50px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    animation: fadeInUp 0.8s ease-out 0.2s both;
+    margin-bottom: 30px;
+  }
+  
+  /* Introduction */
+  .intro {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    padding: 25px;
+    border-radius: 16px;
+    border-left: 5px solid #3b82f6;
+    margin-bottom: 40px;
+  }
+  
+  .intro p {
+    color: #1e40af;
+    font-size: 15px;
+    line-height: 1.8;
+    font-weight: 500;
+  }
+  
+  /* Section */
+  .section {
+    margin-bottom: 40px;
+  }
+  
+  .section:last-child {
+    margin-bottom: 0;
+  }
+  
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 24px;
+    font-weight: 800;
+    color: #1f2937;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 3px solid #e5e7eb;
+  }
+  
+  .section-icon {
+    font-size: 28px;
+  }
+  
+  .section-content {
+    color: #4b5563;
+    font-size: 15px;
+    line-height: 1.8;
+  }
+  
+  .section-content p {
+    margin-bottom: 16px;
+  }
+  
+  .section-content p:last-child {
+    margin-bottom: 0;
+  }
+  
+  /* List Styles */
+  .info-list {
+    list-style: none;
+    padding: 0;
+    margin: 16px 0;
+  }
+  
+  .info-list li {
+    padding: 14px 20px;
+    margin-bottom: 12px;
+    position: relative;
+    color: #4b5563;
+    font-size: 15px;
+    line-height: 1.7;
+    background: #f9fafb;
+    border-radius: 10px;
+    border-left: 4px solid #667eea;
+  }
+  
+  /* Success List */
+  .success-list li {
+    background: #ecfdf5;
+    border-left-color: #10b981;
+  }
+  
+  .success-list li::before {
+    content: '✓';
+    position: absolute;
+    left: -28px;
+    color: #10b981;
+    font-weight: 900;
+    font-size: 20px;
+  }
+  
+  /* Warning List */
+  .warning-list li {
+    background: #fef2f2;
+    border-left-color: #ef4444;
+  }
+  
+  .warning-list li::before {
+    content: '✗';
+    position: absolute;
+    left: -28px;
+    color: #ef4444;
+    font-weight: 900;
+    font-size: 20px;
+  }
+  
+  /* Alert Boxes */
+  .alert-box {
+    padding: 20px;
+    border-radius: 12px;
+    margin: 20px 0;
+    border-left: 5px solid;
+  }
+  
+  .alert-box p {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.7;
+    margin: 0;
+  }
+  
+  .alert-success {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    border-left-color: #10b981;
+  }
+  
+  .alert-success p {
+    color: #065f46;
+  }
+  
+  .alert-warning {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border-left-color: #f59e0b;
+  }
+  
+  .alert-warning p {
+    color: #78350f;
+  }
+  
+  .alert-danger {
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    border-left-color: #ef4444;
+  }
+  
+  .alert-danger p {
+    color: #991b1b;
+  }
+  
+  .alert-info {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    border-left-color: #3b82f6;
+  }
+  
+  .alert-info p {
+    color: #1e40af;
+  }
+  
+  /* Process Steps */
+  .process-steps {
+    display: grid;
+    gap: 16px;
+    margin: 24px 0;
+  }
+  
+  .step-item {
+    display: flex;
+    gap: 16px;
+    padding: 20px;
+    background: #f9fafb;
+    border-radius: 12px;
+    border-left: 4px solid #667eea;
+    transition: all 0.3s ease;
+  }
+  
+  .step-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  
+  .step-number {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 900;
+    font-size: 18px;
+  }
+  
+  .step-content {
+    flex: 1;
+  }
+  
+  .step-title {
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 6px;
+    font-size: 16px;
+  }
+  
+  .step-desc {
+    color: #6b7280;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  
+  /* Timeline */
+  .timeline {
+    position: relative;
+    padding-left: 40px;
+    margin: 24px 0;
+  }
+  
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, #667eea, #764ba2);
+  }
+  
+  .timeline-item {
+    position: relative;
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+  }
+  
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -33px;
+    top: 5px;
+    width: 16px;
+    height: 16px;
+    background: white;
+    border: 4px solid #667eea;
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px rgba(102,126,234,0.2);
+  }
+  
+  .timeline-title {
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 8px;
+    font-size: 16px;
+  }
+  
+  .timeline-desc {
+    color: #6b7280;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  
+  /* Stats Card */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin: 24px 0;
+  }
+  
+  .stat-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 24px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(102,126,234,0.3);
+  }
+  
+  .stat-icon {
+    font-size: 36px;
+    margin-bottom: 8px;
+  }
+  
+  .stat-value {
+    font-size: 28px;
+    font-weight: 900;
+    color: white;
+    margin-bottom: 4px;
+  }
+  
+  .stat-label {
+    color: rgba(255,255,255,0.9);
+    font-size: 13px;
+    font-weight: 600;
+  }
+  
+  /* FAQ Style */
+  .faq-item {
+    background: #f9fafb;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    border-left: 4px solid #667eea;
+  }
+  
+  .faq-question {
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 8px;
+    font-size: 16px;
+  }
+  
+  .faq-answer {
+    color: #6b7280;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+  
+  /* Contact Box */
+  .contact-box {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 30px;
+    border-radius: 16px;
+    text-align: center;
+    margin-top: 40px;
+    box-shadow: 0 8px 30px rgba(102,126,234,0.3);
+  }
+  
+  .contact-box h3 {
+    color: white;
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 12px;
+  }
+  
+  .contact-box p {
+    color: rgba(255,255,255,0.95);
+    font-size: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .contact-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 32px;
+    background: white;
+    color: #667eea;
+    font-size: 16px;
+    font-weight: 800;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  }
+  
+  .contact-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+  }
+  
+  /* Back Button */
+  .back-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: white;
+    color: #667eea;
+    font-size: 16px;
+    font-weight: 700;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    animation: fadeInUp 0.8s ease-out 0.4s both;
+  }
+  
+  .back-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+  }
+  
+  /* Animations */
+  @keyframes fadeInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .header h1 {
+      font-size: 32px;
+    }
+    
+    .content-card {
+      padding: 30px 25px;
+    }
+    
+    .section-title {
+      font-size: 20px;
+    }
+    
+    .section-content {
+      font-size: 14px;
+    }
+    
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .timeline {
+      padding-left: 30px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <h1>💰 Refund Policy</h1>
+    <p class="subtitle">Kebijakan Pengembalian Dana R STORE</p>
+    <p class="last-updated">Terakhir diperbarui: 29 Desember 2025</p>
+  </div>
+  
+  <!-- Content Card -->
+  <div class="content-card">
+    
+    <!-- Introduction -->
+    <div class="intro">
+      <p>
+        <strong>R STORE</strong> berkomitmen untuk memberikan layanan terbaik. Kami memahami bahwa dalam beberapa kondisi tertentu, pengembalian dana mungkin diperlukan. Berikut adalah kebijakan lengkap mengenai refund.
+      </p>
+    </div>
+    
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">⚡</div>
+        <div class="stat-value">1-3</div>
+        <div class="stat-label">Hari Kerja Proses Refund</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">💯</div>
+        <div class="stat-value">100%</div>
+        <div class="stat-label">Garansi Uang Kembali*</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🛡️</div>
+        <div class="stat-value">24/7</div>
+        <div class="stat-label">Support Tersedia</div>
+      </div>
+    </div>
+    
+    <!-- Section 1 -->
+    <div class="section">
+      <h2 class="section-title">
+        <span class="section-icon">✅</span>
+        Kondisi Refund 100% Diterima
+      </h2>
+      <div class="section-content">
+        <p>Anda berhak mendapatkan refund 100% dalam kondisi berikut:</p>
+        <ul class="info-list success-list">
+          <li><strong>Robux tidak dapat dikirim</strong> karena kesalahan sistem atau technical error dari pihak R STORE</li>
+          <li><strong>Proses Pre-Order melebihi 15 hari kerja</strong> tanpa konfirmasi atau update dari admin</li>
+          <li><strong>Double payment</strong> - Anda melakukan pembayaran 2x untuk pesanan yang sama</li>
+          <li><strong>Admin konfirmasi tidak bisa proses</strong> karena alasan teknis dari pihak kami</li>
+          <li><strong>Robux dikirim ke akun yang salah</strong> karena kesalahan input dari admin kami</li>
+          <li><strong>Jumlah Robux tidak sesuai</strong> dengan yang dipesan (kurang dari pesanan)</li>
+        </ul>
+        <div class="alert-box alert-success">
+          <p>✓ Untuk kasus-kasus di atas, refund akan diproses TANPA potongan apapun (100% full refund)</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Section 2 -->
+    <div class="section">
+      <h2 class="section-title">
+        <span class="section-icon">❌</span>
+        Kondisi Refund TIDAK Dapat Diterima
+      </h2>
+      <div class="section-content">
+        <p>Refund TIDAK akan diproses dalam kondisi berikut:</p>
+        <ul class="info-list warning-list">
+          <li><strong>Belum join grup 15 hari</strong> dan tidak sabar menunggu proses PO</li>
+          <li><strong>Robux sudah berhasil dikirim</strong> ke akun yang benar sesuai pesanan</li>
+          <li><strong>Berubah pikiran</strong> setelah pembayaran dilakukan</li>
+          <li><strong>Akun Roblox di-banned</strong> karena aktivitas mencurigakan dari pembeli</li>
+          <li><strong>Proses masih dalam waktu normal</strong> (kurang dari 30 menit untuk instant)</li>
+          <li><strong>Kehilangan Robux</strong> karena hacking, phishing, atau kelalaian pembeli</li>
+          <li><strong>Tidak ada bukti pembayaran</strong> yang valid</li>
+        </ul>
+        <div class="alert-box alert-danger">
+          <p>⚠️ PENTING: Pastikan username Roblox yang Anda masukkan BENAR sebelum melakukan pembayaran. Kami tidak bertanggung jawab atas kesalahan input dari pembeli!</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Section 3 -->
+    <div class="section">
+      <h2 class="section-title">
+        <span class="section-icon">⏱️</span>
+        Waktu Pengajuan Refund
+      </h2>
+      <div class="section-content">
+        <p>Pengajuan refund memiliki batasan waktu sebagai berikut:</p>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-title">Instant Order (Stock Tersedia)</div>
+            <div class="timeline-desc">Refund dapat diajukan setelah 30 menit jika Robux belum masuk dan tidak ada update dari admin</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-title">Pre-Order</div>
+            <div class="timeline-desc">Refund dapat diajukan setelah 15 hari kerja jika tidak ada update atau konfirmasi pengiriman</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-title">Maksimal Pengajuan</div>
+            <div class="timeline-desc">Refund harus diajukan maksimal 30 hari setelah tanggal pembayaran. Lewat dari itu, refund tidak dapat diproses</div>
+          </div>
+        </div>
+        <div class="alert-box alert-warning">
+          <p>📌 Simpan semua bukti transaksi dan komunikasi dengan admin untuk mempercepat proses refund</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Section 4 -->
+    <div class="section">
+      <h2 class="section-title">
+        <span class="section-icon">📋</span>
+        Cara Mengajukan Refund
+      </h2>
+      <div class="section-content">
+        <p>Ikuti langkah-langkah berikut untuk mengajukan refund:</p>
+        <div class="process-steps">
+          <div class="step-item">
+            <div class="step-number">1</div>
+            <div class="step-content">
+              <div class="step-title">Hubungi Admin</div>
+              <div class="step-desc">Hubungi admin melalui Discord dengan menyertakan detail pesanan Anda</div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-number">2</div>
+            <div class="step-content">
+              <div class="step-title">Siapkan Bukti</div>
+              <div class="step-desc">Siapkan bukti pembayaran, screenshot order, dan komunikasi sebelumnya</div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-number">3</div>
+            <div class="step-content">
+              <div class="step-title">Jelaskan Alasan</div>
+              <div class="step-desc">Jelaskan alasan refund dengan detail dan jelas</div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-number">4</div>
+            <div class="step-content">
+              <div class="step-title">Tunggu Verifikasi</div>
+              <div class="step-desc">Admin akan memverifikasi pesanan dan alasan refund (1-2 hari kerja)</div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-number">5</div>
+            <div class="step-content">
+              <div class="step-title">Proses Refund</div>
+              <div class="step-desc">Jika disetujui, refund akan diproses ke metode pembayaran yang sama (1-3 hari kerja)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Section 5 -->
+    <div class="section">
+      <h2 class="section-title">
+        <span class="section-icon">💳</span>
+        Metode Pengembalian Dana
+      </h2>
+      <div class="section-content">
+        <p>Refund hanya dapat dilakukan ke metode pembayaran berikut:</p>
+        <ul class="info-list">
+          <li><strong>E-Wallet:</strong> DANA, OVO, GOPAY, LINK AJA, SHOPEEPAY</li>
+          <li><strong>Digital Bank:</strong> SEA BANK, BANK JAGO</li>
+          <li><strong>Bank Transfer:</strong> BCA, BNI, BRI, Mandiri, dan bank lainnya</li>
+          <li><strong>Waktu proses:</strong> 1-3 hari kerja setelah approval</li>
+          <li><strong>Notifikasi:</strong> Anda akan mendapat konfirmasi ketika refund sudah diproses</li>
+          <li><strong>No fee:</strong> Tidak ada biaya admin untuk refund yang sah</li>
+        </ul>
+        <div class="alert-box alert-warning">
+          <p>⚠️ PENTING: Pastikan Anda memberikan nomor/rekening yang aktif dan valid. Refund yang gagal karena nomor salah TIDAK dapat diulang!</p>
+        </div>
+        <div class="alert-box alert-info">
+          <p>ℹ️ Waktu sampai dana ke rekening Anda tergantung dari bank/e-wallet masing-masing (biasanya 1-2x24 jam)</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Section 6 -->
+    <div class="section">
+      <h2 class="section-title">
+        <span class="section-icon">🔍</span>
+        Proses Investigasi
+      </h2>
+      <div class="section-content">
+        <p>Sebelum refund diproses, kami akan melakukan investigasi untuk memastikan validitas klaim:</p>
+        <ul class="info-list">
+          <li>Verifikasi bukti pembayaran dan order ID</li>
+          <li>Pengecekan status pengiriman Robux</li>
+          <li>Review komunikasi dengan admin</li>
+          <li>Konfirmasi username Roblox yang digunakan</li>
+          <li>Pengecekan history transaksi</li>
+        </ul>
+        <p style="margin-top: 16px;">Proses investigasi biasanya memakan waktu 1-2 hari kerja. Kami akan menghubungi Anda jika memerlukan informasi tambahan.</p>
+      </div>
+    </div>
+    
+    <!-- Section 7 -->
+    <div class="section">
+      <h2 class="section-title">
+        <span class="section-icon">❓</span>
+        FAQ Refund
+      </h2>
+      <div class="section-content">
+        <div class="faq-item">
+          <div class="faq-question">Q: Berapa lama proses refund?</div>
+          <div class="faq-answer">A: Setelah disetujui, refund diproses dalam 1-3 hari kerja. Dana sampai ke rekening tergantung bank/e-wallet Anda.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">Q: Apakah ada potongan biaya untuk refund?</div>
+          <div class="faq-answer">A: TIDAK ada potongan biaya untuk refund yang sah. Anda akan menerima 100% dari jumlah yang dibayarkan.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">Q: Bagaimana jika saya salah input username?</div>
+          <div class="faq-answer">A: Kesalahan username dari pembeli TIDAK dapat di-refund. Pastikan username benar sebelum pembayaran!</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">Q: Apakah bisa refund sebagian?</div>
+          <div class="faq-answer">A: Tidak, refund hanya bisa full amount (100%) atau tidak sama sekali, tergantung kondisi.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">Q: Bagaimana jika proses PO lama?</div>
+          <div class="faq-answer">A: Jika PO melebihi 15 hari kerja tanpa update, Anda berhak mengajukan refund 100%.</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Section 8 -->
+    <div class="section">
+      <h2 class="section-title">
+        <span class="section-icon">⚠️</span>
+        Hal yang Perlu Diperhatikan
+      </h2>
+      <div class="section-content">
+        <div class="alert-box alert-warning">
+          <p><strong>PENTING!</strong> Sebelum melakukan pembayaran, pastikan:</p>
+        </div>
+        <ul class="info-list">
+          <li>Username Roblox yang Anda masukkan 100% BENAR</li>
+          <li>Sudah join grup R STUDIO LAB minimal 15 hari untuk instant delivery</li>
+          <li>Memahami waktu proses sesuai status (instant/PO)</li>
+          <li>Menyimpan semua bukti transaksi dan komunikasi</li>
+          <li>Membaca semua Terms of Service dengan teliti</li>
+        </ul>
+        <div class="alert-box alert-danger">
+          <p>🚫 Pengajuan refund palsu atau berulang kali dapat mengakibatkan blacklist permanen!</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Contact Box -->
+    <div class="contact-box">
+      <h3>💬 Butuh Bantuan dengan Refund?</h3>
+      <p>Jika Anda memerlukan bantuan atau ingin mengajukan refund, hubungi admin kami segera!</p>
+      <a href="https://discord.gg/AUAzsxPP27" class="contact-button">
+        📞 Hubungi Admin
+      </a>
+    </div>
+    
+  </div>
+  
+  <!-- Back Button -->
+  <div style="text-align: center;">
+    <a href="index.html" class="back-button">
+      ← Kembali ke Beranda
+    </a>
+  </div>
+  
+</div>
+
+</body>
+</html>

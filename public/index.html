@@ -3,243 +3,232 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Beli Robux</title>
+<title>Beli Robux - R STORE</title>
 
 <link href="https://fonts.googleapis.com/css2?family=HK+Grotesk:wght@400;600;700;900&display=swap" rel="stylesheet">
-
-<style>
-body {
-  margin: 0;
-  font-family: 'HK Grotesk', sans-serif;
-  background: #232527;
-  color: #fff;
-}
-
-.navbar {
-  background: #393b3d;
-  padding: 16px 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.nav-logo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-weight: 900;
-  font-size: 20px;
-}
-
-.btn-track {
-  background: #00b06f;
-  color: #fff;
-  padding: 10px 18px;
-  border-radius: 8px;
-  text-decoration: none;
-  font-weight: 700;
-}
-
-.hero {
-  padding: 48px 24px;
-  text-align: center;
-  background: linear-gradient(180deg, #393b3d, #232527);
-}
-
-.hero h1 {
-  font-size: 42px;
-  margin-bottom: 8px;
-  background: linear-gradient(135deg,#00b06f,#00d4a0);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.main {
-  max-width: 900px;
-  margin: auto;
-  padding: 32px 24px;
-}
-
-.stock-alert {
-  background: #393b3d;
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 24px;
-  border: 2px solid #4a4c4f;
-}
-
-.stock-alert.available { border-color: #00b06f }
-.stock-alert.low { border-color: #ffa116 }
-.stock-alert.out { border-color: #ff4444 }
-
-.card {
-  background: #393b3d;
-  border-radius: 16px;
-  padding: 32px;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-}
-
-@media (max-width:768px) {
-  .grid { grid-template-columns: 1fr }
-}
-
-input {
-  width: 100%;
-  padding: 16px;
-  border-radius: 8px;
-  border: 2px solid #4a4c4f;
-  background: #232527;
-  color: #fff;
-  font-size: 18px;
-  font-weight: 700;
-}
-
-input:focus {
-  outline: none;
-  border-color: #00b06f;
-}
-
-.summary {
-  background: linear-gradient(135deg,#00b06f,#00d4a0);
-  border-radius: 12px;
-  padding: 24px;
-  margin: 24px 0;
-}
-
-.summary h2 {
-  font-size: 40px;
-  margin: 0;
-}
-
-.btn-buy {
-  width: 100%;
-  padding: 18px;
-  background: #00b06f;
-  border: none;
-  border-radius: 12px;
-  font-size: 18px;
-  font-weight: 800;
-  color: #fff;
-  cursor: pointer;
-}
-
-.footer {
-  text-align: center;
-  padding: 32px;
-  color: #6c7075;
-}
-</style>
+<link rel="stylesheet" href="index.css">
 </head>
 
 <body>
+
+<div class="loading-screen" id="loadingScreen">
+  <div class="load-cube"></div>
+  <div class="load-cube"></div>
+  <div class="load-cube"></div>
+  <div class="load-cube"></div>
+  
+  <div class="load-particles">
+    <div class="load-particle"></div>
+    <div class="load-particle"></div>
+    <div class="load-particle"></div>
+    <div class="load-particle"></div>
+    <div class="load-particle"></div>
+    <div class="load-particle"></div>
+    <div class="load-particle"></div>
+    <div class="load-particle"></div>
+    <div class="load-particle"></div>
+    <div class="load-particle"></div>
+  </div>
+  
+  <div class="load-content">
+    <div class="load-spinner">
+      <div class="spin-ring"></div>
+      <div class="spin-ring"></div>
+      <div class="spin-ring"></div>
+      
+      <div class="orbit-dots">
+        <div class="orbit-dot"></div>
+        <div class="orbit-dot"></div>
+        <div class="orbit-dot"></div>
+      </div>
+      
+      <div class="load-logo">
+        <img src="./images/favicon.png" alt="RS Logo" style="width: 70px; height: 70px; object-fit: contain; position: relative; z-index: 1; filter: drop-shadow(0 4px 12px rgba(255,255,255,0.6));">
+      </div>
+    </div>
+    
+    <div class="load-progress">
+      <div class="progress-track">
+        <div class="progress-bar-fill" id="progressBarFill"></div>
+      </div>
+      <div class="progress-percent" id="progressPercent">0%</div>
+    </div>
+    
+    <div class="load-title">
+      <span class="load-letter">R</span>
+      <span class="load-letter">S</span>
+      <span class="load-letter">T</span>
+      <span class="load-letter">O</span>
+      <span class="load-letter">R</span>
+      <span class="load-letter">E</span>
+    </div>
+    
+    <div class="load-subtitle">Toko Robux Dengan Rate Rendah & Instant</div>
+  </div>
+</div>
 
 <nav class="navbar">
   <div class="nav-logo">R STORE – ROBUX</div>
   <a href="track.html" class="btn-track">Lacak Pesanan</a>
 </nav>
 
-<section class="hero">
+<section class="hero" id="custom-robux">
   <h1>Beli Robux</h1>
   <p>Masukkan jumlah Robux yang ingin dibeli</p>
 </section>
 
 <main class="main">
 
+<!-- Enhanced Stock Alert -->
 <div id="stockAlert" class="stock-alert available">
-  <strong id="stockTitle">Stock Tersedia</strong>
-  <div id="stockDesc">Pengiriman instant tersedia</div>
+  <div class="stock-header">
+    <div class="stock-icon" id="stockIcon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="stock-info">
+      <strong id="stockTitle">Stock Tersedia</strong>
+      <div id="stockDesc">Pengiriman instant tersedia</div>
+    </div>
+    <div class="stock-badge" id="stockBadge">TERSEDIA</div>
+  </div>
+  
+  <!-- Stock Progress Bar -->
+  <div class="stock-progress-container">
+    <div class="stock-progress-header">
+      <span class="stock-label">Stock Saat Ini</span>
+      <span class="stock-count" id="stockCount">
+        <span id="stockNumber">0</span> Robux
+      </span>
+    </div>
+    <div class="stock-progress-bar">
+      <div class="stock-progress-fill" id="stockProgressFill"></div>
+      <div class="stock-progress-glow"></div>
+    </div>
+    <div class="stock-progress-labels">
+      <span class="stock-min">0</span>
+      <span class="stock-max" id="stockMax">100.000</span>
+    </div>
+  </div>
 </div>
 
 <div class="card">
   <div class="grid">
     <div>
       <label>Jumlah Robux</label>
-      <input type="number" id="robuxInput" min="100" step="10" placeholder="100">
+      <input type="number" id="robuxInput" min="10" step="10" placeholder="10">
     </div>
     <div>
       <label>Harga / Robux</label>
-      <input type="text" value="Rp 115" disabled>
+      <input type="text" id="pricePerRobuxInput" value="Rp 115" disabled>
     </div>
   </div>
 
   <div class="summary">
-    <div>Total Pembayaran</div>
+    <div class="summary-header">
+      <span>Total Pembayaran</span>
+      <div class="delivery-badge" id="deliveryBadge">
+        <span id="deliveryInfo">⚡ Pengiriman Instant</span>
+      </div>
+    </div>
     <h2 id="totalPrice">Rp 0</h2>
-    <div id="deliveryInfo">⚡ Pengiriman Instant</div>
+    
+    <!-- Order Details -->
+    <div class="order-details">
+      <div class="detail-row">
+        <span>Jumlah Robux:</span>
+        <strong id="detailRobux">0</strong>
+      </div>
+      <div class="detail-row">
+        <span>Rate per Robux:</span>
+        <strong id="detailRate">Rp 115</strong>
+      </div>
+      <div class="detail-divider"></div>
+      <div class="detail-row total">
+        <span>Total:</span>
+        <strong id="detailTotal">Rp 0</strong>
+      </div>
+    </div>
   </div>
 
-  <button class="btn-buy" onclick="submitOrder()">Lanjutkan Pembayaran</button>
+  <button class="btn-buy" id="btnBuy">
+    <span class="btn-icon">💎</span>
+    <span>Lanjutkan Pembayaran</span>
+    <span class="btn-arrow">→</span>
+  </button>
 </div>
 
 </main>
 
+<!-- Modern Footer -->
 <footer class="footer">
-  © 2025 Roblox Store — Unofficial
+    <div class="footer-content">
+        <div class="footer-section">
+            <h3>💎 R STORE</h3>
+            <p>Salah satu toko Robux terpercaya di Indonesia. instant, harga murah, aman & legal.</p>
+            
+            <div class="trust-badges">
+                <span class="trust-badge">✓ Aman & Legal</span>
+                <span class="trust-badge">⚡ Instant</span>
+                <span class="trust-badge">💯 Terpercaya</span>
+            </div>
+            
+            <div class="social-links" style="margin-top: 20px;">
+                <a href="https://www.roblox.com/communities/13174452/R-TEAMX#!/about" class="social-link" title="Roblox">
+                  <img src="./images/roblox-icon.png" alt="Roblox" style="width: 24px; height: 24px; position: relative; z-index: 1;">
+                </a>
+                <a href="https://discord.gg/AUAzsxPP27" class="social-link" title="Discord">
+                    <img src="./images/discord-icon.jpg" alt="Discord" style="width: 24px; height: 24px; position: relative; z-index: 1;">
+                </a>
+                <a href="https://www.youtube.com/@ahmadrodiii" class="social-link" title="YouTube">
+                    <img src="./images/youtube-icon.png" alt="YouTube" style="width: 24px; height: 24px; position: relative; z-index: 1;">
+                </a>
+                <a href="https://www.instagram.com/ahmadrodiii" class="social-link" title="Instagram">
+                    <img src="./images/instagram-icon.png" alt="Instagram" style="width: 24px; height: 24px; position: relative; z-index: 1;">
+                </a>
+            </div>
+        </div>
+
+        <div class="footer-section">
+            <h3>🔗 Quick Links</h3>
+            <div class="footer-links">
+                <a href="#custom-robux">Custom Robux</a>
+                <a href="carabeli.html">Cara Beli</a>
+                <a href="#testimonial">Testimoni</a>
+                <a href="#faq">FAQ</a>
+                <a href="https://discord.gg/AUAzsxPP27">Support</a>
+            </div>
+        </div>
+
+        <div class="footer-section">
+            <h3>💳 Payment</h3>
+            <p>Metode pembayaran yang tersedia:</p>
+            <div class="payment-methods">
+                <div class="payment-icon">QRIS</div>
+            </div>
+        </div>
+
+        <div class="footer-section">
+            <h3>📞 Hubungi Kami</h3>
+            <p>Punya pertanyaan? Chat admin kami sekarang!</p>
+            <div class="contact-form">
+                <a href="https://discord.gg/AUAzsxPP27" class="contact-btn">Administrator</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <p>&copy; 2025 R STUDIO. All rights reserved. Made with ❤️ in Indonesia</p>
+        <div class="footer-bottom-links">
+            <a href="privacy.html">Privacy Policy</a>
+            <a href="terms.html">Terms of Service</a>
+            <a href="reffund.html">Refund Policy</a>
+        </div>
+    </div>
 </footer>
 
-<script>
-
-/* ===== CONFIG (NANTI BISA DARI FIRESTORE) ===== */
-const PRICE_PER_ROBUX = 115;
-const CURRENT_STOCK = 0;
-const CURRENT_PO = 0;
-const PO_LIMIT = 10000;
-
-/* ===== ELEMENT ===== */
-const robuxInput = document.getElementById('robuxInput');
-const totalPrice = document.getElementById('totalPrice');
-const deliveryInfo = document.getElementById('deliveryInfo');
-const stockAlert = document.getElementById('stockAlert');
-const stockTitle = document.getElementById('stockTitle');
-const stockDesc = document.getElementById('stockDesc');
-
-/* ===== UPDATE UI ===== */
-function updateUI() {
-  const robux = Number(robuxInput.value || 0);
-  const total = robux * PRICE_PER_ROBUX;
-  totalPrice.textContent = 'Rp ' + total.toLocaleString('id-ID');
-
-  if (CURRENT_STOCK <= 0) {
-    deliveryInfo.textContent = '📦 Pre-Order 15 hari kerja';
-    stockAlert.className = 'stock-alert out';
-    stockTitle.textContent = 'Pre-Order';
-    stockDesc.textContent = 'Stock habis – pesanan masuk PO';
-  } else if (robux > CURRENT_STOCK) {
-    deliveryInfo.textContent = `⚡ ${CURRENT_STOCK} Instant + 📦 ${robux - CURRENT_STOCK} PO`;
-    stockAlert.className = 'stock-alert low';
-  } else {
-    deliveryInfo.textContent = '⚡ Pengiriman Instant';
-    stockAlert.className = 'stock-alert available';
-  }
-}
-
-/* ===== SUBMIT ===== */
-function submitOrder() {
-  const robux = Number(robuxInput.value);
-  if (robux < 100) {
-    alert('Minimal pembelian 100 Robux');
-    return;
-  }
-
-  const total = robux * PRICE_PER_ROBUX;
-
-  const params = new URLSearchParams({
-    amount: robux,
-    price: 'Rp ' + total.toLocaleString('id-ID'),
-    delivery: deliveryInfo.textContent
-  });
-
-  window.location.href = 'payment.html?' + params.toString();
-}
-
-robuxInput.addEventListener('input', updateUI);
-updateUI();
-</script>
+<script type="module" src="./index.js"></script>
 
 </body>
 </html>

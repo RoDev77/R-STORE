@@ -93,7 +93,7 @@ input:focus { outline: none; border-color: #667eea; }
 
     <div class="section qris">
       <h3>📱 Scan QRIS</h3>
-      <img src="/Qris.jpeg" alt="QRIS">
+      <img src="./images/Qris.jpeg" alt="QRIS">
       <p>Scan menggunakan aplikasi pembayaran</p>
     </div>
 
@@ -114,121 +114,6 @@ input:focus { outline: none; border-color: #667eea; }
   </div>
 </div>
 
-<script>
-/* ===============================
-   DISCORD WEBHOOK (ANTI HAPUS)
-================================ */
-const DISCORD_WEBHOOK_URL =
-  "https://discord.com/api/webhooks/1451905582117425215/2ZkLzr6avvdxXx-kd8gMNbJ2F11VyADWFji9gx-TAf6pOm5zCfth1wslEigh6S1ttBWE";
-
-/* ===============================
-   PARAMETER URL
-================================ */
-const params = new URLSearchParams(location.search);
-const amount = Number(params.get("amount"));
-const price = params.get("price");
-const deliveryType = params.get("delivery");
-const poInfo = params.get("poInfo") || "";
-
-/* ===============================
-   TAMPILKAN KE UI (FIX FINAL)
-================================ */
-amountText.textContent = amount ? amount.toLocaleString("id-ID") : "-";
-priceText.textContent = price || "-";
-deliveryText.textContent = deliveryType ? deliveryType.replace(/\+/g, " ") : "";
-
-/* ===============================
-   STATE UPLOAD
-================================ */
-let proofBlob = null;
-
-uploadBox.onclick = () => fileInput.click();
-
-fileInput.onchange = () => {
-  const file = fileInput.files[0];
-  if (!file) return;
-
-  preview.src = URL.createObjectURL(file);
-  preview.style.display = "block";
-  uploadBox.classList.add("done");
-  proofBlob = file;
-};
-
-/* ===============================
-   SEND DISCORD (FILE ATTACHMENT)
-================================ */
-async function sendToDiscord(payload) {
-  const embed = {
-    title: "🧾 Pesanan Robux Baru",
-    color: 5763719,
-    fields: [
-      { name: "Order ID", value: payload.orderId },
-      { name: "Username", value: payload.username, inline: true },
-      { name: "Robux", value: payload.amount.toLocaleString("id-ID"), inline: true },
-      { name: "Total", value: payload.price },
-      { name: "Delivery", value: payload.deliveryType || "-" },
-      { name: "PO Info", value: payload.poInfo || "-" }
-    ],
-    footer: { text: "R STORE - ROBUX" },
-    timestamp: new Date()
-  };
-
-  const fd = new FormData();
-  fd.append("payload_json", JSON.stringify({
-    content: "🔔 Pesanan Robux baru masuk",
-    embeds: [embed]
-  }));
-  fd.append("file", proofBlob, "bukti_transfer.jpg");
-
-  await fetch(DISCORD_WEBHOOK_URL, { method: "POST", body: fd });
-}
-
-/* ===============================
-   SUBMIT FINAL
-================================ */
-sendBtn.onclick = async () => {
-  const username = document.getElementById("username").value.trim();
-
-  if (!username) {
-    alert("Username Roblox wajib diisi");
-    return;
-  }
-
-  if (!proofBlob) {
-    alert("Upload bukti transfer dulu");
-    return;
-  }
-
-  sendBtn.disabled = true;
-
-  const orderId = "RBX-" + Date.now();
-
-  const order = {
-    orderId,
-    username,
-    amount,
-    price,
-    deliveryType,
-    poInfo,
-    status: "PENDING",
-    createdAt: new Date().toISOString()
-  };
-
-  try {
-    await fetch("/api/order", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(order)
-    });
-
-    await sendDiscord(order);
-
-    location.href = `process.html?orderId=${orderId}`;
-  } catch (e) {
-    alert("Gagal mengirim pesanan");
-    sendBtn.disabled = false;
-  }
-};
-</script>
+<script type="module" src="./payment.js"></script>
 </body>
 </html>

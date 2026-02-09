@@ -382,7 +382,7 @@
 
             <div class="search-box">
                 <input type="text" class="search-input" id="orderIdInput" placeholder="Masukkan Order ID (contoh: RBX1234567890)">
-                <button class="search-button" onclick="searchOrder()">Cari Pesanan</button>
+                <button class="search-button" id="searchBtn">Cari Pesanan</button>
             </div>
 
             <div class="loading" id="loading">
@@ -474,116 +474,7 @@
         </div>
     </div>
 
-    <script>
-        async function searchOrder() {
-            const orderId = document.getElementById('orderIdInput').value.trim();
-            
-            if (!orderId) {
-                alert('❌ Masukkan Order ID terlebih dahulu!');
-                return;
-            }
+<script type="module" src="./track.js"></script>
 
-            document.getElementById('loading').classList.add('show');
-            document.getElementById('orderResult').classList.remove('show');
-            document.getElementById('noResult').classList.remove('show');
-
-            try {
-                const orderData = await window.storage.get(`order:${orderId}`, true);
-                
-                document.getElementById('loading').classList.remove('show');
-
-                if (orderData) {
-                    const order = JSON.parse(orderData.value);
-                    displayOrder(order);
-                } else {
-                    document.getElementById('noResult').classList.add('show');
-                }
-            } catch (error) {
-                console.log('Order not found:', error);
-                document.getElementById('loading').classList.remove('show');
-                document.getElementById('noResult').classList.add('show');
-            }
-        }
-
-        function displayOrder(order) {
-            document.getElementById('orderResult').classList.add('show');
-
-            const statusBadge = document.getElementById('statusBadge');
-            const statusTitle = document.getElementById('statusTitle');
-            const statusMessage = document.getElementById('statusMessage');
-
-            if (order.status === 'pending') {
-                statusBadge.className = 'status-badge status-pending';
-                statusBadge.textContent = 'PENDING';
-                statusTitle.textContent = 'Menunggu Verifikasi';
-                statusMessage.textContent = 'Pesanan Anda sedang dalam proses verifikasi pembayaran. Mohon tunggu 1-24 jam.';
-            } else if (order.status === 'processing') {
-                statusBadge.className = 'status-badge status-processing';
-                statusBadge.textContent = 'PROCESSING';
-                statusTitle.textContent = 'Sedang Diproses';
-                statusMessage.textContent = 'Pembayaran telah diverifikasi. Robux sedang diproses untuk dikirim ke akun Anda.';
-            } else if (order.status === 'completed') {
-                statusBadge.className = 'status-badge status-completed';
-                statusBadge.textContent = 'COMPLETED';
-                statusTitle.textContent = 'Pesanan Selesai';
-                statusMessage.textContent = `Robux telah berhasil dikirim ke akun ${order.username}. Jangan lupa tetap join grup minimal 15 hari!`;
-            } else if (order.status === 'rejected') {
-                statusBadge.className = 'status-badge status-rejected';
-                statusBadge.textContent = 'REJECTED';
-                statusTitle.textContent = 'Pesanan Ditolak';
-                statusMessage.textContent = 'Pembayaran tidak valid atau bukti transfer tidak sesuai. Silakan hubungi admin untuk informasi lebih lanjut.';
-            }
-
-            document.getElementById('detailOrderId').textContent = order.orderId;
-            document.getElementById('detailUsername').textContent = order.username;
-            document.getElementById('detailRobux').textContent = order.amount.toLocaleString('id-ID') + ' Robux';
-            document.getElementById('detailAmount').textContent = order.price;
-            document.getElementById('detailDelivery').textContent = order.deliveryType || '-';
-            document.getElementById('detailTime').textContent = new Date(order.timestamp).toLocaleString('id-ID');
-
-            const icon1 = document.getElementById('icon1');
-            const icon2 = document.getElementById('icon2');
-            const icon3 = document.getElementById('icon3');
-            const icon4 = document.getElementById('icon4');
-
-            const time1 = document.getElementById('time1');
-            const time2 = document.getElementById('time2');
-            const time3 = document.getElementById('time3');
-            const time4 = document.getElementById('time4');
-
-            time1.textContent = new Date(order.timeline.created).toLocaleString('id-ID');
-            icon1.classList.remove('inactive');
-
-            if (order.timeline.verified) {
-                time2.textContent = new Date(order.timeline.verified).toLocaleString('id-ID');
-                icon2.classList.remove('inactive');
-            } else {
-                time2.textContent = '-';
-                icon2.classList.add('inactive');
-            }
-
-            if (order.timeline.processing) {
-                time3.textContent = new Date(order.timeline.processing).toLocaleString('id-ID');
-                icon3.classList.remove('inactive');
-            } else {
-                time3.textContent = '-';
-                icon3.classList.add('inactive');
-            }
-
-            if (order.timeline.completed) {
-                time4.textContent = new Date(order.timeline.completed).toLocaleString('id-ID');
-                icon4.classList.remove('inactive');
-            } else {
-                time4.textContent = '-';
-                icon4.classList.add('inactive');
-            }
-        }
-
-        document.getElementById('orderIdInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                searchOrder();
-            }
-        });
-    </script>
 </body>
 </html>
