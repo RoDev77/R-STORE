@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pilih Pembayaran - R STORE</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-logo">🎮 R STORE – ROBUX</div>
+  <a href="track.html" class="btn-track">Lacak Pesanan</a>
+</nav>
+
+<main class="main">
+  <div class="card" style="max-width: 500px; margin: 0 auto;">
+    <h2 style="margin-bottom: 20px;">Pilih Metode Pembayaran</h2>
+    
+    <div id="orderInfo" class="order-summary" style="margin-bottom: 30px; padding: 15px; background: #f5f5f5; border-radius: 12px;">
+      <p><strong>Order ID:</strong> <span id="orderId">-</span></p>
+      <p><strong>Jumlah Robux:</strong> <span id="payRobux">0</span></p>
+      <p><strong>Total:</strong> <span id="payTotal">Rp 0</span></p>
+    </div>
+
+    <div class="payment-methods">
+      <button class="payment-method" data-method="qris">
+        <img src="https://cdn-icons-png.flaticon.com/512/11815/11815083.png" alt="QRIS" style="width: 40px;">
+        <span>QRIS (Scan QRIS)</span>
+      </button>
+      <button class="payment-method" data-method="bca">
+        <img src="https://cdn-icons-png.flaticon.com/512/1170/1170579.png" alt="BCA" style="width: 40px;">
+        <span>BCA Virtual Account</span>
+      </button>
+      <button class="payment-method" data-method="mandiri">
+        <img src="https://cdn-icons-png.flaticon.com/512/1170/1170579.png" alt="Mandiri" style="width: 40px;">
+        <span>Mandiri Virtual Account</span>
+      </button>
+      <button class="payment-method" data-method="gopay">
+        <img src="https://cdn-icons-png.flaticon.com/512/5968/5968738.png" alt="GoPay" style="width: 40px;">
+        <span>GoPay</span>
+      </button>
+      <button class="payment-method" data-method="dana">
+        <img src="https://cdn-icons-png.flaticon.com/512/10871/10871943.png" alt="DANA" style="width: 40px;">
+        <span>DANA</span>
+      </button>
+    </div>
+
+    <div id="paymentNote" class="payment-note" style="margin-top: 20px; font-size: 13px; color: #666; text-align: center;">
+      ⚡ Demo mode - Integrasi DOKU akan segera hadir
+    </div>
+  </div>
+</main>
+
+<footer class="footer">© 2025 R Store — Unofficial Roblox Store</footer>
+
+<script type="module">
+  import { db, doc, getDoc, updateDoc } from './firebase-config.js';
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const orderId = urlParams.get('orderId');
+
+  if (!orderId) {
+    alert('Order ID tidak ditemukan!');
+    window.location.href = 'index.html';
+  }
+
+  // Tampilkan info order
+  async function loadOrder() {
+    const orderRef = doc(db, 'orders', orderId);
+    const orderSnap = await getDoc(orderRef);
+    
+    if (orderSnap.exists()) {
+      const data = orderSnap.data();
+      document.getElementById('orderId').textContent = orderId.slice(0, 8) + '...';
+      document.getElementById('payRobux').textContent = data.robuxAmount.toLocaleString('id-ID');
+      document.getElementById('payTotal').textContent = 'Rp ' + data.totalPrice.toLocaleString('id-ID');
+    } else {
+      alert('Order tidak ditemukan!');
+      window.location.href = 'index.html';
+    }
+  }
+
+  // Handle pilih metode pembayaran (sementara redirect ke done)
+  document.querySelectorAll('.payment-method').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const method = btn.dataset.method;
+      
+      // Update status order
+      const orderRef = doc(db, 'orders', orderId);
+      await updateDoc(orderRef, {
+        paymentMethod: method,
+        status: 'waiting_payment',
+        updatedAt: new Date()
+      });
+
+      // Redirect ke halaman done
+      window.location.href = `done.html?orderId=${orderId}&method=${method}`;
+    });
+  });
+
+  loadOrder();
+</script>
+
+</body>
+</html>

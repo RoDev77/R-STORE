@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lacak Pesanan - R STORE</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-logo">🎮 R STORE – ROBUX</div>
+  <a href="index.html" class="btn-track">Beli Robux</a>
+</nav>
+
+<main class="main">
+  <div class="card" style="max-width: 500px; margin: 0 auto;">
+    <h2 style="margin-bottom: 20px;">Lacak Pesanan</h2>
+    
+    <div class="input-group">
+      <label>Masukkan Order ID</label>
+      <input type="text" id="trackOrderId" placeholder="Contoh: abc123def456" />
+    </div>
+    
+    <button class="btn-buy" id="trackBtn" style="margin-top: 10px;">Lacak</button>
+
+    <div id="trackResult" style="margin-top: 30px; display: none;">
+      <div style="background: #f5f5f5; padding: 20px; border-radius: 12px;">
+        <h3>Detail Pesanan</h3>
+        <p><strong>Order ID:</strong> <span id="resultOrderId">-</span></p>
+        <p><strong>Jumlah Robux:</strong> <span id="resultRobux">-</span></p>
+        <p><strong>Total:</strong> <span id="resultTotal">-</span></p>
+        <p><strong>Status:</strong> <span id="resultStatus">-</span></p>
+        <p><strong>Metode Pembayaran:</strong> <span id="resultMethod">-</span></p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="footer">© 2025 R Store — Unofficial Roblox Store</footer>
+
+<script type="module">
+  import { db, doc, getDoc } from './firebase-config.js';
+
+  document.getElementById('trackBtn').addEventListener('click', async () => {
+    const orderId = document.getElementById('trackOrderId').value.trim();
+    
+    if (!orderId) {
+      alert('Masukkan Order ID!');
+      return;
+    }
+
+    const orderRef = doc(db, 'orders', orderId);
+    const orderSnap = await getDoc(orderRef);
+
+    const resultDiv = document.getElementById('trackResult');
+    
+    if (orderSnap.exists()) {
+      const data = orderSnap.data();
+      const statusMap = {
+        'pending': '⏳ Menunggu pembayaran',
+        'waiting_payment': '💳 Menunggu pembayaran',
+        'paid': '✅ Sudah dibayar - Sedang diproses',
+        'delivered': '🎉 Robux sudah dikirim!',
+        'cancelled': '❌ Dibatalkan'
+      };
+      
+      document.getElementById('resultOrderId').textContent = orderId.slice(0, 12) + '...';
+      document.getElementById('resultRobux').textContent = (data.robuxAmount || 0).toLocaleString('id-ID');
+      document.getElementById('resultTotal').textContent = 'Rp ' + (data.totalPrice || 0).toLocaleString('id-ID');
+      document.getElementById('resultStatus').textContent = statusMap[data.status] || data.status;
+      document.getElementById('resultMethod').textContent = (data.paymentMethod || '-').toUpperCase();
+      
+      resultDiv.style.display = 'block';
+    } else {
+      alert('Order ID tidak ditemukan!');
+      resultDiv.style.display = 'none';
+    }
+  });
+</script>
+
+</body>
+</html>

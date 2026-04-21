@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel - R STORE</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .admin-section {
+      margin-bottom: 30px;
+      padding: 20px;
+      background: #f9f9f9;
+      border-radius: 16px;
+    }
+    .admin-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 600px) {
+      .admin-grid { grid-template-columns: 1fr; }
+    }
+    .order-item {
+      background: white;
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 10px;
+      border: 1px solid #eee;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .status-pending { background: #ffc107; color: #000; }
+    .status-paid { background: #28a745; color: #fff; }
+    .status-delivered { background: #17a2b8; color: #fff; }
+    .status-cancelled { background: #dc3545; color: #fff; }
+    select, input {
+      width: 100%;
+      padding: 8px;
+      margin: 5px 0;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+    button {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button.danger { background: #dc3545; }
+    button.success { background: #28a745; }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-logo">🎮 R STORE – ADMIN</div>
+  <a href="index.html" class="btn-track">Beli Robux</a>
+</nav>
+
+<main class="main">
+  <div class="card">
+    <h2>Admin Panel</h2>
+    <p style="color: #ff9800; margin-bottom: 20px;">⚠️ Halaman ini hanya untuk pemilik toko. Simpan URL ini dengan aman.</p>
+
+    <!-- Settings -->
+    <div class="admin-section">
+      <h3>⚙️ Pengaturan Toko</h3>
+      <div class="admin-grid">
+        <div>
+          <label>Harga per Robux (Rp)</label>
+          <input type="number" id="adminPrice" />
+        </div>
+        <div>
+          <label>Stock Ready (Instant)</label>
+          <input type="number" id="adminStock" />
+        </div>
+        <div>
+          <label>Pre-Order Available</label>
+          <input type="number" id="adminPO" />
+        </div>
+        <div>
+          <label>PO Limit</label>
+          <input type="number" id="adminPOLimit" />
+        </div>
+      </div>
+      <button id="saveSettingsBtn" style="margin-top: 15px;">💾 Simpan Pengaturan</button>
+    </div>
+
+    <!-- Orders List -->
+    <div class="admin-section">
+      <h3>📦 Daftar Pesanan</h3>
+      <div id="ordersList">Loading...</div>
+    </div>
+  </div>
+</main>
+
+<footer class="footer">© 2025 R Store — Unofficial Roblox Store</footer>
+
+<script type="module">
+  import { db, doc, getDoc, setDoc, updateDoc, collection, query, orderBy, getDocs } from './firebase-config.js';
+
+  const CONFIG_ID = 'storeSettings';
+
+  // Load settings
+  async function loadSettings() {
+    const configRef = doc(db, 'config', CONFIG_ID);
+    const configSnap = await getDoc(configRef);
+    
+    if (configSnap.exists()) {
+      const data = configSnap.data();
+      document.getElementById('adminPrice').value = data.pricePerRobux || 115;
+      document.getElementById('adminStock').value = data.currentStock || 0;
+      document.getElementById('adminPO').value = data.currentPO || 0;
+      document.getElementById('adminPOLimit').value = data.poLimit || 0;
+    } else {
+      // Default values
+      document.getElementById('adminPrice').value = 115;
+      document.getElementById('adminStock').value = 10000;
+      document.getElementById('adminPO').value = 5000;
+      document.getElementById('adminPOLimit').value = 5000;
+    }
+  }
+
+  // Save settings
+  async function saveSettings() {
+    const configRef = doc(db, 'config', CONFIG_ID);
+    await setDoc(configRef, {
+      pricePerRobux: parseInt(document.getElementById('adminPrice').value),
+      currentStock: parseInt(document.getElementById('adminStock').value),
+      currentPO: parseInt(document.getElementById('adminPO').value),
+      poLimit: parseInt(document.getElementById('adminPOLimit').value),
+      updatedAt: new Date()
+    });
+    alert('✅ Pengaturan disimpan!');
+    loadOrders(); // Refresh orders display
+  }
+
+  // Load orders
+  async function loadOrders() {
+    const ordersQuery = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
+    const querySnapshot = await getDocs(ordersQuery);
+    
+    const ordersList = document.getElementById('ordersList');
+    
+    if (querySnapshot.empty) {
+      ordersList.innerHTML = '<p>Belum ada pesanan.</p>';
+      return;
+    }
+
+    let html = '';
+    querySnapshot.forEach(doc => {
+      const order = doc.data();
+      const statusClass = `status-${order.status === 'waiting_payment' ? 'pending' : order.status}`;
+      
+      html += `
+        <div class="order-item" data-id="${doc.id}">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+            <div>
+              <strong>ID:</strong> ${doc.id.slice(0, 12)}...<br>
+              <strong>Robux:</strong> ${(order.robuxAmount || 0).toLocaleString('id-ID')}<br>
+              <strong>Total:</strong> Rp ${(order.totalPrice || 0).toLocaleString('id-ID')}
+            </div>
+            <div>
+              <select class="status-select" data-id="${doc.id}">
+                <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>⏳ Menunggu</option>
+                <option value="waiting_payment" ${order.status === 'waiting_payment' ? 'selected' : ''}>💳 Menunggu Bayar</option>
+                <option value="paid" ${order.status === 'paid' ? 'selected' : ''}>✅ Dibayar</option>
+                <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>🎉 Terkirim</option>
+                <option value="cancelled" ${order.status === 'cancelled' ? 'selected' : ''}>❌ Dibatalkan</option>
+              </select>
+              <button class="success update-status" data-id="${doc.id}" style="margin-top: 5px;">Update</button>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+    
+    ordersList.innerHTML = html;
+    
+    // Attach event listeners
+    document.querySelectorAll('.update-status').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const orderId = btn.dataset.id;
+        const select = document.querySelector(`.status-select[data-id="${orderId}"]`);
+        const newStatus = select.value;
+        
+        await updateDoc(doc(db, 'orders', orderId), {
+          status: newStatus,
+          updatedAt: new Date()
+        });
+        
+        alert(`✅ Status pesanan ${orderId.slice(0,8)}... diubah menjadi ${newStatus}`);
+        loadOrders(); // Refresh
+      });
+    });
+  }
+
+  document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
+  
+  loadSettings();
+  loadOrders();
+</script>
+
+</body>
+</html>

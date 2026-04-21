@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Memproses Pesanan - R STORE</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .process-container {
+      text-align: center;
+      padding: 80px 20px;
+    }
+    .spinner {
+      width: 60px;
+      height: 60px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 30px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-logo">🎮 R STORE – ROBUX</div>
+  <a href="track.html" class="btn-track">Lacak Pesanan</a>
+</nav>
+
+<main class="main">
+  <div class="card process-container">
+    <div class="spinner"></div>
+    <h2>Memproses Pesanan Anda...</h2>
+    <p>Mohon tunggu, kami sedang menyiapkan transaksi.</p>
+  </div>
+</main>
+
+<footer class="footer">© 2025 R Store — Unofficial Roblox Store</footer>
+
+<script type="module">
+  import { db, addDoc, collection, serverTimestamp } from './firebase-config.js';
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const robux = urlParams.get('robux');
+  const total = urlParams.get('total');
+  const delivery = urlParams.get('delivery');
+
+  async function createOrder() {
+    const orderData = {
+      robuxAmount: parseInt(robux),
+      totalPrice: parseInt(total),
+      deliveryInfo: delivery,
+      status: 'pending',
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    };
+
+    const docRef = await addDoc(collection(db, 'orders'), orderData);
+    
+    // Redirect ke payment page dengan orderId
+    window.location.href = `payment.html?orderId=${docRef.id}`;
+  }
+
+  createOrder();
+</script>
+
+</body>
+</html>
