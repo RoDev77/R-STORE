@@ -158,26 +158,27 @@
     const orderRef = doc(db, 'orders', orderId);
     const orderSnap = await getDoc(orderRef);
     
-    if (orderSnap.exists()) {
-      const data = orderSnap.data();
-      
-      // Tampilkan Order ID dengan tombol copy
-      const orderIdContainer = document.getElementById('orderIdContainer');
-      orderIdContainer.innerHTML = `
-        <span class="order-id-text">${orderId}</span>
-        <button class="copy-btn" id="copyOrderIdBtn">📋 Copy</button>
-      `;
-      
-      // Event listener untuk tombol copy
-      document.getElementById('copyOrderIdBtn').addEventListener('click', (e) => {
-        copyToClipboard(orderId, e.target);
-      });
-      
-      document.getElementById('payMethod').textContent = method ? method.toUpperCase() : (data.paymentMethod || '-').toUpperCase();
-      document.getElementById('totalAmount').textContent = 'Rp ' + (data.totalPrice || 0).toLocaleString('id-ID');
-    } else {
-      document.getElementById('orderIdContainer').innerHTML = '<span>Order tidak ditemukan</span>';
+    if (!orderSnap.exists()) {
+      document.getElementById('orderIdContainer').innerHTML = '<span>❌ Pesanan tidak ditemukan atau sudah kadaluarsa</span>';
+      return;
     }
+    
+    const data = orderSnap.data();
+    
+    // Tampilkan Order ID dengan tombol copy
+    const orderIdContainer = document.getElementById('orderIdContainer');
+    orderIdContainer.innerHTML = `
+      <span class="order-id-text">${orderId}</span>
+      <button class="copy-btn" id="copyOrderIdBtn">📋 Copy</button>
+    `;
+    
+    // Event listener untuk tombol copy
+    document.getElementById('copyOrderIdBtn').addEventListener('click', (e) => {
+      copyToClipboard(orderId, e.target);
+    });
+    
+    document.getElementById('payMethod').textContent = method ? method.toUpperCase() : (data.paymentMethod || '-').toUpperCase();
+    document.getElementById('totalAmount').textContent = 'Rp ' + (data.totalPrice || 0).toLocaleString('id-ID');
   }
 
   loadOrder();

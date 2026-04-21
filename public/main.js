@@ -129,7 +129,7 @@ function updateUI() {
 
 // Fungsi untuk generate Order ID format RBX-xxxxxxxxxx
 function generateOrderId() {
-  const randomNum = Math.floor(Math.random() * 10000000000).toString().padStart(13, '0');
+  const randomNum = Math.floor(Math.random() * 10000000000000).toString().padStart(13, '0');
   return `RBX-${randomNum}`;
 }
 
@@ -161,6 +161,10 @@ async function submitOrder() {
     return submitOrder(); // Rekursif generate ulang
   }
   
+  // 🔥 HITUNG WAKTU KADALUARSA: 2 JAM DARI SEKARANG
+  const expireAt = new Date();
+  expireAt.setHours(expireAt.getHours() + 2); // +2 jam
+  
   // Create order dengan custom ID
   const orderData = {
     robuxAmount: robux,
@@ -168,7 +172,8 @@ async function submitOrder() {
     deliveryInfo: deliveryInfo.textContent,
     status: 'pending',
     createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp()
+    updatedAt: serverTimestamp(),
+    expireAt: expireAt  // 🔥 TAMBAHKAN INI UNTUK TTL
   };
   
   try {

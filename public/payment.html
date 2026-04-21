@@ -140,27 +140,36 @@
     const orderRef = doc(db, 'orders', orderId);
     const orderSnap = await getDoc(orderRef);
     
-    if (orderSnap.exists()) {
-      const data = orderSnap.data();
-      
-      // Tampilkan Order ID dengan tombol copy
-      const orderIdContainer = document.getElementById('orderIdContainer');
-      orderIdContainer.innerHTML = `
-        <span class="order-id-text">${orderId}</span>
-        <button class="copy-btn" id="copyOrderIdBtn">📋 Copy</button>
-      `;
-      
-      // Event listener untuk tombol copy
-      document.getElementById('copyOrderIdBtn').addEventListener('click', (e) => {
-        copyToClipboard(orderId, e.target);
-      });
-      
-      document.getElementById('payRobux').textContent = data.robuxAmount.toLocaleString('id-ID');
-      document.getElementById('payTotal').textContent = 'Rp ' + data.totalPrice.toLocaleString('id-ID');
-    } else {
-      alert('Order tidak ditemukan!');
+    if (!orderSnap.exists()) {
+      alert('❌ Pesanan tidak ditemukan atau sudah kadaluarsa (2 jam). Silakan buat pesanan baru.');
       window.location.href = 'index.html';
+      return;
     }
+    
+    const data = orderSnap.data();
+    
+    // Cek apakah sudah expired
+    const expireAt = data.expireAt?.toDate();
+    if (expireAt && new Date() > expireAt) {
+      alert('❌ Pesanan sudah kadaluarsa (melewati 2 jam). Silakan buat pesanan baru.');
+      window.location.href = 'index.html';
+      return;
+    }
+    
+    // Tampilkan Order ID dengan tombol copy
+    const orderIdContainer = document.getElementById('orderIdContainer');
+    orderIdContainer.innerHTML = `
+      <span class="order-id-text">${orderId}</span>
+      <button class="copy-btn" id="copyOrderIdBtn">📋 Copy</button>
+    `;
+    
+    // Event listener untuk tombol copy
+    document.getElementById('copyOrderIdBtn').addEventListener('click', (e) => {
+      copyToClipboard(orderId, e.target);
+    });
+    
+    document.getElementById('payRobux').textContent = data.robuxAmount.toLocaleString('id-ID');
+    document.getElementById('payTotal').textContent = 'Rp ' + data.totalPrice.toLocaleString('id-ID');
   }
 
   // Handle pilih metode pembayaran
