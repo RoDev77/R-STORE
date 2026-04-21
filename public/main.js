@@ -129,7 +129,7 @@ function updateUI() {
 
 // Fungsi untuk generate Order ID format RBX-xxxxxxxxxx
 function generateOrderId() {
-  const randomNum = Math.floor(Math.random() * 10000000000).toString().padStart(10, '0');
+  const randomNum = Math.floor(Math.random() * 10000000000).toString().padStart(13, '0');
   return `RBX-${randomNum}`;
 }
 
