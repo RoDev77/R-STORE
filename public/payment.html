@@ -19,31 +19,26 @@
     <h2 style="margin-bottom: 20px;">Pilih Metode Pembayaran</h2>
     
     <div id="orderInfo" class="order-summary" style="margin-bottom: 30px; padding: 15px; background: #f5f5f5; border-radius: 12px;">
-      <p><strong>Order ID:</strong> <span id="orderId">-</span></p>
+      <p><strong>Order ID:</strong> <span id="orderId" style="font-family: monospace; font-size: 14px;">-</span></p>
       <p><strong>Jumlah Robux:</strong> <span id="payRobux">0</span></p>
       <p><strong>Total:</strong> <span id="payTotal">Rp 0</span></p>
     </div>
 
     <div class="payment-methods">
       <button class="payment-method" data-method="qris">
-        <img src="https://cdn-icons-png.flaticon.com/512/11815/11815083.png" alt="QRIS" style="width: 40px;">
-        <span>QRIS (Scan QRIS)</span>
+        <span>📱 QRIS (Scan QRIS)</span>
       </button>
       <button class="payment-method" data-method="bca">
-        <img src="https://cdn-icons-png.flaticon.com/512/1170/1170579.png" alt="BCA" style="width: 40px;">
-        <span>BCA Virtual Account</span>
+        <span>🏦 BCA Virtual Account</span>
       </button>
       <button class="payment-method" data-method="mandiri">
-        <img src="https://cdn-icons-png.flaticon.com/512/1170/1170579.png" alt="Mandiri" style="width: 40px;">
-        <span>Mandiri Virtual Account</span>
+        <span>🏦 Mandiri Virtual Account</span>
       </button>
       <button class="payment-method" data-method="gopay">
-        <img src="https://cdn-icons-png.flaticon.com/512/5968/5968738.png" alt="GoPay" style="width: 40px;">
-        <span>GoPay</span>
+        <span>💚 GoPay</span>
       </button>
       <button class="payment-method" data-method="dana">
-        <img src="https://cdn-icons-png.flaticon.com/512/10871/10871943.png" alt="DANA" style="width: 40px;">
-        <span>DANA</span>
+        <span>💙 DANA</span>
       </button>
     </div>
 
@@ -66,14 +61,15 @@
     window.location.href = 'index.html';
   }
 
-  // Tampilkan info order
+  // Tampilkan info order (FULL Order ID)
   async function loadOrder() {
     const orderRef = doc(db, 'orders', orderId);
     const orderSnap = await getDoc(orderRef);
     
     if (orderSnap.exists()) {
       const data = orderSnap.data();
-      document.getElementById('orderId').textContent = orderId.slice(0, 8) + '...';
+      // Tampilkan FULL Order ID, tidak dipotong
+      document.getElementById('orderId').textContent = orderId;
       document.getElementById('payRobux').textContent = data.robuxAmount.toLocaleString('id-ID');
       document.getElementById('payTotal').textContent = 'Rp ' + data.totalPrice.toLocaleString('id-ID');
     } else {
@@ -82,7 +78,7 @@
     }
   }
 
-  // Handle pilih metode pembayaran (sementara redirect ke done)
+  // Handle pilih metode pembayaran
   document.querySelectorAll('.payment-method').forEach(btn => {
     btn.addEventListener('click', async () => {
       const method = btn.dataset.method;

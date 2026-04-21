@@ -44,11 +44,11 @@
 <footer class="footer">© 2025 R Store — Unofficial Roblox Store</footer>
 
 <script type="module">
-import { db, doc, setDoc, serverTimestamp } from './firebase-config.js';
+import { db, doc, getDoc, setDoc, serverTimestamp } from './firebase-config.js';
 
-// Fungsi untuk generate Order ID format RBX-xxxxxxxxxx
+// Fungsi untuk generate Order ID format RBX- (13 digit angka)
 function generateOrderId() {
-  const randomNum = Math.floor(Math.random() * 10000000000).toString().padStart(13, '0');
+  const randomNum = Math.floor(Math.random() * 10000000000000).toString().padStart(13, '0');
   return `RBX-${randomNum}`;
 }
 
@@ -65,7 +65,7 @@ async function createOrder() {
   const orderSnap = await getDoc(orderRef);
   
   if (orderSnap.exists()) {
-    // Re-generate jika duplikat
+    // Re-generate jika duplikat (probabilitas sangat kecil)
     return createOrder();
   }
   

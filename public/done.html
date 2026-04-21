@@ -21,18 +21,19 @@
     <p>Pesanan Anda telah dibuat. Silakan selesaikan pembayaran.</p>
     
     <div id="orderDetail" style="background: #f5f5f5; padding: 20px; border-radius: 12px; margin: 20px 0; text-align: left;">
-      <p><strong>Order ID:</strong> <span id="orderId">-</span></p>
+      <p><strong>Order ID:</strong> <span id="orderId" style="font-family: monospace; font-size: 14px; word-break: break-all;">-</span></p>
       <p><strong>Metode Pembayaran:</strong> <span id="payMethod">-</span></p>
       <p><strong>Total:</strong> <span id="totalAmount">-</span></p>
     </div>
 
     <p style="font-size: 14px; color: #666;">
-      ⚡ Setelah pembayaran dikonfirmasi, Robux akan dikirim otomatis ke akun Roblox Anda.
+      💡 <strong>Simpan Order ID Anda!</strong><br>
+      Gunakan Order ID di atas untuk melacak pesanan.
     </p>
 
     <div style="margin-top: 20px;">
-      <a href="track.html" class="btn-track" style="display: inline-block; margin: 5px;">Lacak Pesanan</a>
-      <a href="index.html" class="btn-track" style="display: inline-block; background: #667eea;">Beli Lagi</a>
+      <a href="track.html" class="btn-track" style="display: inline-block; margin: 5px;">🔍 Lacak Pesanan</a>
+      <a href="index.html" class="btn-track" style="display: inline-block; background: #667eea;">🛒 Beli Lagi</a>
     </div>
   </div>
 </main>
@@ -57,9 +58,12 @@
     
     if (orderSnap.exists()) {
       const data = orderSnap.data();
-      document.getElementById('orderId').textContent = orderId.slice(0, 8) + '...';
+      // Tampilkan FULL Order ID, tidak dipotong
+      document.getElementById('orderId').textContent = orderId;
       document.getElementById('payMethod').textContent = method ? method.toUpperCase() : '-';
       document.getElementById('totalAmount').textContent = 'Rp ' + (data.totalPrice || 0).toLocaleString('id-ID');
+    } else {
+      document.getElementById('orderId').textContent = 'Order tidak ditemukan';
     }
   }
 
