@@ -5,131 +5,194 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Panel - R STORE</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
   <style>
-    .admin-section {
-      margin-bottom: 30px;
-      padding: 20px;
-      background: #f9f9f9;
-      border-radius: 16px;
-    }
-    .admin-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
-    @media (max-width: 600px) {
-      .admin-grid { grid-template-columns: 1fr; }
-    }
-    .order-item {
-      background: white;
-      padding: 15px;
-      border-radius: 12px;
-      margin-bottom: 10px;
-      border: 1px solid #eee;
-    }
-    .status-badge {
-      display: inline-block;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
+    .navbar { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; background: rgba(255,255,255,0.95); box-shadow: 0 2px 20px rgba(0,0,0,0.1); }
+    .nav-logo { font-size: 20px; font-weight: 700; background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .btn-track { background: #667eea; color: white; padding: 10px 20px; border-radius: 30px; text-decoration: none; font-weight: 600; }
+    .main { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    .card { background: white; border-radius: 24px; padding: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); margin-bottom: 30px; }
+    
+    /* Login Screen */
+    .login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+    .login-box { background: white; padding: 40px; border-radius: 24px; width: 350px; text-align: center; }
+    .login-box h2 { margin-bottom: 20px; color: #333; }
+    .login-box input { width: 100%; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 12px; font-size: 16px; margin-bottom: 20px; }
+    .login-box button { width: 100%; background: #667eea; color: white; border: none; padding: 12px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; }
+    .login-box button:hover { background: #5a67d8; }
+    .error-msg { color: #dc3545; margin-top: 10px; display: none; }
+    .loading-msg { color: #667eea; margin-top: 10px; display: none; }
+    
+    /* Admin Content */
+    .admin-content { display: none; }
+    .admin-section { margin-bottom: 30px; padding: 20px; background: #f9f9f9; border-radius: 16px; }
+    .admin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+    .admin-grid input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
+    button { background: #667eea; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+    button.danger { background: #dc3545; }
+    button.success { background: #28a745; }
+    .order-item { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #eee; }
+    .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
     .status-pending { background: #ffc107; color: #000; }
+    .status-waiting_payment { background: #ffc107; color: #000; }
     .status-paid { background: #28a745; color: #fff; }
     .status-delivered { background: #17a2b8; color: #fff; }
     .status-cancelled { background: #dc3545; color: #fff; }
-    select, input {
-      width: 100%;
-      padding: 8px;
-      margin: 5px 0;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-    }
-    button {
-      background: #667eea;
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    button.danger { background: #dc3545; }
-    button.success { background: #28a745; }
+    .quick-buttons { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+    .quick-buttons button { padding: 5px 12px; font-size: 12px; }
+    .footer { text-align: center; padding: 30px; color: rgba(255,255,255,0.7); font-size: 14px; }
+    @media (max-width: 600px) { .navbar { padding: 15px 20px; } .card { padding: 20px; } }
   </style>
 </head>
 <body>
 
-<nav class="navbar">
-  <div class="nav-logo">🎮 R STORE – ADMIN</div>
-  <a href="index.html" class="btn-track">Beli Robux</a>
-</nav>
+<!-- Login Screen -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <h2>🔐 Admin Login</h2>
+    <input type="password" id="adminPassword" placeholder="Masukkan password admin" />
+    <button id="loginBtn">Login</button>
+    <div class="loading-msg" id="loadingMsg">⏳ Memeriksa password...</div>
+    <div class="error-msg" id="loginError">❌ Password salah!</div>
+  </div>
+</div>
 
-<main class="main">
-  <div class="card">
-    <h2>Admin Panel</h2>
-    <p style="color: #ff9800; margin-bottom: 20px;">⚠️ Halaman ini hanya untuk pemilik toko. Simpan URL ini dengan aman.</p>
+<!-- Admin Content -->
+<div class="admin-content" id="adminContent">
+  <nav class="navbar">
+    <div class="nav-logo">🎮 R STORE – ADMIN PANEL</div>
+    <div style="display: flex; gap: 15px;">
+      <a href="index.html" class="btn-track">🛒 Buka Toko</a>
+      <button id="logoutBtn" class="btn-track" style="background: #dc3545;">🚪 Logout</button>
+    </div>
+  </nav>
 
-    <!-- Settings -->
-    <div class="admin-section">
-      <h3>⚙️ Pengaturan Toko</h3>
-      <div class="admin-grid">
-        <div>
-          <label>Harga per Robux (Rp)</label>
-          <input type="number" id="adminPrice" />
+  <main class="main">
+    <div class="card">
+      <h2>⚙️ Pengaturan Toko</h2>
+      <div class="admin-section">
+        <div class="admin-grid">
+          <div><label>Harga per Robux (Rp)</label><input type="number" id="adminPrice" /></div>
+          <div><label>Stock Ready (Instant)</label><input type="number" id="adminStock" /></div>
+          <div><label>Pre-Order Available</label><input type="number" id="adminPO" /></div>
+          <div><label>PO Limit</label><input type="number" id="adminPOLimit" /></div>
         </div>
-        <div>
-          <label>Stock Ready (Instant)</label>
-          <input type="number" id="adminStock" />
-        </div>
-        <div>
-          <label>Pre-Order Available</label>
-          <input type="number" id="adminPO" />
-        </div>
-        <div>
-          <label>PO Limit</label>
-          <input type="number" id="adminPOLimit" />
-        </div>
+        <button id="saveSettingsBtn">💾 Simpan Pengaturan</button>
+        <span id="saveFeedback" style="margin-left: 15px; color: green;"></span>
       </div>
-      <button id="saveSettingsBtn" style="margin-top: 15px;">💾 Simpan Pengaturan</button>
     </div>
 
-    <!-- Orders List -->
-    <div class="admin-section">
-      <h3>📦 Daftar Pesanan</h3>
+    <div class="card">
+      <h2>📦 Daftar Pesanan <span id="orderCount" style="font-size: 14px; color: #666;"></span></h2>
       <div id="ordersList">Loading...</div>
     </div>
-  </div>
-</main>
+  </main>
 
-<footer class="footer">© 2025 R Store — Unofficial Roblox Store</footer>
+  <footer class="footer">© 2025 R Store — Unofficial Roblox Store</footer>
+</div>
 
 <script type="module">
-  import { db, doc, getDoc, setDoc, updateDoc, collection, query, orderBy, getDocs } from './firebase-config.js';
+  import { db, doc, getDoc, setDoc, updateDoc, collection, query, orderBy, onSnapshot } from './firebase-config.js';
 
   const CONFIG_ID = 'storeSettings';
+  
+  // Lokasi password di Firestore
+  const PASSWORD_REF = doc(db, 'pconfig', 'admins');
+  const PASSWORD_FIELD = 'RS824NFAFMMV-22AD';
 
-  // Load settings
+  // ========== CEK PASSWORD DARI FIRESTORE (TANPA HARDCODE) ==========
+  async function verifyPassword(inputPassword) {
+    try {
+      const docSnap = await getDoc(PASSWORD_REF);
+      if (docSnap.exists()) {
+        const correctPassword = docSnap.data()[PASSWORD_FIELD];
+        return inputPassword === correctPassword;
+      }
+      return false;
+    } catch (error) {
+      console.error('Error verifying password:', error);
+      return false;
+    }
+  }
+
+  // ========== LOGIN SYSTEM ==========
+  const loginScreen = document.getElementById('loginScreen');
+  const adminContent = document.getElementById('adminContent');
+  const adminPassword = document.getElementById('adminPassword');
+  const loginBtn = document.getElementById('loginBtn');
+  const loginError = document.getElementById('loginError');
+  const loadingMsg = document.getElementById('loadingMsg');
+  const logoutBtn = document.getElementById('logoutBtn');
+
+  function checkAuth() {
+    const isLoggedIn = sessionStorage.getItem('adminLoggedIn');
+    if (isLoggedIn === 'true') {
+      loginScreen.style.display = 'none';
+      adminContent.style.display = 'block';
+      loadSettings();
+      listenOrders();
+    } else {
+      loginScreen.style.display = 'flex';
+      adminContent.style.display = 'none';
+    }
+  }
+
+  loginBtn.addEventListener('click', async () => {
+    const password = adminPassword.value;
+    if (!password) {
+      loginError.textContent = '❌ Masukkan password!';
+      loginError.style.display = 'block';
+      return;
+    }
+    
+    loadingMsg.style.display = 'block';
+    loginError.style.display = 'none';
+    loginBtn.disabled = true;
+    
+    const isValid = await verifyPassword(password);
+    
+    loadingMsg.style.display = 'none';
+    loginBtn.disabled = false;
+    
+    if (isValid) {
+      sessionStorage.setItem('adminLoggedIn', 'true');
+      loginScreen.style.display = 'none';
+      adminContent.style.display = 'block';
+      adminPassword.value = '';
+      loadSettings();
+      listenOrders();
+    } else {
+      loginError.textContent = '❌ Password salah!';
+      loginError.style.display = 'block';
+    }
+  });
+
+  adminPassword.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') loginBtn.click();
+  });
+
+  logoutBtn.addEventListener('click', () => {
+    sessionStorage.removeItem('adminLoggedIn');
+    loginScreen.style.display = 'flex';
+    adminContent.style.display = 'none';
+    adminPassword.value = '';
+  });
+
+  // ========== LOAD SETTINGS ==========
   async function loadSettings() {
     const configRef = doc(db, 'config', CONFIG_ID);
     const configSnap = await getDoc(configRef);
-    
     if (configSnap.exists()) {
       const data = configSnap.data();
       document.getElementById('adminPrice').value = data.pricePerRobux || 115;
       document.getElementById('adminStock').value = data.currentStock || 0;
       document.getElementById('adminPO').value = data.currentPO || 0;
       document.getElementById('adminPOLimit').value = data.poLimit || 0;
-    } else {
-      // Default values
-      document.getElementById('adminPrice').value = 115;
-      document.getElementById('adminStock').value = 10000;
-      document.getElementById('adminPO').value = 5000;
-      document.getElementById('adminPOLimit').value = 5000;
     }
   }
 
-  // Save settings
+  // ========== SAVE SETTINGS ==========
   async function saveSettings() {
     const configRef = doc(db, 'config', CONFIG_ID);
     await setDoc(configRef, {
@@ -139,75 +202,99 @@
       poLimit: parseInt(document.getElementById('adminPOLimit').value),
       updatedAt: new Date()
     });
-    alert('✅ Pengaturan disimpan!');
-    loadOrders(); // Refresh orders display
+    const feedback = document.getElementById('saveFeedback');
+    feedback.textContent = '✅ Tersimpan!';
+    setTimeout(() => { feedback.textContent = ''; }, 2000);
   }
 
-  // Load orders
-  async function loadOrders() {
-    const ordersQuery = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
-    const querySnapshot = await getDocs(ordersQuery);
-    
-    const ordersList = document.getElementById('ordersList');
-    
-    if (querySnapshot.empty) {
-      ordersList.innerHTML = '<p>Belum ada pesanan.</p>';
-      return;
-    }
+  document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
 
-    let html = '';
-    querySnapshot.forEach(doc => {
-      const order = doc.data();
-      const statusClass = `status-${order.status === 'waiting_payment' ? 'pending' : order.status}`;
-      
-      html += `
-        <div class="order-item" data-id="${doc.id}">
-          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
-            <div>
-              <strong>ID:</strong> ${doc.id.slice(0, 12)}...<br>
-              <strong>Robux:</strong> ${(order.robuxAmount || 0).toLocaleString('id-ID')}<br>
-              <strong>Total:</strong> Rp ${(order.totalPrice || 0).toLocaleString('id-ID')}
-            </div>
-            <div>
-              <select class="status-select" data-id="${doc.id}">
-                <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>⏳ Menunggu</option>
-                <option value="waiting_payment" ${order.status === 'waiting_payment' ? 'selected' : ''}>💳 Menunggu Bayar</option>
-                <option value="paid" ${order.status === 'paid' ? 'selected' : ''}>✅ Dibayar</option>
-                <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>🎉 Terkirim</option>
-                <option value="cancelled" ${order.status === 'cancelled' ? 'selected' : ''}>❌ Dibatalkan</option>
-              </select>
-              <button class="success update-status" data-id="${doc.id}" style="margin-top: 5px;">Update</button>
+  // ========== REAL-TIME ORDERS ==========
+  function listenOrders() {
+    const ordersQuery = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
+    onSnapshot(ordersQuery, (snapshot) => {
+      const ordersList = document.getElementById('ordersList');
+      const orderCount = document.getElementById('orderCount');
+      if (snapshot.empty) {
+        ordersList.innerHTML = '<p>✨ Belum ada pesanan.</p>';
+        orderCount.textContent = '(0)';
+        return;
+      }
+      orderCount.textContent = `(${snapshot.size})`;
+      let html = '';
+      snapshot.forEach(doc => {
+        const order = doc.data();
+        const orderId = doc.id;
+        let statusClass = 'status-pending';
+        if (order.status === 'paid') statusClass = 'status-paid';
+        else if (order.status === 'delivered') statusClass = 'status-delivered';
+        else if (order.status === 'cancelled') statusClass = 'status-cancelled';
+        else if (order.status === 'waiting_payment') statusClass = 'status-waiting_payment';
+        
+        let createdAt = '-';
+        if (order.createdAt?.toDate) createdAt = order.createdAt.toDate().toLocaleString('id-ID');
+        
+        html += `
+          <div class="order-item" data-id="${orderId}">
+            <div style="display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap;">
+              <div>
+                <strong>🆔 ${orderId}</strong><br>
+                <strong>🎮 Robux:</strong> ${(order.robuxAmount || 0).toLocaleString('id-ID')}<br>
+                <strong>💰 Total:</strong> Rp ${(order.totalPrice || 0).toLocaleString('id-ID')}<br>
+                <strong>💳 Metode:</strong> ${(order.paymentMethod || '-').toUpperCase()}<br>
+                <strong>📅 Dibuat:</strong> ${createdAt}<br>
+                <strong>📌 Status:</strong> <span class="status-badge ${statusClass}">${order.status || 'pending'}</span>
+              </div>
+              <div>
+                <select class="status-select" data-id="${orderId}" style="padding: 8px; border-radius: 8px; margin-bottom: 8px;">
+                  <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>⏳ Menunggu</option>
+                  <option value="waiting_payment" ${order.status === 'waiting_payment' ? 'selected' : ''}>💳 Menunggu Bayar</option>
+                  <option value="paid" ${order.status === 'paid' ? 'selected' : ''}>✅ Dibayar</option>
+                  <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>🎉 Terkirim</option>
+                  <option value="cancelled" ${order.status === 'cancelled' ? 'selected' : ''}>❌ Dibatalkan</option>
+                </select>
+                <div class="quick-buttons">
+                  <button class="quick-paid success" data-id="${orderId}">✅ Paid</button>
+                  <button class="quick-delivered info" data-id="${orderId}">🎉 Delivered</button>
+                  <button class="quick-cancel danger" data-id="${orderId}">❌ Cancel</button>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      `;
-    });
-    
-    ordersList.innerHTML = html;
-    
-    // Attach event listeners
-    document.querySelectorAll('.update-status').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const orderId = btn.dataset.id;
-        const select = document.querySelector(`.status-select[data-id="${orderId}"]`);
-        const newStatus = select.value;
-        
-        await updateDoc(doc(db, 'orders', orderId), {
-          status: newStatus,
-          updatedAt: new Date()
+        `;
+      });
+      ordersList.innerHTML = html;
+      
+      document.querySelectorAll('.status-select').forEach(select => {
+        select.addEventListener('change', async (e) => {
+          const orderId = e.target.dataset.id;
+          await updateDoc(doc(db, 'orders', orderId), { status: e.target.value, updatedAt: new Date() });
         });
-        
-        alert(`✅ Status pesanan ${orderId.slice(0,8)}... diubah menjadi ${newStatus}`);
-        loadOrders(); // Refresh
+      });
+      document.querySelectorAll('.quick-paid').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const orderId = btn.dataset.id;
+          await updateDoc(doc(db, 'orders', orderId), { status: 'paid', updatedAt: new Date() });
+        });
+      });
+      document.querySelectorAll('.quick-delivered').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const orderId = btn.dataset.id;
+          await updateDoc(doc(db, 'orders', orderId), { status: 'delivered', updatedAt: new Date() });
+        });
+      });
+      document.querySelectorAll('.quick-cancel').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const orderId = btn.dataset.id;
+          if (confirm('Yakin ingin membatalkan pesanan ini?')) {
+            await updateDoc(doc(db, 'orders', orderId), { status: 'cancelled', updatedAt: new Date() });
+          }
+        });
       });
     });
   }
 
-  document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
-  
-  loadSettings();
-  loadOrders();
+  checkAuth();
 </script>
-
 </body>
 </html>
