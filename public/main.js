@@ -1,4 +1,4 @@
-import { db, doc, getDoc, addDoc, collection, serverTimestamp } from './firebase-config.js';
+import { db, doc, getDoc, setDoc, addDoc, collection, serverTimestamp } from './firebase-config.js';
 
 // DOM Elements
 const loadingScreen = document.getElementById('loadingScreen');

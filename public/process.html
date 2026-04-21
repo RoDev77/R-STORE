@@ -44,30 +44,47 @@
 <footer class="footer">© 2025 R Store — Unofficial Roblox Store</footer>
 
 <script type="module">
-  import { db, addDoc, collection, serverTimestamp } from './firebase-config.js';
+import { db, doc, setDoc, serverTimestamp } from './firebase-config.js';
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const robux = urlParams.get('robux');
-  const total = urlParams.get('total');
-  const delivery = urlParams.get('delivery');
+// Fungsi untuk generate Order ID format RBX-xxxxxxxxxx
+function generateOrderId() {
+  const randomNum = Math.floor(Math.random() * 10000000000).toString().padStart(10, '0');
+  return `RBX-${randomNum}`;
+}
 
-  async function createOrder() {
-    const orderData = {
-      robuxAmount: parseInt(robux),
-      totalPrice: parseInt(total),
-      deliveryInfo: delivery,
-      status: 'pending',
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp()
-    };
+const urlParams = new URLSearchParams(window.location.search);
+const robux = urlParams.get('robux');
+const total = urlParams.get('total');
+const delivery = urlParams.get('delivery');
 
-    const docRef = await addDoc(collection(db, 'orders'), orderData);
-    
-    // Redirect ke payment page dengan orderId
-    window.location.href = `payment.html?orderId=${docRef.id}`;
+async function createOrder() {
+  const orderId = generateOrderId();
+  
+  // Cek duplikasi
+  const orderRef = doc(db, 'orders', orderId);
+  const orderSnap = await getDoc(orderRef);
+  
+  if (orderSnap.exists()) {
+    // Re-generate jika duplikat
+    return createOrder();
   }
+  
+  const orderData = {
+    robuxAmount: parseInt(robux),
+    totalPrice: parseInt(total),
+    deliveryInfo: delivery,
+    status: 'pending',
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp()
+  };
 
-  createOrder();
+  await setDoc(orderRef, orderData);
+  
+  // Redirect ke payment page dengan orderId custom
+  window.location.href = `payment.html?orderId=${orderId}`;
+}
+
+createOrder();
 </script>
 
 </body>
