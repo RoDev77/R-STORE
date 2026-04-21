@@ -127,6 +127,12 @@ function updateUI() {
   }
 }
 
+// Fungsi untuk generate Order ID format RBX-xxxxxxxxxx
+function generateOrderId() {
+  const randomNum = Math.floor(Math.random() * 10000000000).toString().padStart(10, '0');
+  return `RBX-${randomNum}`;
+}
+
 async function submitOrder() {
   const robux = Number(robuxInput.value);
   
@@ -143,7 +149,19 @@ async function submitOrder() {
     return;
   }
   
-  // Create order in Firestore
+  // Generate custom Order ID
+  const orderId = generateOrderId();
+  
+  // Cek apakah ID sudah ada (untuk menghindari duplikasi)
+  const orderRef = doc(db, 'orders', orderId);
+  const orderSnap = await getDoc(orderRef);
+  
+  if (orderSnap.exists()) {
+    // Jika kebetulan duplikat, generate ulang
+    return submitOrder(); // Rekursif generate ulang
+  }
+  
+  // Create order dengan custom ID
   const orderData = {
     robuxAmount: robux,
     totalPrice: total,
@@ -154,9 +172,9 @@ async function submitOrder() {
   };
   
   try {
-    const docRef = await addDoc(collection(db, 'orders'), orderData);
-    // Redirect to payment page
-    window.location.href = `payment.html?orderId=${docRef.id}`;
+    await setDoc(orderRef, orderData);
+    // Redirect ke payment page dengan orderId custom
+    window.location.href = `payment.html?orderId=${orderId}`;
   } catch (error) {
     console.error('Error creating order:', error);
     alert('Gagal membuat pesanan. Silakan coba lagi.');
