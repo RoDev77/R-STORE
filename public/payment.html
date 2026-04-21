@@ -108,8 +108,10 @@
 
 <footer class="footer">© 2025 R Store — Unofficial Roblox Store</footer>
 
+<!-- Di dalam script tag, tambahkan import dan update fungsi -->
 <script type="module">
   import { db, doc, getDoc, updateDoc } from './firebase-config.js';
+  import { createVirtualAccount, createQRIS, createEWallet, checkPaymentStatus } from './doku-payment.js';
 
   const urlParams = new URLSearchParams(window.location.search);
   const orderId = urlParams.get('orderId');
@@ -119,76 +121,129 @@
     window.location.href = 'index.html';
   }
 
-  // Fungsi copy ke clipboard
-  async function copyToClipboard(text, buttonElement) {
-    try {
-      await navigator.clipboard.writeText(text);
-      const originalText = buttonElement.textContent;
-      buttonElement.textContent = '✅ Tersalin!';
-      buttonElement.classList.add('copied');
-      setTimeout(() => {
-        buttonElement.textContent = originalText;
-        buttonElement.classList.remove('copied');
-      }, 2000);
-    } catch (err) {
-      alert('Gagal menyalin. Silakan copy manual.');
-    }
-  }
+  // ... (fungsi copyToClipboard dan loadOrder sama seperti sebelumnya)
 
-  // Tampilkan info order
-  async function loadOrder() {
-    const orderRef = doc(db, 'orders', orderId);
-    const orderSnap = await getDoc(orderRef);
-    
-    if (!orderSnap.exists()) {
-      alert('❌ Pesanan tidak ditemukan atau sudah kadaluarsa (2 jam). Silakan buat pesanan baru.');
-      window.location.href = 'index.html';
-      return;
-    }
-    
-    const data = orderSnap.data();
-    
-    // Cek apakah sudah expired
-    const expireAt = data.expireAt?.toDate();
-    if (expireAt && new Date() > expireAt) {
-      alert('❌ Pesanan sudah kadaluarsa (melewati 2 jam). Silakan buat pesanan baru.');
-      window.location.href = 'index.html';
-      return;
-    }
-    
-    // Tampilkan Order ID dengan tombol copy
-    const orderIdContainer = document.getElementById('orderIdContainer');
-    orderIdContainer.innerHTML = `
-      <span class="order-id-text">${orderId}</span>
-      <button class="copy-btn" id="copyOrderIdBtn">📋 Copy</button>
-    `;
-    
-    // Event listener untuk tombol copy
-    document.getElementById('copyOrderIdBtn').addEventListener('click', (e) => {
-      copyToClipboard(orderId, e.target);
-    });
-    
-    document.getElementById('payRobux').textContent = data.robuxAmount.toLocaleString('id-ID');
-    document.getElementById('payTotal').textContent = 'Rp ' + data.totalPrice.toLocaleString('id-ID');
-  }
-
-  // Handle pilih metode pembayaran
+  // Handle pilih metode pembayaran - INTEGRASI DOKU
   document.querySelectorAll('.payment-method').forEach(btn => {
     btn.addEventListener('click', async () => {
       const method = btn.dataset.method;
-      
-      // Update status order
       const orderRef = doc(db, 'orders', orderId);
-      await updateDoc(orderRef, {
-        paymentMethod: method,
-        status: 'waiting_payment',
-        updatedAt: new Date()
-      });
-
-      // Redirect ke halaman done
-      window.location.href = `done.html?orderId=${orderId}&method=${method}`;
+      const orderSnap = await getDoc(orderRef);
+      const orderData = orderSnap.data();
+      const amount = orderData.totalPrice;
+      
+      // Tampilkan loading
+      btn.disabled = true;
+      btn.textContent = '⏳ Memproses...';
+      
+      let result;
+      
+      switch(method) {
+        case 'bca':
+        case 'mandiri':
+        case 'bni':
+        case 'bri':
+          result = await createVirtualAccount(orderId, amount, method);
+          if (result.success) {
+            // Tampilkan halaman detail VA
+            showVAPage(result.virtualAccount, result.howToPayUrl, orderId, method);
+          } else {
+            alert('❌ Gagal membuat Virtual Account: ' + result.error);
+            btn.disabled = false;
+            btn.textContent = btn.dataset.originalText || '🏦 ' + method.toUpperCase();
+          }
+          break;
+          
+        case 'qris':
+          result = await createQRIS(orderId, amount);
+          if (result.success) {
+            showQRISPage(result.qrImage, result.qrUrl, orderId);
+          } else {
+            alert('❌ Gagal membuat QRIS: ' + result.error);
+            btn.disabled = false;
+            btn.textContent = btn.dataset.originalText || '📱 QRIS';
+          }
+          break;
+          
+        case 'gopay':
+        case 'dana':
+          result = await createEWallet(orderId, amount, method);
+          if (result.success) {
+            // Redirect ke halaman pembayaran e-wallet
+            window.location.href = result.paymentUrl;
+          } else {
+            alert('❌ Gagal membuat pembayaran: ' + result.error);
+            btn.disabled = false;
+            btn.textContent = btn.dataset.originalText || (method === 'gopay' ? '💚 GoPay' : '💙 DANA');
+          }
+          break;
+      }
     });
   });
+
+  function showVAPage(vaNumber, howToPayUrl, orderId, bankCode) {
+    const paymentMethodsDiv = document.querySelector('.payment-methods');
+    const orderInfoDiv = document.getElementById('orderInfo');
+    
+    paymentMethodsDiv.innerHTML = `
+      <div style="text-align: center; padding: 20px;">
+        <div style="font-size: 48px; margin-bottom: 20px;">🏦</div>
+        <h3>Virtual Account ${bankCode.toUpperCase()}</h3>
+        <div style="background: #f0f0f0; padding: 15px; border-radius: 12px; margin: 20px 0;">
+          <p style="font-size: 12px; color: #666;">Nomor Virtual Account</p>
+          <p style="font-size: 28px; font-weight: bold; letter-spacing: 2px;">${vaNumber}</p>
+        </div>
+        <button id="copyVABtn" class="copy-btn" style="margin-bottom: 20px;">📋 Copy VA Number</button>
+        <div class="instruction-box" style="text-align: left; margin-top: 20px;">
+          <strong>📌 Cara Pembayaran:</strong>
+          <ol style="margin-top: 10px; padding-left: 20px;">
+            <li>Buka aplikasi mobile banking ${bankCode.toUpperCase()}</li>
+            <li>Pilih menu Transfer ke Virtual Account</li>
+            <li>Masukkan nomor Virtual Account di atas</li>
+            <li>Konfirmasi pembayaran sebesar Rp ${document.getElementById('payTotal').textContent}</li>
+            <li>Pembayaran akan dikonfirmasi otomatis dalam beberapa menit</li>
+          </ol>
+        </div>
+        <div class="btn-group" style="margin-top: 30px;">
+          <a href="track.html?orderId=${orderId}" class="btn-primary">🔍 Cek Status</a>
+          <a href="index.html" class="btn-secondary">🛒 Kembali</a>
+        </div>
+      </div>
+    `;
+    
+    document.getElementById('copyVABtn').addEventListener('click', () => {
+      navigator.clipboard.writeText(vaNumber);
+      alert('✅ Nomor VA disalin!');
+    });
+  }
+  
+  function showQRISPage(qrImage, qrUrl, orderId) {
+    const paymentMethodsDiv = document.querySelector('.payment-methods');
+    
+    paymentMethodsDiv.innerHTML = `
+      <div style="text-align: center; padding: 20px;">
+        <div style="font-size: 48px; margin-bottom: 20px;">📱</div>
+        <h3>QRIS Payment</h3>
+        <div style="background: white; padding: 20px; border-radius: 12px; margin: 20px auto; max-width: 250px;">
+          <img src="${qrImage}" alt="QRIS Code" style="width: 100%;" />
+        </div>
+        <div class="instruction-box" style="text-align: left; margin-top: 20px;">
+          <strong>📌 Cara Pembayaran:</strong>
+          <ol style="margin-top: 10px; padding-left: 20px;">
+            <li>Buka aplikasi QRIS (GoPay, DANA, OVO, LinkAja, dll)</li>
+            <li>Pilih menu Scan QRIS</li>
+            <li>Scan QR code di atas</li>
+            <li>Konfirmasi pembayaran sebesar Rp ${document.getElementById('payTotal').textContent}</li>
+            <li>Pembayaran akan dikonfirmasi otomatis</li>
+          </ol>
+        </div>
+        <div class="btn-group" style="margin-top: 30px;">
+          <a href="track.html?orderId=${orderId}" class="btn-primary">🔍 Cek Status</a>
+          <a href="index.html" class="btn-secondary">🛒 Kembali</a>
+        </div>
+      </div>
+    `;
+  }
 
   loadOrder();
 </script>
