@@ -1,6 +1,22 @@
-// Firebase Konfigurasi - GANTI DENGAN PUNYA ANDA
+// Firebase Konfigurasi
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, query, where, getDocs, orderBy, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { 
+  getFirestore, 
+  doc, 
+  getDoc, 
+  setDoc, 
+  updateDoc, 
+  addDoc, 
+  collection, 
+  query, 
+  where, 
+  getDocs, 
+  orderBy, 
+  deleteDoc, 
+  serverTimestamp,
+  onSnapshot,
+  limit
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBKmEOkiP8qdoAOjdPxRbBttbCdcZvzpGg",
@@ -15,4 +31,21 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-export { db, doc, getDoc, setDoc, updateDoc, collection, addDoc, query, where, getDocs, orderBy, deleteDoc, serverTimestamp };
+// Ekspor semua yang dibutuhkan
+export { 
+  db, 
+  doc, 
+  getDoc, 
+  setDoc, 
+  updateDoc, 
+  addDoc, 
+  collection, 
+  query, 
+  where, 
+  getDocs, 
+  orderBy, 
+  deleteDoc, 
+  serverTimestamp,
+  onSnapshot,
+  limit
+};

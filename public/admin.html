@@ -93,15 +93,16 @@
 </div>
 
 <script type="module">
-  import { db, doc, getDoc, setDoc, updateDoc, collection, query, orderBy, onSnapshot } from './firebase-config.js';
+ import { db, doc, getDoc, setDoc, updateDoc, collection, query, orderBy } from './firebase-config.js';
+ import { onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
   const CONFIG_ID = 'storeSettings';
   
-  // Lokasi password di Firestore
+  // ========== AMBIL PASSWORD DARI FIRESTORE ==========
+  // Collection: pconfig, Document: admins, Field: password
   const PASSWORD_REF = doc(db, 'pconfig', 'admins');
-  const PASSWORD_FIELD = 'RS824NFAFMMV-22AD';
+  const PASSWORD_FIELD = 'password';
 
-  // ========== CEK PASSWORD DARI FIRESTORE (TANPA HARDCODE) ==========
   async function verifyPassword(inputPassword) {
     try {
       const docSnap = await getDoc(PASSWORD_REF);
@@ -109,6 +110,7 @@
         const correctPassword = docSnap.data()[PASSWORD_FIELD];
         return inputPassword === correctPassword;
       }
+      console.error('❌ Document admins tidak ditemukan di collection pconfig');
       return false;
     } catch (error) {
       console.error('Error verifying password:', error);
