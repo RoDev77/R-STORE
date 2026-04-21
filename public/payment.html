@@ -59,6 +59,56 @@
       background: #f8f9ff;
       transform: translateX(5px);
     }
+    .instruction-box {
+      background: #e8f0fe;
+      border-left: 4px solid #667eea;
+      padding: 15px;
+      border-radius: 12px;
+      margin: 20px 0;
+      text-align: left;
+    }
+    .instruction-box ol {
+      margin-top: 10px;
+      padding-left: 20px;
+    }
+    .instruction-box li {
+      margin-bottom: 5px;
+    }
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+    .btn-primary {
+      background: #667eea;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 40px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.2s;
+      display: inline-block;
+    }
+    .btn-primary:hover {
+      background: #5a67d8;
+      transform: translateY(-2px);
+    }
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 40px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.2s;
+      display: inline-block;
+    }
+    .btn-secondary:hover {
+      background: #5a6268;
+      transform: translateY(-2px);
+    }
   </style>
 </head>
 <body>
@@ -108,10 +158,9 @@
 
 <footer class="footer">© 2025 R Store — Unofficial Roblox Store</footer>
 
-<!-- Di dalam script tag, tambahkan import dan update fungsi -->
 <script type="module">
   import { db, doc, getDoc, updateDoc } from './firebase-config.js';
-  import { createVirtualAccount, createQRIS, createEWallet, checkPaymentStatus } from './doku-payment.js';
+  import { createVirtualAccount, createQRIS, createEWallet } from './doku-payment.js';
 
   const urlParams = new URLSearchParams(window.location.search);
   const orderId = urlParams.get('orderId');
@@ -121,7 +170,57 @@
     window.location.href = 'index.html';
   }
 
-  // ... (fungsi copyToClipboard dan loadOrder sama seperti sebelumnya)
+  // Fungsi copy ke clipboard
+  async function copyToClipboard(text, buttonElement) {
+    try {
+      await navigator.clipboard.writeText(text);
+      const originalText = buttonElement.textContent;
+      buttonElement.textContent = '✅ Tersalin!';
+      buttonElement.classList.add('copied');
+      setTimeout(() => {
+        buttonElement.textContent = originalText;
+        buttonElement.classList.remove('copied');
+      }, 2000);
+    } catch (err) {
+      alert('Gagal menyalin. Silakan copy manual.');
+    }
+  }
+
+  // Fungsi load order (TAMBAHKAN INI)
+  async function loadOrder() {
+    const orderRef = doc(db, 'orders', orderId);
+    const orderSnap = await getDoc(orderRef);
+    
+    if (!orderSnap.exists()) {
+      alert('❌ Pesanan tidak ditemukan atau sudah kadaluarsa (2 jam). Silakan buat pesanan baru.');
+      window.location.href = 'index.html';
+      return;
+    }
+    
+    const data = orderSnap.data();
+    
+    // Cek apakah sudah expired
+    const expireAt = data.expireAt?.toDate();
+    if (expireAt && new Date() > expireAt) {
+      alert('❌ Pesanan sudah kadaluarsa (melewati 2 jam). Silakan buat pesanan baru.');
+      window.location.href = 'index.html';
+      return;
+    }
+    
+    // Tampilkan Order ID dengan tombol copy
+    const orderIdContainer = document.getElementById('orderIdContainer');
+    orderIdContainer.innerHTML = `
+      <span class="order-id-text">${orderId}</span>
+      <button class="copy-btn" id="copyOrderIdBtn">📋 Copy</button>
+    `;
+    
+    document.getElementById('copyOrderIdBtn').addEventListener('click', (e) => {
+      copyToClipboard(orderId, e.target);
+    });
+    
+    document.getElementById('payRobux').textContent = data.robuxAmount.toLocaleString('id-ID');
+    document.getElementById('payTotal').textContent = 'Rp ' + data.totalPrice.toLocaleString('id-ID');
+  }
 
   // Handle pilih metode pembayaran - INTEGRASI DOKU
   document.querySelectorAll('.payment-method').forEach(btn => {
@@ -132,9 +231,12 @@
       const orderData = orderSnap.data();
       const amount = orderData.totalPrice;
       
+      // Simpan teks asli tombol
+      const originalText = btn.innerHTML;
+      
       // Tampilkan loading
       btn.disabled = true;
-      btn.textContent = '⏳ Memproses...';
+      btn.innerHTML = '<span>⏳ Memproses...</span>';
       
       let result;
       
@@ -145,12 +247,11 @@
         case 'bri':
           result = await createVirtualAccount(orderId, amount, method);
           if (result.success) {
-            // Tampilkan halaman detail VA
             showVAPage(result.virtualAccount, result.howToPayUrl, orderId, method);
           } else {
-            alert('❌ Gagal membuat Virtual Account: ' + result.error);
+            alert('❌ Gagal membuat Virtual Account: ' + (result.error || 'Unknown error'));
             btn.disabled = false;
-            btn.textContent = btn.dataset.originalText || '🏦 ' + method.toUpperCase();
+            btn.innerHTML = originalText;
           }
           break;
           
@@ -159,9 +260,9 @@
           if (result.success) {
             showQRISPage(result.qrImage, result.qrUrl, orderId);
           } else {
-            alert('❌ Gagal membuat QRIS: ' + result.error);
+            alert('❌ Gagal membuat QRIS: ' + (result.error || 'Unknown error'));
             btn.disabled = false;
-            btn.textContent = btn.dataset.originalText || '📱 QRIS';
+            btn.innerHTML = originalText;
           }
           break;
           
@@ -169,12 +270,11 @@
         case 'dana':
           result = await createEWallet(orderId, amount, method);
           if (result.success) {
-            // Redirect ke halaman pembayaran e-wallet
             window.location.href = result.paymentUrl;
           } else {
-            alert('❌ Gagal membuat pembayaran: ' + result.error);
+            alert('❌ Gagal membuat pembayaran: ' + (result.error || 'Unknown error'));
             btn.disabled = false;
-            btn.textContent = btn.dataset.originalText || (method === 'gopay' ? '💚 GoPay' : '💙 DANA');
+            btn.innerHTML = originalText;
           }
           break;
       }
@@ -183,7 +283,6 @@
 
   function showVAPage(vaNumber, howToPayUrl, orderId, bankCode) {
     const paymentMethodsDiv = document.querySelector('.payment-methods');
-    const orderInfoDiv = document.getElementById('orderInfo');
     
     paymentMethodsDiv.innerHTML = `
       <div style="text-align: center; padding: 20px;">
@@ -194,7 +293,7 @@
           <p style="font-size: 28px; font-weight: bold; letter-spacing: 2px;">${vaNumber}</p>
         </div>
         <button id="copyVABtn" class="copy-btn" style="margin-bottom: 20px;">📋 Copy VA Number</button>
-        <div class="instruction-box" style="text-align: left; margin-top: 20px;">
+        <div class="instruction-box">
           <strong>📌 Cara Pembayaran:</strong>
           <ol style="margin-top: 10px; padding-left: 20px;">
             <li>Buka aplikasi mobile banking ${bankCode.toUpperCase()}</li>
@@ -227,7 +326,7 @@
         <div style="background: white; padding: 20px; border-radius: 12px; margin: 20px auto; max-width: 250px;">
           <img src="${qrImage}" alt="QRIS Code" style="width: 100%;" />
         </div>
-        <div class="instruction-box" style="text-align: left; margin-top: 20px;">
+        <div class="instruction-box">
           <strong>📌 Cara Pembayaran:</strong>
           <ol style="margin-top: 10px; padding-left: 20px;">
             <li>Buka aplikasi QRIS (GoPay, DANA, OVO, LinkAja, dll)</li>
@@ -245,6 +344,7 @@
     `;
   }
 
+  // Panggil loadOrder
   loadOrder();
 </script>
 
