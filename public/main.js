@@ -1,14 +1,10 @@
-/* index.js */
+import { db, doc, getDoc, addDoc, collection, serverTimestamp } from './firebase-config.js';
 
-/* ===== CONFIG (LOADED FROM FIRESTORE) ===== */
-let PRICE_PER_ROBUX = 115;
-let CURRENT_STOCK = 0;
-let CURRENT_PO = 0;
-let PO_LIMIT = 0;
-
-/* ===== ELEMENT ===== */
+// DOM Elements
+const loadingScreen = document.getElementById('loadingScreen');
 const robuxInput = document.getElementById('robuxInput');
 const totalPrice = document.getElementById('totalPrice');
+const pricePerRobuxInput = document.getElementById('pricePerRobux');
 const deliveryInfo = document.getElementById('deliveryInfo');
 const stockAlert = document.getElementById('stockAlert');
 const stockTitle = document.getElementById('stockTitle');
@@ -17,60 +13,72 @@ const stockReady = document.getElementById('stockReady');
 const poAvailable = document.getElementById('poAvailable');
 const btnBuy = document.getElementById('btnBuy');
 const robuxError = document.getElementById('robuxError');
-const pricePerRobuxInput = document.getElementById('pricePerRobux');
+const detailRobux = document.getElementById('detailRobux');
+const detailRate = document.getElementById('detailRate');
+const detailTotal = document.getElementById('detailTotal');
 
-/* ===== LOAD CONFIG FROM FIRESTORE ===== */
-async function loadConfig() {
-  try {
-    const response = await fetch('https://r-store-rho.vercel.app/api/config');
-    const data = await response.json();
-    
-    if (data.success) {
-      PRICE_PER_ROBUX = data.data.pricePerRobux || 115;
-      CURRENT_STOCK = data.data.currentStock || 0;
-      CURRENT_PO = data.data.currentPO || 0;
-      PO_LIMIT = data.data.poLimit || 0;
-      
-      // Update UI with loaded config
-      pricePerRobuxInput.value = 'Rp ' + formatNumber(PRICE_PER_ROBUX);
-      updateStockDisplay();
-      updateUI();
-      
-      console.log('✅ Config loaded:', data.data);
-    } else {
-      console.warn('⚠️ Failed to load config, using defaults');
-    }
-  } catch (error) {
-    console.error('❌ Failed to load config:', error);
-    // Use default values if fetch fails
-    updateStockDisplay();
-    updateUI();
-  }
-}
+// Config variables
+let PRICE_PER_ROBUX = 115;
+let CURRENT_STOCK = 0;
+let CURRENT_PO = 0;
+let PO_LIMIT = 0;
 
-/* ===== FORMAT NUMBER ===== */
+const CONFIG_ID = 'storeSettings';
+
 function formatNumber(num) {
   return num.toLocaleString('id-ID');
 }
 
-/* ===== UPDATE STOCK DISPLAY ===== */
+async function loadConfig() {
+  try {
+    const configRef = doc(db, 'config', CONFIG_ID);
+    const configSnap = await getDoc(configRef);
+    
+    if (configSnap.exists()) {
+      const data = configSnap.data();
+      PRICE_PER_ROBUX = data.pricePerRobux || 115;
+      CURRENT_STOCK = data.currentStock || 0;
+      CURRENT_PO = data.currentPO || 0;
+      PO_LIMIT = data.poLimit || 0;
+    } else {
+      // Default values if config not exists
+      PRICE_PER_ROBUX = 115;
+      CURRENT_STOCK = 10000;
+      CURRENT_PO = 5000;
+      PO_LIMIT = 5000;
+    }
+    
+    // Update UI
+    pricePerRobuxInput.value = 'Rp ' + formatNumber(PRICE_PER_ROBUX);
+    updateStockDisplay();
+    updateUI();
+    
+    // Hide loading screen
+    loadingScreen.style.display = 'none';
+    
+    console.log('✅ Config loaded');
+  } catch (error) {
+    console.error('❌ Failed to load config:', error);
+    loadingScreen.style.display = 'none';
+  }
+}
+
 function updateStockDisplay() {
   stockReady.textContent = formatNumber(CURRENT_STOCK);
   poAvailable.textContent = formatNumber(CURRENT_PO);
 }
 
-/* ===== UPDATE UI ===== */
 function updateUI() {
   const robux = Number(robuxInput.value || 0);
   const total = robux * PRICE_PER_ROBUX;
   
-  // Update total price
   totalPrice.textContent = 'Rp ' + formatNumber(total);
-
-  // Hide error by default
+  detailRobux.textContent = formatNumber(robux);
+  detailRate.textContent = 'Rp ' + formatNumber(PRICE_PER_ROBUX);
+  detailTotal.textContent = 'Rp ' + formatNumber(total);
+  
   robuxError.classList.remove('show');
-
-  // Disable button if invalid
+  
   if (robux < 10) {
     btnBuy.disabled = true;
     if (robux > 0) {
@@ -79,16 +87,16 @@ function updateUI() {
   } else {
     btnBuy.disabled = false;
   }
-
-  // Update delivery info and stock alert
+  
+  const maxAvailable = CURRENT_STOCK + CURRENT_PO;
+  
   if (CURRENT_STOCK <= 0) {
-    // No stock, all PO
     if (robux <= CURRENT_PO) {
       deliveryInfo.textContent = '📦 Pre-Order (15 hari kerja)';
       stockAlert.className = 'stock-alert out';
       stockTitle.textContent = '📦 Pre-Order Mode';
       stockDesc.textContent = `Stock habis – Sisa PO: ${formatNumber(CURRENT_PO)} Robux`;
-    } else {
+    } else if (robux > 0) {
       deliveryInfo.textContent = '❌ Melebihi kapasitas PO';
       stockAlert.className = 'stock-alert out';
       stockTitle.textContent = '❌ Tidak Tersedia';
@@ -96,7 +104,6 @@ function updateUI() {
       btnBuy.disabled = true;
     }
   } else if (robux > CURRENT_STOCK) {
-    // Partial stock + PO
     const instantPart = CURRENT_STOCK;
     const poPart = robux - CURRENT_STOCK;
     
@@ -109,11 +116,10 @@ function updateUI() {
       deliveryInfo.textContent = '❌ Melebihi kapasitas';
       stockAlert.className = 'stock-alert out';
       stockTitle.textContent = '❌ Tidak Tersedia';
-      stockDesc.textContent = `Maksimal: ${formatNumber(CURRENT_STOCK + CURRENT_PO)} Robux`;
+      stockDesc.textContent = `Maksimal: ${formatNumber(maxAvailable)} Robux`;
       btnBuy.disabled = true;
     }
   } else {
-    // All instant
     deliveryInfo.textContent = '⚡ Pengiriman Instant';
     stockAlert.className = 'stock-alert available';
     stockTitle.textContent = '✅ Stock Tersedia';
@@ -121,44 +127,48 @@ function updateUI() {
   }
 }
 
-/* ===== SUBMIT ORDER (REDIRECT TO PAYMENT) ===== */
-function submitOrder() {
+async function submitOrder() {
   const robux = Number(robuxInput.value);
   
   if (robux < 10) {
     alert('❌ Minimal pembelian 10 Robux');
     return;
   }
-
+  
   const total = robux * PRICE_PER_ROBUX;
   const maxAvailable = CURRENT_STOCK + CURRENT_PO;
-
+  
   if (robux > maxAvailable) {
     alert(`❌ Maksimal pembelian saat ini: ${formatNumber(maxAvailable)} Robux`);
     return;
   }
-
-  // Redirect to payment page with parameters
-  const params = new URLSearchParams({
-    amount: robux,
-    price: 'Rp ' + formatNumber(total),
-    delivery: deliveryInfo.textContent
-  });
-
-  window.location.href = 'payment.html?' + params.toString();
+  
+  // Create order in Firestore
+  const orderData = {
+    robuxAmount: robux,
+    totalPrice: total,
+    deliveryInfo: deliveryInfo.textContent,
+    status: 'pending',
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp()
+  };
+  
+  try {
+    const docRef = await addDoc(collection(db, 'orders'), orderData);
+    // Redirect to payment page
+    window.location.href = `payment.html?orderId=${docRef.id}`;
+  } catch (error) {
+    console.error('Error creating order:', error);
+    alert('Gagal membuat pesanan. Silakan coba lagi.');
+  }
 }
 
-/* ===== EVENT LISTENERS ===== */
 robuxInput.addEventListener('input', updateUI);
 btnBuy.addEventListener('click', submitOrder);
 
-/* ===== AUTO REFRESH CONFIG ===== */
-// Refresh config every 30 seconds to sync with Firestore
+// Auto-refresh config every 30 seconds
 setInterval(() => {
   loadConfig();
-  console.log('🔄 Auto-refreshing config...');
 }, 30000);
 
-/* ===== INITIALIZE ===== */
-// Load config from Firestore first, then update UI
 loadConfig();

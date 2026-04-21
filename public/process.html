@@ -1,128 +1,74 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Processing Order - R Store</title>
-<link href="https://fonts.googleapis.com/css2?family=HK+Grotesk:wght@400;600;700;900&display=swap" rel="stylesheet">
-<style>
-*{box-sizing:border-box}
-body{margin:0;font-family:'HK Grotesk',sans-serif;background:linear-gradient(135deg,#667eea,#764ba2);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
-.box{background:#fff;border-radius:20px;padding:50px 40px;max-width:500px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.25);animation:slideUp .5s ease-out}
-@keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
-.icon{font-size:96px;animation:pulse 1.5s infinite}
-@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
-h1{font-size:34px;font-weight:900;margin:16px 0;color:#333}
-.message{color:#666;font-size:18px;line-height:1.6;margin:16px 0}
-.detail{margin-top:32px;background:#f8f9fa;border-radius:12px;padding:24px;text-align:left}
-.row{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #e0e0e0}
-.row:last-child{border:none}
-.label{color:#666;font-weight:600}
-.value{font-weight:700;color:#333;text-align:right;word-break:break-all}
-.status-badge{display:inline-block;padding:6px 12px;border-radius:20px;font-size:14px;font-weight:700;background:linear-gradient(135deg,#ffa116,#ff6b6b);color:#fff}
-.btn-container{margin-top:32px;display:flex;gap:12px}
-.btn{flex:1;padding:16px;border-radius:12px;text-decoration:none;color:#fff;font-weight:800;font-size:16px;transition:all .3s;text-align:center;border:none;cursor:pointer;font-family:'HK Grotesk',sans-serif}
-.btn-primary{background:linear-gradient(135deg,#667eea,#764ba2)}
-.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(102,126,234,.4)}
-.btn-secondary{background:#6c757d}
-.btn-secondary:hover{background:#5a6268;transform:translateY(-2px)}
-.info-box{margin-top:24px;padding:16px;background:#fff3cd;border-left:4px solid #ffa116;border-radius:8px;text-align:left}
-.info-box p{margin:8px 0;font-size:14px;color:#856404}
-.copy-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:#667eea;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;transition:all .3s;margin-left:8px}
-.copy-btn:hover{background:#764ba2;transform:scale(1.05)}
-@media(max-width:768px){
-.box{padding:40px 24px}
-h1{font-size:28px}
-.icon{font-size:72px}
-.btn-container{flex-direction:column}
-.value{font-size:14px}
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Memproses Pesanan - R STORE</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .process-container {
+      text-align: center;
+      padding: 80px 20px;
+    }
+    .spinner {
+      width: 60px;
+      height: 60px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 30px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
 </head>
 <body>
-<div class="box">
-<div class="icon">⏳</div>
-<h1>Pesanan Sedang Diproses</h1>
-<p class="message">Terima kasih! Pesanan kamu sudah diterima dan sedang dalam proses verifikasi pembayaran.</p>
-<div class="detail">
-<div class="row">
-<span class="label">Order ID</span>
-<span class="value">
-<span id="orderId">-</span>
-<button class="copy-btn" onclick="copyOrderId()">📋 Copy</button>
-</span>
-</div>
-<div class="row">
-<span class="label">Username</span>
-<span class="value" id="username">-</span>
-</div>
-<div class="row">
-<span class="label">Jumlah Robux</span>
-<span class="value" id="amount">-</span>
-</div>
-<div class="row">
-<span class="label">Total Bayar</span>
-<span class="value" id="price">-</span>
-</div>
-<div class="row">
-<span class="label">Status</span>
-<span class="value"><span class="status-badge">⏳ PENDING</span></span>
-</div>
-</div>
-<div class="info-box">
-<p><strong>ℹ️ Informasi:</strong></p>
-<p>• Pembayaran akan diverifikasi dalam 5-15 menit</p>
-<p>• Robux akan dikirim otomatis setelah verifikasi</p>
-<p>• Simpan Order ID untuk tracking pesanan</p>
-</div>
-<div class="btn-container">
-<a href="index.html" class="btn btn-secondary">← Kembali</a>
-<button class="btn btn-primary" id="trackBtn">🔍 Track Order</button>
-</div>
-</div>
-<script>
-const params=new URLSearchParams(location.search);
-const orderId=params.get("orderId")||"-";
-const username=params.get("username")||"-";
-const amount=params.get("amount")||"0";
-const price=params.get("price")||"Rp 0";
 
-document.getElementById('orderId').textContent=orderId;
-document.getElementById('username').textContent=decodeURIComponent(username);
-document.getElementById('amount').textContent=Number(amount).toLocaleString("id-ID")+" Robux";
-document.getElementById('price').textContent=decodeURIComponent(price);
+<nav class="navbar">
+  <div class="nav-logo">🎮 R STORE – ROBUX</div>
+  <a href="track.html" class="btn-track">Lacak Pesanan</a>
+</nav>
 
-function copyOrderId(){
-const orderIdText=document.getElementById('orderId').textContent;
-navigator.clipboard.writeText(orderIdText).then(()=>{
-const btn=document.querySelector('.copy-btn');
-const originalText=btn.innerHTML;
-btn.innerHTML='✅ Copied!';
-btn.style.background='#43e97b';
-setTimeout(()=>{
-btn.innerHTML=originalText;
-btn.style.background='#667eea';
-},2000);
-}).catch(()=>{
-alert('Gagal copy. Order ID: '+orderIdText);
-});
-}
+<main class="main">
+  <div class="card process-container">
+    <div class="spinner"></div>
+    <h2>Memproses Pesanan Anda...</h2>
+    <p>Mohon tunggu, kami sedang menyiapkan transaksi.</p>
+  </div>
+</main>
 
-document.getElementById('trackBtn').onclick=function(){
-if(orderId&&orderId!=='-'){
-window.location.href=`track.html?search=${orderId}`;
-}else{
-window.location.href='track.html';
-}
-};
+<footer class="footer">© 2025 R Store — Unofficial Roblox Store</footer>
 
-setTimeout(()=>{
-document.querySelector('.icon').textContent='✅';
-document.querySelector('h1').textContent='Pesanan Diterima!';
-document.querySelector('.message').textContent='Admin akan segera memverifikasi pembayaran kamu. Robux akan dikirim dalam 5-15 menit.';
-document.querySelector('.status-badge').innerHTML='✅ RECEIVED';
-document.querySelector('.status-badge').style.background='linear-gradient(135deg,#43e97b,#38f9d7)';
-},2000);
+<script type="module">
+  import { db, addDoc, collection, serverTimestamp } from './firebase-config.js';
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const robux = urlParams.get('robux');
+  const total = urlParams.get('total');
+  const delivery = urlParams.get('delivery');
+
+  async function createOrder() {
+    const orderData = {
+      robuxAmount: parseInt(robux),
+      totalPrice: parseInt(total),
+      deliveryInfo: delivery,
+      status: 'pending',
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    };
+
+    const docRef = await addDoc(collection(db, 'orders'), orderData);
+    
+    // Redirect ke payment page dengan orderId
+    window.location.href = `payment.html?orderId=${docRef.id}`;
+  }
+
+  createOrder();
 </script>
+
 </body>
 </html>

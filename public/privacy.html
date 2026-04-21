@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy - R STORE</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 40px 20px;
+  }
+  
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 40px;
+    animation: fadeInDown 0.8s ease-out;
+  }
+  
+  .header h1 {
+    color: white;
+    font-size: 48px;
+    font-weight: 900;
+    margin-bottom: 12px;
+    text-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  }
+  
+  .header .subtitle {
+    color: rgba(255,255,255,0.95);
+    font-size: 16px;
+    font-weight: 600;
+  }
+  
+  .header .last-updated {
+    color: rgba(255,255,255,0.85);
+    font-size: 14px;
+    margin-top: 8px;
+    font-weight: 500;
+  }
+  
+  /* Content Card */
+  .content-card {
+    background: white;
+    border-radius: 24px;
+    padding: 50px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    animation: fadeInUp 0.8s ease-out 0.2s both;
+    margin-bottom: 30px;
+  }
+  
+  /* Introduction */
+  .intro {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    padding: 25px;
+    border-radius: 16px;
+    border-left: 5px solid #0284c7;
+    margin-bottom: 40px;
+  }
+  
+  .intro p {
+    color: #0c4a6e;
+    font-size: 15px;
+    line-height: 1.8;
+    font-weight: 500;
+  }
+  
+  /* Section */
+  .section {
+    margin-bottom: 40px;
+  }
+  
+  .section:last-child {
+    margin-bottom: 0;
+  }
+  
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 24px;
+    font-weight: 800;
+    color: #1f2937;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 3px solid #e5e7eb;
+  }
+  
+  .section-icon {
+    font-size: 28px;
+  }
+  
+  .section-content {
+    color: #4b5563;
+    font-size: 15px;
+    line-height: 1.8;
+  }
+  
+  .section-content p {
+    margin-bottom: 16px;
+  }
+  
+  .section-content p:last-child {
+    margin-bottom: 0;
+  }
+  
+  /* List Styles */
+  .info-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .info-list li {
+    padding: 12px 0 12px 35px;
+    position: relative;
+    color: #4b5563;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+  
+  .info-list li::before {
+    content: '✓';
+    position: absolute;
+    left: 8px;
+    top: 12px;
+    color: #10b981;
+    font-weight: 900;
+    font-size: 18px;
+  }
+  
+  /* Highlight Box */
+  .highlight-box {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    padding: 20px;
+    border-radius: 12px;
+    border-left: 5px solid #f59e0b;
+    margin: 20px 0;
+  }
+  
+  .highlight-box p {
+    color: #78350f;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.7;
+    margin: 0;
+  }
+  
+  /* Contact Box */
+  .contact-box {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 30px;
+    border-radius: 16px;
+    text-align: center;
+    margin-top: 40px;
+    box-shadow: 0 8px 30px rgba(102,126,234,0.3);
+  }
+  
+  .contact-box h3 {
+    color: white;
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 12px;
+  }
+  
+  .contact-box p {
+    color: rgba(255,255,255,0.95);
+    font-size: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .contact-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 32px;
+    background: white;
+    color: #667eea;
+    font-size: 16px;
+    font-weight: 800;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  }
+  
+  .contact-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+  }
+  
+  /* Back Button */
+  .back-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: white;
+    color: #667eea;
+    font-size: 16px;
+    font-weight: 700;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    animation: fadeInUp 0.8s ease-out 0.4s both;
+  }
+  
+  .back-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+  }
+  
+  /* Animations */
+  @keyframes fadeInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .header h1 {
+      font-size: 32px;
+    }
+    
+    .content-card {
+      padding: 30px 25px;
+    }
+    
+    .section-title {
+      font-size: 20px;
+    }
+    
+    .section-content {
+      font-size: 14px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <h1>🔒 Privacy Policy</h1>
+    <p class="subtitle">Kebijakan Privasi R STORE</p>
+    <p class="last-updated">Terakhir diperbarui: 29 Desember 2025</p>
+  </div>
+  
+  <!-- Content Card -->
+  <div class="content-card">
+    
+    <!-- Introduction -->
+    <div class="intro">
+      <p>
+        <strong>R STORE</strong> berkomitmen untuk melindungi privasi dan keamanan data pribadi Anda. Kebijakan privasi ini menjelaskan bagaimana kami mengumpulkan, menggunakan, dan melindungi informasi Anda saat menggunakan layanan kami.
+      </p>
+    </div>
+    
+    <!-- Section 1 -->
+    <div class="section">
+      <h2 class="section-title">
+        <span class="section-icon">📋</span>
+        Informasi yang Kami Kumpulkan
+      </h2>
+      <div class="section-content">
+        <p>Kami mengumpulkan informasi berikut untuk memproses pesanan Anda:</p>
+        <ul class="info-list">
+          <li><strong>Username Roblox:</strong> Untuk pengiriman Robux ke akun Anda</li>
+          <li><strong>Bukti Pembayaran:</strong> Screenshot transfer untuk verifikasi transaksi</li>
+          <li><strong>Nomor Kontak:</strong> Untuk komunikasi terkait pesanan (opsional)</li>
+          <li><strong>Data Transaksi:</strong> Jumlah Robux, harga, dan waktu pembelian</li>
+        </ul>
+        <div class="highlight-box">
+          <p>⚠️ Kami TIDAK mengumpulkan password Roblox atau informasi login Anda. Jangan pernah memberikan password ke siapapun!</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Section 2 -->
+    <div class="section">
+      <h2 class="section-title">
+        <span class="section-icon">🎯</span>
+        Penggunaan Informasi
+      </h2>
+      <div class="section-content">
+        <p>Informasi yang kami kumpulkan digunakan untuk:</p>
+        <ul class="info-list">
+          <li>Memproses dan mengirimkan pesanan Robux Anda</li>
+          <li>Verifikasi pembayaran dan mencegah penipuan</li>
+          <li>Menghubungi Anda terkait status pesanan</li>
+          <li>Meningkatkan kualitas layanan kami</li>
+          <li>Menyelesaikan masalah atau komplain pelanggan</li>
+        </ul>
+      </div>
+    </div>
+    
+    <!-- Section 3 -->
+    <div class="section">
+      <h2 class="section-title">
+        <span class="section-icon">🔐</span>
+        Keamanan Data
+      </h2>
+      <div class="section-content">
+        <p>Kami menerapkan langkah-langkah keamanan untuk melindungi data Anda:</p>
+        <ul class="info-list">
+          <li>Enkripsi data saat transmisi</li>
+          <li>Akses terbatas hanya untuk admin yang berwenang</li>
+          <li>Penyimpanan data di server yang aman</li>
+          <li>Penghapusan otomatis bukti pembayaran setelah 30 hari</li>
+          <li>Tidak membagikan data pribadi Anda ke pihak ketiga tanpa izin</li>
+        </ul>
+        <p style="margin-top: 20px;">Meskipun kami berusaha maksimal melindungi data Anda, tidak ada metode transmisi internet yang 100% aman. Kami mendorong Anda untuk juga menjaga keamanan akun Anda.</p>
+      </div>
+    </div>
+    
+    <!-- Section 4 -->
+    <div class="section">
+      <h2 class="section-title">
+        <span class="section-icon">🍪</span>
+        Cookies dan Tracking
+      </h2>
+      <div class="section-content">
+        <p>Website kami mungkin menggunakan cookies untuk meningkatkan pengalaman pengguna. Cookies ini digunakan untuk:</p>
+        <ul class="info-list">
+          <li>Mengingat preferensi Anda</li>
+          <li>Menganalisis traffic website</li>
+          <li>Meningkatkan performa website</li>
+        </ul>
+        <p style="margin-top: 16px;">Anda dapat menonaktifkan cookies melalui pengaturan browser Anda, namun beberapa fitur website mungkin tidak berfungsi optimal.</p>
+      </div>
+    </div>
+    
+    <!-- Section 5 -->
+    <div class="section">
+      <h2 class="section-title">
+        <span class="section-icon">🤝</span>
+        Pembagian Informasi
+      </h2>
+      <div class="section-content">
+        <p>Kami TIDAK akan membagikan, menjual, atau menyewakan data pribadi Anda kepada pihak ketiga, kecuali:</p>
+        <ul class="info-list">
+          <li>Jika diwajibkan oleh hukum atau peraturan pemerintah</li>
+          <li>Untuk melindungi hak dan keamanan R STORE</li>
+          <li>Dengan izin eksplisit dari Anda</li>
+        </ul>
+      </div>
+    </div>
+    
+    <!-- Section 6 -->
+    <div class="section">
+      <h2 class="section-title">
+        <span class="section-icon">⏳</span>
+        Retensi Data
+      </h2>
+      <div class="section-content">
+        <p>Kami menyimpan data Anda selama diperlukan untuk tujuan berikut:</p>
+        <ul class="info-list">
+          <li><strong>Data Transaksi:</strong> Disimpan selama 1 tahun untuk keperluan audit</li>
+          <li><strong>Bukti Pembayaran:</strong> Dihapus otomatis setelah 30 hari</li>
+          <li><strong>Riwayat Chat:</strong> Disimpan selama 90 hari</li>
+        </ul>
+        <p style="margin-top: 16px;">Setelah periode retensi, data akan dihapus secara permanen dari sistem kami.</p>
+      </div>
+    </div>
+    
+    <!-- Section 7 -->
+    <div class="section">
+      <h2 class="section-title">
+        <span class="section-icon">👶</span>
+        Privasi Anak-anak
+      </h2>
+      <div class="section-content">
+        <p>Layanan kami terbuka untuk semua usia. Namun, untuk pengguna di bawah 18 tahun, kami merekomendasikan:</p>
+        <ul class="info-list">
+          <li>Bertransaksi dengan pengawasan orang tua/wali</li>
+          <li>Tidak membagikan informasi pribadi yang sensitif</li>
+          <li>Berkonsultasi dengan orang tua sebelum melakukan pembelian</li>
+        </ul>
+      </div>
+    </div>
+    
+    <!-- Section 8 -->
+    <div class="section">
+      <h2 class="section-title">
+        <span class="section-icon">✏️</span>
+        Hak Anda
+      </h2>
+      <div class="section-content">
+        <p>Sebagai pengguna, Anda memiliki hak untuk:</p>
+        <ul class="info-list">
+          <li>Mengakses data pribadi yang kami simpan</li>
+          <li>Meminta koreksi data yang tidak akurat</li>
+          <li>Meminta penghapusan data Anda</li>
+          <li>Menarik persetujuan penggunaan data kapan saja</li>
+          <li>Mengajukan keluhan terkait penanganan data</li>
+        </ul>
+        <p style="margin-top: 16px;">Untuk menggunakan hak-hak ini, silakan hubungi admin kami melalui kontak yang tersedia.</p>
+      </div>
+    </div>
+    
+    <!-- Section 9 -->
+    <div class="section">
+      <h2 class="section-title">
+        <span class="section-icon">🔄</span>
+        Perubahan Kebijakan
+      </h2>
+      <div class="section-content">
+        <p>Kami dapat memperbarui kebijakan privasi ini sewaktu-waktu. Perubahan akan diinformasikan melalui:</p>
+        <ul class="info-list">
+          <li>Pengumuman di website</li>
+          <li>Notifikasi di grup Discord</li>
+          <li>Update tanggal "Terakhir diperbarui" di halaman ini</li>
+        </ul>
+        <p style="margin-top: 16px;">Dengan terus menggunakan layanan kami setelah perubahan, Anda dianggap menyetujui kebijakan privasi yang diperbarui.</p>
+      </div>
+    </div>
+    
+    <!-- Contact Box -->
+    <div class="contact-box">
+      <h3>💬 Punya Pertanyaan tentang Privasi?</h3>
+      <p>Jika Anda memiliki pertanyaan, kekhawatiran, atau ingin menggunakan hak privasi Anda, jangan ragu untuk menghubungi kami!</p>
+      <a href="https://discord.gg/AUAzsxPP27" class="contact-button">
+        📞 Hubungi Admin
+      </a>
+    </div>
+    
+  </div>
+  
+  <!-- Back Button -->
+  <div style="text-align: center;">
+    <a href="index.html" class="back-button">
+      ← Kembali ke Beranda
+    </a>
+  </div>
+  
+</div>
+
+</body>
+</html>
