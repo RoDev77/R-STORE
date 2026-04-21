@@ -6,6 +6,51 @@
   <title>Lacak Pesanan - R STORE</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <style>
+    .order-id-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 5px;
+    }
+    .order-id-text {
+      font-family: monospace;
+      font-size: 14px;
+      background: #f0f0f0;
+      padding: 6px 10px;
+      border-radius: 6px;
+      word-break: break-all;
+    }
+    .copy-btn {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .copy-btn:hover {
+      background: #5a67d8;
+    }
+    .copy-btn.copied {
+      background: #28a745;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .status-pending { background: #ffc107; color: #000; }
+    .status-waiting_payment { background: #ffc107; color: #000; }
+    .status-paid { background: #28a745; color: #fff; }
+    .status-delivered { background: #17a2b8; color: #fff; }
+    .status-cancelled { background: #dc3545; color: #fff; }
+  </style>
 </head>
 <body>
 
@@ -16,23 +61,28 @@
 
 <main class="main">
   <div class="card" style="max-width: 500px; margin: 0 auto;">
-    <h2 style="margin-bottom: 20px;">Lacak Pesanan</h2>
+    <h2 style="margin-bottom: 20px;">🔍 Lacak Pesanan</h2>
     
     <div class="input-group">
       <label>Masukkan Order ID</label>
-      <input type="text" id="trackOrderId" placeholder="Contoh: abc123def456" />
+      <input type="text" id="trackOrderId" placeholder="Contoh: RBX-1234567890123" />
     </div>
     
     <button class="btn-buy" id="trackBtn" style="margin-top: 10px;">Lacak</button>
 
     <div id="trackResult" style="margin-top: 30px; display: none;">
       <div style="background: #f5f5f5; padding: 20px; border-radius: 12px;">
-        <h3>Detail Pesanan</h3>
-        <p><strong>Order ID:</strong> <span id="resultOrderId">-</span></p>
-        <p><strong>Jumlah Robux:</strong> <span id="resultRobux">-</span></p>
-        <p><strong>Total:</strong> <span id="resultTotal">-</span></p>
-        <p><strong>Status:</strong> <span id="resultStatus">-</span></p>
-        <p><strong>Metode Pembayaran:</strong> <span id="resultMethod">-</span></p>
+        <h3>📋 Detail Pesanan</h3>
+        
+        <div style="margin-bottom: 15px;">
+          <strong>Order ID:</strong>
+          <div class="order-id-container" id="orderIdContainer"></div>
+        </div>
+        
+        <p><strong>💰 Jumlah Robux:</strong> <span id="resultRobux">-</span></p>
+        <p><strong>💵 Total:</strong> <span id="resultTotal">-</span></p>
+        <p><strong>📌 Status:</strong> <span id="resultStatus">-</span></p>
+        <p><strong>💳 Metode Pembayaran:</strong> <span id="resultMethod">-</span></p>
       </div>
     </div>
   </div>
@@ -43,39 +93,88 @@
 <script type="module">
   import { db, doc, getDoc } from './firebase-config.js';
 
-  document.getElementById('trackBtn').addEventListener('click', async () => {
-    const orderId = document.getElementById('trackOrderId').value.trim();
+  const trackBtn = document.getElementById('trackBtn');
+  const trackOrderId = document.getElementById('trackOrderId');
+  const trackResult = document.getElementById('trackResult');
+
+  // Fungsi untuk copy teks ke clipboard
+  async function copyToClipboard(text, buttonElement) {
+    try {
+      await navigator.clipboard.writeText(text);
+      // Tampilkan feedback "Copied!"
+      const originalText = buttonElement.textContent;
+      buttonElement.textContent = '✅ Tersalin!';
+      buttonElement.classList.add('copied');
+      
+      // Kembalikan ke teks semula setelah 2 detik
+      setTimeout(() => {
+        buttonElement.textContent = originalText;
+        buttonElement.classList.remove('copied');
+      }, 2000);
+    } catch (err) {
+      console.error('Gagal copy: ', err);
+      alert('Gagal menyalin. Silakan copy manual.');
+    }
+  }
+
+  // Fungsi untuk menampilkan hasil tracking
+  async function trackOrder() {
+    const orderId = trackOrderId.value.trim();
     
     if (!orderId) {
-      alert('Masukkan Order ID!');
+      alert('❌ Masukkan Order ID!');
       return;
     }
 
     const orderRef = doc(db, 'orders', orderId);
     const orderSnap = await getDoc(orderRef);
 
-    const resultDiv = document.getElementById('trackResult');
-    
     if (orderSnap.exists()) {
       const data = orderSnap.data();
+      
+      // Peta status ke teks dan class
       const statusMap = {
-        'pending': '⏳ Menunggu pembayaran',
-        'waiting_payment': '💳 Menunggu pembayaran',
-        'paid': '✅ Sudah dibayar - Sedang diproses',
-        'delivered': '🎉 Robux sudah dikirim!',
-        'cancelled': '❌ Dibatalkan'
+        'pending': { text: '⏳ Menunggu pembayaran', class: 'status-pending' },
+        'waiting_payment': { text: '💳 Menunggu pembayaran', class: 'status-waiting_payment' },
+        'paid': { text: '✅ Sudah dibayar - Sedang diproses', class: 'status-paid' },
+        'delivered': { text: '🎉 Robux sudah dikirim!', class: 'status-delivered' },
+        'cancelled': { text: '❌ Dibatalkan', class: 'status-cancelled' }
       };
       
-      document.getElementById('resultOrderId').textContent = orderId;  // Tampilkan full
+      const statusInfo = statusMap[data.status] || { text: data.status, class: 'status-pending' };
+      
+      // Tampilkan Order ID dengan tombol copy
+      const orderIdContainer = document.getElementById('orderIdContainer');
+      orderIdContainer.innerHTML = `
+        <span class="order-id-text">${orderId}</span>
+        <button class="copy-btn" onclick="window.copyOrderId('${orderId}')">📋 Copy</button>
+      `;
+      
+      // Karena fungsi onclick di atas menggunakan window, kita perlu attach function ke window
+      window.copyOrderId = (id) => {
+        const btn = document.querySelector('.copy-btn');
+        copyToClipboard(id, btn);
+      };
+      
+      // Tampilkan data lainnya
       document.getElementById('resultRobux').textContent = (data.robuxAmount || 0).toLocaleString('id-ID');
       document.getElementById('resultTotal').textContent = 'Rp ' + (data.totalPrice || 0).toLocaleString('id-ID');
-      document.getElementById('resultStatus').textContent = statusMap[data.status] || data.status;
+      document.getElementById('resultStatus').innerHTML = `<span class="status-badge ${statusInfo.class}">${statusInfo.text}</span>`;
       document.getElementById('resultMethod').textContent = (data.paymentMethod || '-').toUpperCase();
       
-      resultDiv.style.display = 'block';
+      trackResult.style.display = 'block';
     } else {
-      alert('Order ID tidak ditemukan!');
-      resultDiv.style.display = 'none';
+      alert('❌ Order ID tidak ditemukan!');
+      trackResult.style.display = 'none';
+    }
+  }
+
+  trackBtn.addEventListener('click', trackOrder);
+  
+  // Enter key support
+  trackOrderId.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      trackOrder();
     }
   });
 </script>

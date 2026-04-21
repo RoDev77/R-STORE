@@ -6,6 +6,86 @@
   <title>Menunggu Pembayaran - R STORE</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <style>
+    .order-id-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 5px;
+      margin-bottom: 15px;
+    }
+    .order-id-text {
+      font-family: monospace;
+      font-size: 14px;
+      background: #f0f0f0;
+      padding: 10px 14px;
+      border-radius: 10px;
+      word-break: break-all;
+      flex: 1;
+    }
+    .copy-btn {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 600;
+    }
+    .copy-btn:hover {
+      background: #5a67d8;
+      transform: scale(1.02);
+    }
+    .copy-btn.copied {
+      background: #28a745;
+    }
+    .instruction-box {
+      background: #e8f0fe;
+      border-left: 4px solid #667eea;
+      padding: 15px;
+      border-radius: 12px;
+      margin: 20px 0;
+      text-align: left;
+    }
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+    .btn-primary {
+      background: #667eea;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 40px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.2s;
+      display: inline-block;
+    }
+    .btn-primary:hover {
+      background: #5a67d8;
+      transform: translateY(-2px);
+    }
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 40px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.2s;
+      display: inline-block;
+    }
+    .btn-secondary:hover {
+      background: #5a6268;
+      transform: translateY(-2px);
+    }
+  </style>
 </head>
 <body>
 
@@ -15,25 +95,31 @@
 </nav>
 
 <main class="main">
-  <div class="card" style="max-width: 500px; margin: 0 auto; text-align: center;">
+  <div class="card" style="max-width: 550px; margin: 0 auto; text-align: center;">
     <div style="font-size: 70px; margin-bottom: 20px;">⏳</div>
     <h2>Menunggu Pembayaran</h2>
     <p>Pesanan Anda telah dibuat. Silakan selesaikan pembayaran.</p>
     
-    <div id="orderDetail" style="background: #f5f5f5; padding: 20px; border-radius: 12px; margin: 20px 0; text-align: left;">
-      <p><strong>Order ID:</strong> <span id="orderId" style="font-family: monospace; font-size: 14px; word-break: break-all;">-</span></p>
-      <p><strong>Metode Pembayaran:</strong> <span id="payMethod">-</span></p>
-      <p><strong>Total:</strong> <span id="totalAmount">-</span></p>
+    <div style="background: #f5f5f5; padding: 20px; border-radius: 16px; margin: 20px 0; text-align: left;">
+      <p style="margin-bottom: 8px;"><strong>🆔 Order ID:</strong></p>
+      <div id="orderIdContainer" class="order-id-container"></div>
+      
+      <p><strong>💳 Metode Pembayaran:</strong> <span id="payMethod">-</span></p>
+      <p><strong>💰 Total:</strong> <span id="totalAmount">-</span></p>
     </div>
 
-    <p style="font-size: 14px; color: #666;">
-      💡 <strong>Simpan Order ID Anda!</strong><br>
-      Gunakan Order ID di atas untuk melacak pesanan.
-    </p>
+    <div class="instruction-box">
+      <strong>📌 Instruksi:</strong>
+      <ul style="margin-top: 8px; padding-left: 20px;">
+        <li>Simpan Order ID Anda untuk lacak pesanan</li>
+        <li>Lakukan pembayaran sesuai metode yang dipilih</li>
+        <li>Robux akan dikirim otomatis setelah pembayaran dikonfirmasi</li>
+      </ul>
+    </div>
 
-    <div style="margin-top: 20px;">
-      <a href="track.html" class="btn-track" style="display: inline-block; margin: 5px;">🔍 Lacak Pesanan</a>
-      <a href="index.html" class="btn-track" style="display: inline-block; background: #667eea;">🛒 Beli Lagi</a>
+    <div class="btn-group">
+      <a href="track.html" class="btn-primary">🔍 Lacak Pesanan</a>
+      <a href="index.html" class="btn-secondary">🛒 Beli Lagi</a>
     </div>
   </div>
 </main>
@@ -47,9 +133,25 @@
   const orderId = urlParams.get('orderId');
   const method = urlParams.get('method');
 
+  // Fungsi copy ke clipboard
+  async function copyToClipboard(text, buttonElement) {
+    try {
+      await navigator.clipboard.writeText(text);
+      const originalText = buttonElement.textContent;
+      buttonElement.textContent = '✅ Tersalin!';
+      buttonElement.classList.add('copied');
+      setTimeout(() => {
+        buttonElement.textContent = originalText;
+        buttonElement.classList.remove('copied');
+      }, 2000);
+    } catch (err) {
+      alert('Gagal menyalin. Silakan copy manual.');
+    }
+  }
+
   async function loadOrder() {
     if (!orderId) {
-      document.getElementById('orderId').textContent = 'Tidak ditemukan';
+      document.getElementById('orderIdContainer').innerHTML = '<span>Order ID tidak ditemukan</span>';
       return;
     }
 
@@ -58,12 +160,23 @@
     
     if (orderSnap.exists()) {
       const data = orderSnap.data();
-      // Tampilkan FULL Order ID, tidak dipotong
-      document.getElementById('orderId').textContent = orderId;
-      document.getElementById('payMethod').textContent = method ? method.toUpperCase() : '-';
+      
+      // Tampilkan Order ID dengan tombol copy
+      const orderIdContainer = document.getElementById('orderIdContainer');
+      orderIdContainer.innerHTML = `
+        <span class="order-id-text">${orderId}</span>
+        <button class="copy-btn" id="copyOrderIdBtn">📋 Copy</button>
+      `;
+      
+      // Event listener untuk tombol copy
+      document.getElementById('copyOrderIdBtn').addEventListener('click', (e) => {
+        copyToClipboard(orderId, e.target);
+      });
+      
+      document.getElementById('payMethod').textContent = method ? method.toUpperCase() : (data.paymentMethod || '-').toUpperCase();
       document.getElementById('totalAmount').textContent = 'Rp ' + (data.totalPrice || 0).toLocaleString('id-ID');
     } else {
-      document.getElementById('orderId').textContent = 'Order tidak ditemukan';
+      document.getElementById('orderIdContainer').innerHTML = '<span>Order tidak ditemukan</span>';
     }
   }
 

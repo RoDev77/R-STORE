@@ -6,6 +6,60 @@
   <title>Pilih Pembayaran - R STORE</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <style>
+    .order-id-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 5px;
+    }
+    .order-id-text {
+      font-family: monospace;
+      font-size: 14px;
+      background: #e8e8e8;
+      padding: 8px 12px;
+      border-radius: 8px;
+      word-break: break-all;
+      flex: 1;
+    }
+    .copy-btn {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .copy-btn:hover {
+      background: #5a67d8;
+      transform: scale(1.02);
+    }
+    .copy-btn.copied {
+      background: #28a745;
+    }
+    .payment-method {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      width: 100%;
+      padding: 15px 20px;
+      border: 2px solid #e0e0e0;
+      border-radius: 16px;
+      background: white;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 600;
+      font-size: 16px;
+    }
+    .payment-method:hover {
+      border-color: #667eea;
+      background: #f8f9ff;
+      transform: translateX(5px);
+    }
+  </style>
 </head>
 <body>
 
@@ -16,15 +70,19 @@
 
 <main class="main">
   <div class="card" style="max-width: 500px; margin: 0 auto;">
-    <h2 style="margin-bottom: 20px;">Pilih Metode Pembayaran</h2>
+    <h2 style="margin-bottom: 20px;">💳 Pilih Metode Pembayaran</h2>
     
-    <div id="orderInfo" class="order-summary" style="margin-bottom: 30px; padding: 15px; background: #f5f5f5; border-radius: 12px;">
-      <p><strong>Order ID:</strong> <span id="orderId" style="font-family: monospace; font-size: 14px;">-</span></p>
-      <p><strong>Jumlah Robux:</strong> <span id="payRobux">0</span></p>
-      <p><strong>Total:</strong> <span id="payTotal">Rp 0</span></p>
+    <div id="orderInfo" style="margin-bottom: 30px; padding: 20px; background: #f5f5f5; border-radius: 16px;">
+      <p style="margin-bottom: 12px;"><strong>🆔 Order ID:</strong></p>
+      <div id="orderIdContainer" class="order-id-container"></div>
+      
+      <div style="margin-top: 15px;">
+        <p><strong>🎮 Jumlah Robux:</strong> <span id="payRobux">0</span></p>
+        <p><strong>💰 Total:</strong> <span id="payTotal">Rp 0</span></p>
+      </div>
     </div>
 
-    <div class="payment-methods">
+    <div class="payment-methods" style="display: flex; flex-direction: column; gap: 12px;">
       <button class="payment-method" data-method="qris">
         <span>📱 QRIS (Scan QRIS)</span>
       </button>
@@ -42,7 +100,7 @@
       </button>
     </div>
 
-    <div id="paymentNote" class="payment-note" style="margin-top: 20px; font-size: 13px; color: #666; text-align: center;">
+    <div id="paymentNote" style="margin-top: 20px; font-size: 13px; color: #666; text-align: center;">
       ⚡ Demo mode - Integrasi DOKU akan segera hadir
     </div>
   </div>
@@ -61,15 +119,42 @@
     window.location.href = 'index.html';
   }
 
-  // Tampilkan info order (FULL Order ID)
+  // Fungsi copy ke clipboard
+  async function copyToClipboard(text, buttonElement) {
+    try {
+      await navigator.clipboard.writeText(text);
+      const originalText = buttonElement.textContent;
+      buttonElement.textContent = '✅ Tersalin!';
+      buttonElement.classList.add('copied');
+      setTimeout(() => {
+        buttonElement.textContent = originalText;
+        buttonElement.classList.remove('copied');
+      }, 2000);
+    } catch (err) {
+      alert('Gagal menyalin. Silakan copy manual.');
+    }
+  }
+
+  // Tampilkan info order
   async function loadOrder() {
     const orderRef = doc(db, 'orders', orderId);
     const orderSnap = await getDoc(orderRef);
     
     if (orderSnap.exists()) {
       const data = orderSnap.data();
-      // Tampilkan FULL Order ID, tidak dipotong
-      document.getElementById('orderId').textContent = orderId;
+      
+      // Tampilkan Order ID dengan tombol copy
+      const orderIdContainer = document.getElementById('orderIdContainer');
+      orderIdContainer.innerHTML = `
+        <span class="order-id-text">${orderId}</span>
+        <button class="copy-btn" id="copyOrderIdBtn">📋 Copy</button>
+      `;
+      
+      // Event listener untuk tombol copy
+      document.getElementById('copyOrderIdBtn').addEventListener('click', (e) => {
+        copyToClipboard(orderId, e.target);
+      });
+      
       document.getElementById('payRobux').textContent = data.robuxAmount.toLocaleString('id-ID');
       document.getElementById('payTotal').textContent = 'Rp ' + data.totalPrice.toLocaleString('id-ID');
     } else {
