@@ -1,74 +1,54 @@
-// api/doku-checkout.js
+// api/doku-checkout.js - Debug Version
 export default async function handler(req, res) {
-  // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   
-  // Handle preflight
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-  
-  // Hanya POST
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    // Parse body
-    const body = req.body;
-    console.log('Body received:', JSON.stringify(body));
+    const { orderId, amount, redirectUrl } = req.body;
     
-    const { orderId, amount, redirectUrl } = body;
-    
-    // Validasi sederhana
-    if (!orderId) {
-      return res.status(400).json({ success: false, error: 'Missing orderId' });
-    }
-    
-    if (!amount || amount <= 0) {
-      return res.status(400).json({ success: false, error: 'Invalid amount' });
-    }
-    
-    // Credentials
+    // GANTI DENGAN CREDENTIALS PRODUCTION ASLI ANDA
     const CLIENT_ID = 'BRN-0218-1776775043584';
     const SECRET_KEY = 'SK-2yZfPIww9K6CfEOjC6YA';
+    const crypto = require('crypto');
     
-    // Request body ke DOKU
+    const requestId = 'REQ-' + Date.now() + '-' + Math.random().toString(36).substr(2, 8);
+    const timestamp = new Date().toISOString();
+    
     const requestBody = {
-      order: {
-        invoice_number: orderId,
-        amount: Number(amount)
+      order: { 
+        invoice_number: orderId, 
+        amount: Number(amount) 
       },
-      customer: {
-        name: 'Customer R STORE',
-        email: 'customer@rstore.com'
+      customer: { 
+        name: 'Customer R STORE', 
+        email: 'customer@rstore.com' 
       },
-      payment: {
-        redirect_url: redirectUrl || 'https://store.rstudiolab.online/done.html'
+      payment: { 
+        redirect_url: redirectUrl || 'https://store.rstudiolab.online/done.html' 
       }
     };
     
     const bodyString = JSON.stringify(requestBody);
-    
-    // Generate signature sederhana (untuk testing)
-    const crypto = require('crypto');
-    const requestId = 'REQ-' + Date.now();
-    const timestamp = new Date().toISOString();
-    
-    // Hitung digest
     const digest = crypto.createHash('sha256').update(bodyString).digest('base64');
-    
-    // String to sign
     const stringToSign = `Client-Id:${CLIENT_ID}\nRequest-Id:${requestId}\nRequest-Timestamp:${timestamp}\nRequest-Target:/checkout/v1/payment\nDigest:${digest}`;
-    
-    // Signature
     const signature = 'HMACSHA256=' + crypto.createHmac('sha256', SECRET_KEY).update(stringToSign).digest('base64');
     
-    console.log('Calling DOKU API...');
+    // Log semua data untuk debugging
+    console.log('=== DOKU REQUEST DEBUG ===');
+    console.log('CLIENT_ID:', CLIENT_ID);
+    console.log('orderId:', orderId);
+    console.log('amount:', amount);
+    console.log('requestId:', requestId);
+    console.log('timestamp:', timestamp);
+    console.log('digest:', digest);
+    console.log('stringToSign:', stringToSign.replace(/\n/g, '\\n'));
+    console.log('signature:', signature);
+    console.log('bodyString:', bodyString);
     
-    // Panggil DOKU
     const response = await fetch('https://api.doku.com/checkout/v1/payment', {
       method: 'POST',
       headers: {
@@ -82,29 +62,26 @@ export default async function handler(req, res) {
     });
     
     const data = await response.json();
-    console.log('DOKU Response:', JSON.stringify(data));
+    console.log('DOKU Response Status:', response.status);
+    console.log('DOKU Response Data:', JSON.stringify(data, null, 2));
     
-    if (response.ok) {
-      const checkoutUrl = data.payment?.url || data.checkout_url;
-      if (checkoutUrl) {
-        return res.status(200).json({
-          success: true,
-          checkout_url: checkoutUrl
-        });
-      }
+    if (response.ok && data.payment?.url) {
+      return res.status(200).json({ 
+        success: true, 
+        checkout_url: data.payment.url 
+      });
+    } else {
+      return res.status(500).json({ 
+        success: false, 
+        error: data.error?.message || 'DOKU API error',
+        status: response.status,
+        details: data
+      });
     }
-    
-    return res.status(response.status).json({
-      success: false,
-      error: data.error?.message || 'Unknown error',
-      dokuResponse: data
-    });
-    
   } catch (error) {
-    console.error('Error:', error.message);
-    console.error('Stack:', error.stack);
-    return res.status(500).json({
-      success: false,
+    console.error('Server Error:', error);
+    return res.status(500).json({ 
+      success: false, 
       error: error.message,
       stack: error.stack
     });
