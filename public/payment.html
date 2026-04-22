@@ -238,11 +238,10 @@ async function redirectToDoku(bankCode) {
     throw new Error('Nominal pembayaran tidak valid: ' + currentAmount);
   }
   
-  // Tampilkan loading
-  loadingOverlay.style.display = 'flex';
+  addDebugLog('Calling proxy API', { orderId, currentAmount, bankCode });
   
   try {
-    // Panggil proxy API kita
+    // Panggil proxy API
     const response = await fetch('/api/doku-checkout', {
       method: 'POST',
       headers: {
@@ -258,6 +257,7 @@ async function redirectToDoku(bankCode) {
     });
     
     const result = await response.json();
+    addDebugLog('Proxy response', result);
     
     if (result.success && result.checkout_url) {
       // Simpan metode pembayaran
@@ -267,15 +267,15 @@ async function redirectToDoku(bankCode) {
         updatedAt: new Date()
       });
       
+      addDebugLog('Redirecting to DOKU', result.checkout_url);
       // Redirect ke DOKU
       window.location.href = result.checkout_url;
     } else {
-      throw new Error(result.error?.message || 'Gagal membuat transaksi');
+      throw new Error(result.error || 'Gagal membuat transaksi');
     }
   } catch (error) {
-    console.error('Error:', error);
-    alert('Gagal memproses pembayaran: ' + error.message);
-    loadingOverlay.style.display = 'none';
+    addDebugLog('Error in redirectToDoku', error.message);
+    throw error;
   }
 }
 
