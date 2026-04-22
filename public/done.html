@@ -149,7 +149,33 @@
     }
   }
 
-  async function loadOrder() {
+// Tambahkan di awal fungsi loadOrder() di done.html
+async function loadOrder() {
+  // Cek apakah ini redirect dari DOKU
+  const urlParams = new URLSearchParams(window.location.search);
+  const dokuStatus = urlParams.get('status');
+  const dokuInvoice = urlParams.get('invoice');
+  
+  // Jika dari redirect DOKU
+  if (dokuStatus && dokuInvoice) {
+    const orderRef = doc(db, 'orders', dokuInvoice);
+    
+    if (dokuStatus === 'success') {
+      await updateDoc(orderRef, {
+        status: 'paid',
+        paidAt: new Date(),
+        updatedAt: new Date()
+      });
+      showNotification('✅ Pembayaran berhasil! Pesanan Anda akan segera diproses.', 'success');
+    } else if (dokuStatus === 'cancel') {
+      await updateDoc(orderRef, {
+        status: 'cancelled',
+        updatedAt: new Date()
+      });
+      showNotification('❌ Pembayaran dibatalkan.', 'error');
+    }
+  }
+  
     if (!orderId) {
       document.getElementById('orderIdContainer').innerHTML = '<span>Order ID tidak ditemukan</span>';
       return;

@@ -35,10 +35,6 @@
     }
     .copy-btn:hover {
       background: #5a67d8;
-      transform: scale(1.02);
-    }
-    .copy-btn.copied {
-      background: #28a745;
     }
     .payment-method {
       display: flex;
@@ -59,6 +55,10 @@
       background: #f8f9ff;
       transform: translateX(5px);
     }
+    .payment-method:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
     .instruction-box {
       background: #e8f0fe;
       border-left: 4px solid #667eea;
@@ -70,9 +70,6 @@
     .instruction-box ol {
       margin-top: 10px;
       padding-left: 20px;
-    }
-    .instruction-box li {
-      margin-bottom: 5px;
     }
     .btn-group {
       display: flex;
@@ -88,12 +85,10 @@
       border-radius: 40px;
       text-decoration: none;
       font-weight: 600;
-      transition: all 0.2s;
       display: inline-block;
     }
     .btn-primary:hover {
       background: #5a67d8;
-      transform: translateY(-2px);
     }
     .btn-secondary {
       background: #6c757d;
@@ -102,12 +97,49 @@
       border-radius: 40px;
       text-decoration: none;
       font-weight: 600;
-      transition: all 0.2s;
       display: inline-block;
     }
-    .btn-secondary:hover {
-      background: #5a6268;
-      transform: translateY(-2px);
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      display: none;
+    }
+    .loading-content {
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      text-align: center;
+    }
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .warning-badge {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      color: #856404;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      text-align: center;
     }
   </style>
 </head>
@@ -122,6 +154,11 @@
   <div class="card" style="max-width: 500px; margin: 0 auto;">
     <h2 style="margin-bottom: 20px;">💳 Pilih Metode Pembayaran</h2>
     
+    <!-- Peringatan hanya VA yang aktif -->
+    <div class="warning-badge">
+      ⚡ Saat ini hanya tersedia pembayaran melalui Virtual Account (BCA, Mandiri, BRI, BNI)
+    </div>
+    
     <div id="orderInfo" style="margin-bottom: 30px; padding: 20px; background: #f5f5f5; border-radius: 16px;">
       <p style="margin-bottom: 12px;"><strong>🆔 Order ID:</strong></p>
       <div id="orderIdContainer" class="order-id-container"></div>
@@ -133,34 +170,41 @@
     </div>
 
     <div class="payment-methods" style="display: flex; flex-direction: column; gap: 12px;">
-      <button class="payment-method" data-method="qris">
-        <span>📱 QRIS (Scan QRIS)</span>
-      </button>
-      <button class="payment-method" data-method="bca">
+      <button class="payment-method" data-method="bca" data-bank="BCA">
         <span>🏦 BCA Virtual Account</span>
       </button>
-      <button class="payment-method" data-method="mandiri">
+      <button class="payment-method" data-method="mandiri" data-bank="MANDIRI">
         <span>🏦 Mandiri Virtual Account</span>
       </button>
-      <button class="payment-method" data-method="gopay">
-        <span>💚 GoPay</span>
+      <button class="payment-method" data-method="bni" data-bank="BNI">
+        <span>🏦 BNI Virtual Account</span>
       </button>
-      <button class="payment-method" data-method="dana">
-        <span>💙 DANA</span>
+      <button class="payment-method" data-method="bri" data-bank="BRI">
+        <span>🏦 BRI Virtual Account</span>
       </button>
     </div>
-
-    <div id="paymentNote" style="margin-top: 20px; font-size: 13px; color: #666; text-align: center;">
-      ⚡ Demo mode - Integrasi DOKU akan segera hadir
+    
+    <!-- Metode yang belum aktif disembunyikan -->
+    <div style="display: none;">
+      <button class="payment-method" data-method="qris">📱 QRIS</button>
+      <button class="payment-method" data-method="gopay">💚 GoPay</button>
+      <button class="payment-method" data-method="dana">💙 DANA</button>
     </div>
   </div>
 </main>
 
 <footer class="footer">© 2025 R Store — Unofficial Roblox Store</footer>
 
+<div id="loadingOverlay" class="loading-overlay">
+  <div class="loading-content">
+    <div class="spinner"></div>
+    <p>Memproses pembayaran...</p>
+  </div>
+</div>
+
 <script type="module">
   import { db, doc, getDoc, updateDoc } from './firebase-config.js';
-  import { createVirtualAccount, createQRIS, createEWallet } from './doku-payment.js';
+  import { DOKU_CONFIG } from './doku-config.js';
 
   const urlParams = new URLSearchParams(window.location.search);
   const orderId = urlParams.get('orderId');
@@ -170,44 +214,79 @@
     window.location.href = 'index.html';
   }
 
-  // Fungsi copy ke clipboard
+  let currentAmount = 0;
+
   async function copyToClipboard(text, buttonElement) {
     try {
       await navigator.clipboard.writeText(text);
       const originalText = buttonElement.textContent;
       buttonElement.textContent = '✅ Tersalin!';
-      buttonElement.classList.add('copied');
       setTimeout(() => {
         buttonElement.textContent = originalText;
-        buttonElement.classList.remove('copied');
       }, 2000);
     } catch (err) {
-      alert('Gagal menyalin. Silakan copy manual.');
+      alert('Gagal menyalin.');
     }
   }
 
-  // Fungsi load order (TAMBAHKAN INI)
+  // Redirect ke DOKU Checkout untuk Virtual Account
+  async function redirectToDoku(bankCode) {
+    const config = DOKU_CONFIG[DOKU_CONFIG.mode];
+    
+    // Map bank ke channel DOKU
+    const channelMap = {
+      bca: 'VIRTUAL_ACCOUNT_BCA',
+      mandiri: 'VIRTUAL_ACCOUNT_MANDIRI',
+      bni: 'VIRTUAL_ACCOUNT_BNI',
+      bri: 'VIRTUAL_ACCOUNT_BRI'
+    };
+    
+    // Buat URL redirect ke DOKU
+    const params = new URLSearchParams({
+      client_id: config.clientId,
+      invoice_number: orderId,
+      amount: currentAmount.toString(),
+      name: 'Customer R STORE',
+      email: 'customer@rstore.com',
+      redirect_url: config.redirectUrl,
+      expired_time: config.expiredTime.toString(),
+      channel: channelMap[bankCode] || 'VIRTUAL_ACCOUNT_BCA'
+    });
+    
+    // Simpan metode pembayaran ke database
+    await updateDoc(doc(db, 'orders', orderId), {
+      paymentMethod: bankCode,
+      paymentChannel: channelMap[bankCode],
+      status: 'redirecting_payment',
+      updatedAt: new Date()
+    });
+    
+    // Redirect ke DOKU
+    window.location.href = `${config.baseUrl}/payment?${params.toString()}`;
+  }
+
   async function loadOrder() {
     const orderRef = doc(db, 'orders', orderId);
     const orderSnap = await getDoc(orderRef);
     
     if (!orderSnap.exists()) {
-      alert('❌ Pesanan tidak ditemukan atau sudah kadaluarsa (2 jam). Silakan buat pesanan baru.');
+      alert('❌ Pesanan tidak ditemukan. Silakan buat pesanan baru.');
       window.location.href = 'index.html';
       return;
     }
     
     const data = orderSnap.data();
+    currentAmount = data.totalPrice;
     
-    // Cek apakah sudah expired
+    // Cek expired
     const expireAt = data.expireAt?.toDate();
     if (expireAt && new Date() > expireAt) {
-      alert('❌ Pesanan sudah kadaluarsa (melewati 2 jam). Silakan buat pesanan baru.');
+      alert('❌ Pesanan sudah kadaluarsa (2 jam). Silakan buat pesanan baru.');
       window.location.href = 'index.html';
       return;
     }
     
-    // Tampilkan Order ID dengan tombol copy
+    // Tampilkan Order ID
     const orderIdContainer = document.getElementById('orderIdContainer');
     orderIdContainer.innerHTML = `
       <span class="order-id-text">${orderId}</span>
@@ -222,129 +301,38 @@
     document.getElementById('payTotal').textContent = 'Rp ' + data.totalPrice.toLocaleString('id-ID');
   }
 
-  // Handle pilih metode pembayaran - INTEGRASI DOKU
+  // Handle tombol pembayaran
+  const loadingOverlay = document.getElementById('loadingOverlay');
+  
   document.querySelectorAll('.payment-method').forEach(btn => {
     btn.addEventListener('click', async () => {
       const method = btn.dataset.method;
-      const orderRef = doc(db, 'orders', orderId);
-      const orderSnap = await getDoc(orderRef);
-      const orderData = orderSnap.data();
-      const amount = orderData.totalPrice;
+      const bankName = btn.dataset.bank || method.toUpperCase();
       
-      // Simpan teks asli tombol
-      const originalText = btn.innerHTML;
+      if (!currentAmount) {
+        alert('Error: Data pesanan tidak lengkap.');
+        return;
+      }
+      
+      // Konfirmasi ke pelanggan
+      const confirmMsg = `Anda akan membayar Rp ${currentAmount.toLocaleString('id-ID')} melalui ${bankName} Virtual Account.\n\nLanjutkan?`;
+      if (!confirm(confirmMsg)) return;
       
       // Tampilkan loading
+      loadingOverlay.style.display = 'flex';
       btn.disabled = true;
-      btn.innerHTML = '<span>⏳ Memproses...</span>';
       
-      let result;
-      
-      switch(method) {
-        case 'bca':
-        case 'mandiri':
-        case 'bni':
-        case 'bri':
-          result = await createVirtualAccount(orderId, amount, method);
-          if (result.success) {
-            showVAPage(result.virtualAccount, result.howToPayUrl, orderId, method);
-          } else {
-            alert('❌ Gagal membuat Virtual Account: ' + (result.error || 'Unknown error'));
-            btn.disabled = false;
-            btn.innerHTML = originalText;
-          }
-          break;
-          
-        case 'qris':
-          result = await createQRIS(orderId, amount);
-          if (result.success) {
-            showQRISPage(result.qrImage, result.qrUrl, orderId);
-          } else {
-            alert('❌ Gagal membuat QRIS: ' + (result.error || 'Unknown error'));
-            btn.disabled = false;
-            btn.innerHTML = originalText;
-          }
-          break;
-          
-        case 'gopay':
-        case 'dana':
-          result = await createEWallet(orderId, amount, method);
-          if (result.success) {
-            window.location.href = result.paymentUrl;
-          } else {
-            alert('❌ Gagal membuat pembayaran: ' + (result.error || 'Unknown error'));
-            btn.disabled = false;
-            btn.innerHTML = originalText;
-          }
-          break;
+      try {
+        await redirectToDoku(method);
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Gagal memproses pembayaran: ' + error.message);
+        loadingOverlay.style.display = 'none';
+        btn.disabled = false;
       }
     });
   });
 
-  function showVAPage(vaNumber, howToPayUrl, orderId, bankCode) {
-    const paymentMethodsDiv = document.querySelector('.payment-methods');
-    
-    paymentMethodsDiv.innerHTML = `
-      <div style="text-align: center; padding: 20px;">
-        <div style="font-size: 48px; margin-bottom: 20px;">🏦</div>
-        <h3>Virtual Account ${bankCode.toUpperCase()}</h3>
-        <div style="background: #f0f0f0; padding: 15px; border-radius: 12px; margin: 20px 0;">
-          <p style="font-size: 12px; color: #666;">Nomor Virtual Account</p>
-          <p style="font-size: 28px; font-weight: bold; letter-spacing: 2px;">${vaNumber}</p>
-        </div>
-        <button id="copyVABtn" class="copy-btn" style="margin-bottom: 20px;">📋 Copy VA Number</button>
-        <div class="instruction-box">
-          <strong>📌 Cara Pembayaran:</strong>
-          <ol style="margin-top: 10px; padding-left: 20px;">
-            <li>Buka aplikasi mobile banking ${bankCode.toUpperCase()}</li>
-            <li>Pilih menu Transfer ke Virtual Account</li>
-            <li>Masukkan nomor Virtual Account di atas</li>
-            <li>Konfirmasi pembayaran sebesar Rp ${document.getElementById('payTotal').textContent}</li>
-            <li>Pembayaran akan dikonfirmasi otomatis dalam beberapa menit</li>
-          </ol>
-        </div>
-        <div class="btn-group" style="margin-top: 30px;">
-          <a href="track.html?orderId=${orderId}" class="btn-primary">🔍 Cek Status</a>
-          <a href="index.html" class="btn-secondary">🛒 Kembali</a>
-        </div>
-      </div>
-    `;
-    
-    document.getElementById('copyVABtn').addEventListener('click', () => {
-      navigator.clipboard.writeText(vaNumber);
-      alert('✅ Nomor VA disalin!');
-    });
-  }
-  
-  function showQRISPage(qrImage, qrUrl, orderId) {
-    const paymentMethodsDiv = document.querySelector('.payment-methods');
-    
-    paymentMethodsDiv.innerHTML = `
-      <div style="text-align: center; padding: 20px;">
-        <div style="font-size: 48px; margin-bottom: 20px;">📱</div>
-        <h3>QRIS Payment</h3>
-        <div style="background: white; padding: 20px; border-radius: 12px; margin: 20px auto; max-width: 250px;">
-          <img src="${qrImage}" alt="QRIS Code" style="width: 100%;" />
-        </div>
-        <div class="instruction-box">
-          <strong>📌 Cara Pembayaran:</strong>
-          <ol style="margin-top: 10px; padding-left: 20px;">
-            <li>Buka aplikasi QRIS (GoPay, DANA, OVO, LinkAja, dll)</li>
-            <li>Pilih menu Scan QRIS</li>
-            <li>Scan QR code di atas</li>
-            <li>Konfirmasi pembayaran sebesar Rp ${document.getElementById('payTotal').textContent}</li>
-            <li>Pembayaran akan dikonfirmasi otomatis</li>
-          </ol>
-        </div>
-        <div class="btn-group" style="margin-top: 30px;">
-          <a href="track.html?orderId=${orderId}" class="btn-primary">🔍 Cek Status</a>
-          <a href="index.html" class="btn-secondary">🛒 Kembali</a>
-        </div>
-      </div>
-    `;
-  }
-
-  // Panggil loadOrder
   loadOrder();
 </script>
 
