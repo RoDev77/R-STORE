@@ -59,46 +59,6 @@
       opacity: 0.5;
       cursor: not-allowed;
     }
-    .instruction-box {
-      background: #e8f0fe;
-      border-left: 4px solid #667eea;
-      padding: 15px;
-      border-radius: 12px;
-      margin: 20px 0;
-      text-align: left;
-    }
-    .instruction-box ol {
-      margin-top: 10px;
-      padding-left: 20px;
-    }
-    .btn-group {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-top: 20px;
-    }
-    .btn-primary {
-      background: #667eea;
-      color: white;
-      padding: 12px 24px;
-      border-radius: 40px;
-      text-decoration: none;
-      font-weight: 600;
-      display: inline-block;
-    }
-    .btn-primary:hover {
-      background: #5a67d8;
-    }
-    .btn-secondary {
-      background: #6c757d;
-      color: white;
-      padding: 12px 24px;
-      border-radius: 40px;
-      text-decoration: none;
-      font-weight: 600;
-      display: inline-block;
-    }
     .loading-overlay {
       position: fixed;
       top: 0;
@@ -141,6 +101,28 @@
       font-size: 14px;
       text-align: center;
     }
+    .error-badge {
+      background: #f8d7da;
+      border: 1px solid #dc3545;
+      color: #721c24;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      text-align: center;
+      display: none;
+    }
+    .debug-info {
+      background: #2d2d2d;
+      color: #0f0;
+      padding: 10px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 11px;
+      margin-top: 20px;
+      word-break: break-all;
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -154,9 +136,12 @@
   <div class="card" style="max-width: 500px; margin: 0 auto;">
     <h2 style="margin-bottom: 20px;">💳 Pilih Metode Pembayaran</h2>
     
-    <!-- Peringatan hanya VA yang aktif -->
+    <div id="errorBadge" class="error-badge">
+      ⚠️ Gagal memuat data pesanan. Silakan kembali ke halaman utama.
+    </div>
+    
     <div class="warning-badge">
-      ⚡ Saat ini hanya tersedia pembayaran melalui Virtual Account (BCA, Mandiri, BRI, BNI)
+      ⚡ Saat ini hanya tersedia pembayaran melalui Virtual Account (BCA, Mandiri, BNI, BRI)
     </div>
     
     <div id="orderInfo" style="margin-bottom: 30px; padding: 20px; background: #f5f5f5; border-radius: 16px;">
@@ -184,12 +169,7 @@
       </button>
     </div>
     
-    <!-- Metode yang belum aktif disembunyikan -->
-    <div style="display: none;">
-      <button class="payment-method" data-method="qris">📱 QRIS</button>
-      <button class="payment-method" data-method="gopay">💚 GoPay</button>
-      <button class="payment-method" data-method="dana">💙 DANA</button>
-    </div>
+    <div id="debugInfo" class="debug-info"></div>
   </div>
 </main>
 
@@ -204,7 +184,18 @@
 
 <script type="module">
   import { db, doc, getDoc, updateDoc } from './firebase-config.js';
-  import { DOKU_CONFIG } from './doku-config.js';
+  
+  // DOKU Config langsung didefinisikan di sini untuk menghindari error import
+  const DOKU_CONFIG = {
+    production: {
+      clientId: 'BRN-0292-1776814732519',  // GANTI DENGAN CLIENT ID ASLI
+      secretKey: 'SK-sTXgCWsr9eEV0pALHrE0', // GANTI DENGAN SECRET KEY ASLI
+      baseUrl: 'https://checkout.doku.com'
+    },
+    mode: 'production',
+    redirectUrl: window.location.origin + '/done.html',
+    expiredTime: 60
+  };
 
   const urlParams = new URLSearchParams(window.location.search);
   const orderId = urlParams.get('orderId');
@@ -215,6 +206,16 @@
   }
 
   let currentAmount = 0;
+  let currentRobux = 0;
+
+  // Debug function
+  function addDebugLog(message, data) {
+    const debugDiv = document.getElementById('debugInfo');
+    debugDiv.style.display = 'block';
+    const timestamp = new Date().toLocaleTimeString();
+    debugDiv.innerHTML += `[${timestamp}] ${message}: ${JSON.stringify(data, null, 2)}\n`;
+    console.log(message, data);
+  }
 
   async function copyToClipboard(text, buttonElement) {
     try {
@@ -229,76 +230,117 @@
     }
   }
 
-  // Redirect ke DOKU Checkout untuk Virtual Account
-  async function redirectToDoku(bankCode) {
-    const config = DOKU_CONFIG[DOKU_CONFIG.mode];
-    
-    // Map bank ke channel DOKU
-    const channelMap = {
-      bca: 'VIRTUAL_ACCOUNT_BCA',
-      mandiri: 'VIRTUAL_ACCOUNT_MANDIRI',
-      bni: 'VIRTUAL_ACCOUNT_BNI',
-      bri: 'VIRTUAL_ACCOUNT_BRI'
-    };
-    
-    // Buat URL redirect ke DOKU
-    const params = new URLSearchParams({
-      client_id: config.clientId,
-      invoice_number: orderId,
-      amount: currentAmount.toString(),
-      name: 'Customer R STORE',
-      email: 'customer@rstore.com',
-      redirect_url: config.redirectUrl,
-      expired_time: config.expiredTime.toString(),
-      channel: channelMap[bankCode] || 'VIRTUAL_ACCOUNT_BCA'
-    });
-    
-    // Simpan metode pembayaran ke database
-    await updateDoc(doc(db, 'orders', orderId), {
-      paymentMethod: bankCode,
-      paymentChannel: channelMap[bankCode],
-      status: 'redirecting_payment',
-      updatedAt: new Date()
-    });
-    
-    // Redirect ke DOKU
-    window.location.href = `${config.baseUrl}/payment?${params.toString()}`;
+  // Redirect ke DOKU Checkout
+// Ganti fungsi redirectToDoku dengan ini
+async function redirectToDoku(bankCode) {
+  // Validasi amount
+  if (!currentAmount || currentAmount <= 0) {
+    throw new Error('Nominal pembayaran tidak valid: ' + currentAmount);
   }
+  
+  // Tampilkan loading
+  loadingOverlay.style.display = 'flex';
+  
+  try {
+    // Panggil proxy API kita
+    const response = await fetch('/api/doku-checkout', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        orderId: orderId,
+        amount: currentAmount,
+        customerName: 'Customer R STORE',
+        customerEmail: 'customer@rstore.com',
+        redirectUrl: window.location.origin + '/done.html'
+      })
+    });
+    
+    const result = await response.json();
+    
+    if (result.success && result.checkout_url) {
+      // Simpan metode pembayaran
+      await updateDoc(doc(db, 'orders', orderId), {
+        paymentMethod: bankCode,
+        status: 'redirecting_payment',
+        updatedAt: new Date()
+      });
+      
+      // Redirect ke DOKU
+      window.location.href = result.checkout_url;
+    } else {
+      throw new Error(result.error?.message || 'Gagal membuat transaksi');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Gagal memproses pembayaran: ' + error.message);
+    loadingOverlay.style.display = 'none';
+  }
+}
 
   async function loadOrder() {
-    const orderRef = doc(db, 'orders', orderId);
-    const orderSnap = await getDoc(orderRef);
-    
-    if (!orderSnap.exists()) {
-      alert('❌ Pesanan tidak ditemukan. Silakan buat pesanan baru.');
-      window.location.href = 'index.html';
-      return;
+    try {
+      addDebugLog('Loading order', orderId);
+      
+      const orderRef = doc(db, 'orders', orderId);
+      const orderSnap = await getDoc(orderRef);
+      
+      if (!orderSnap.exists()) {
+        addDebugLog('Order not found', orderId);
+        document.getElementById('errorBadge').style.display = 'block';
+        document.getElementById('errorBadge').textContent = '❌ Pesanan tidak ditemukan!';
+        document.querySelectorAll('.payment-method').forEach(btn => {
+          btn.disabled = true;
+        });
+        return;
+      }
+      
+      const data = orderSnap.data();
+      addDebugLog('Order data', { robuxAmount: data.robuxAmount, totalPrice: data.totalPrice, status: data.status });
+      
+      // Validasi data order
+      if (!data.totalPrice || data.totalPrice <= 0) {
+        addDebugLog('Invalid totalPrice', data.totalPrice);
+        document.getElementById('errorBadge').style.display = 'block';
+        document.getElementById('errorBadge').textContent = '❌ Data pesanan tidak valid (totalPrice: ' + data.totalPrice + ')';
+        return;
+      }
+      
+      currentAmount = data.totalPrice;
+      currentRobux = data.robuxAmount || 0;
+      
+      // Cek expired
+      const expireAt = data.expireAt?.toDate();
+      if (expireAt && new Date() > expireAt) {
+        addDebugLog('Order expired', expireAt);
+        alert('❌ Pesanan sudah kadaluarsa (2 jam). Silakan buat pesanan baru.');
+        window.location.href = 'index.html';
+        return;
+      }
+      
+      // Tampilkan Order ID
+      const orderIdContainer = document.getElementById('orderIdContainer');
+      orderIdContainer.innerHTML = `
+        <span class="order-id-text">${orderId}</span>
+        <button class="copy-btn" id="copyOrderIdBtn">📋 Copy</button>
+      `;
+      
+      document.getElementById('copyOrderIdBtn').addEventListener('click', (e) => {
+        copyToClipboard(orderId, e.target);
+      });
+      
+      document.getElementById('payRobux').textContent = currentRobux.toLocaleString('id-ID');
+      document.getElementById('payTotal').textContent = 'Rp ' + currentAmount.toLocaleString('id-ID');
+      
+      addDebugLog('Order loaded successfully', { currentAmount, currentRobux });
+      
+    } catch (error) {
+      addDebugLog('Error loading order', error.message);
+      console.error('Error loading order:', error);
+      document.getElementById('errorBadge').style.display = 'block';
+      document.getElementById('errorBadge').textContent = '❌ Error: ' + error.message;
     }
-    
-    const data = orderSnap.data();
-    currentAmount = data.totalPrice;
-    
-    // Cek expired
-    const expireAt = data.expireAt?.toDate();
-    if (expireAt && new Date() > expireAt) {
-      alert('❌ Pesanan sudah kadaluarsa (2 jam). Silakan buat pesanan baru.');
-      window.location.href = 'index.html';
-      return;
-    }
-    
-    // Tampilkan Order ID
-    const orderIdContainer = document.getElementById('orderIdContainer');
-    orderIdContainer.innerHTML = `
-      <span class="order-id-text">${orderId}</span>
-      <button class="copy-btn" id="copyOrderIdBtn">📋 Copy</button>
-    `;
-    
-    document.getElementById('copyOrderIdBtn').addEventListener('click', (e) => {
-      copyToClipboard(orderId, e.target);
-    });
-    
-    document.getElementById('payRobux').textContent = data.robuxAmount.toLocaleString('id-ID');
-    document.getElementById('payTotal').textContent = 'Rp ' + data.totalPrice.toLocaleString('id-ID');
   }
 
   // Handle tombol pembayaran
@@ -309,8 +351,12 @@
       const method = btn.dataset.method;
       const bankName = btn.dataset.bank || method.toUpperCase();
       
-      if (!currentAmount) {
-        alert('Error: Data pesanan tidak lengkap.');
+      addDebugLog('Payment button clicked', { method, bankName, currentAmount });
+      
+      // Validasi amount
+      if (!currentAmount || currentAmount <= 0) {
+        alert('Error: Data pesanan tidak lengkap. Silakan refresh halaman.');
+        addDebugLog('Invalid amount on click', currentAmount);
         return;
       }
       
@@ -325,7 +371,7 @@
       try {
         await redirectToDoku(method);
       } catch (error) {
-        console.error('Error:', error);
+        addDebugLog('Error in redirectToDoku', error.message);
         alert('Gagal memproses pembayaran: ' + error.message);
         loadingOverlay.style.display = 'none';
         btn.disabled = false;

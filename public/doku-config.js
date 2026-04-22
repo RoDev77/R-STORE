@@ -1,4 +1,4 @@
-// DOKU Configuration - PRODUCTION MODE (Virtual Account Only)
+// DOKU Configuration - PRODUCTION MODE
 const DOKU_CONFIG = {
   production: {
     clientId: 'BRN-0218-1776775043584',  // Ganti dengan Client ID Production Anda
@@ -7,7 +7,7 @@ const DOKU_CONFIG = {
   },
   mode: 'production',
   redirectUrl: window.location.origin + '/done.html',
-  expiredTime: 60  // 60 menit masa berlaku VA
+  expiredTime: 60
 };
 
 export { DOKU_CONFIG };
