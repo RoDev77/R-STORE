@@ -3,131 +3,521 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Menunggu Pembayaran - R STORE</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <title>Status Orderan- R STORE</title>
+  <meta name="description" content="Konfirmasi pembayaran Robux" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <link rel="stylesheet" href="style.css" />
   <style>
-    .order-id-container {
+    /* Done Page Specific Styles */
+    .done-container {
+      max-width: 550px;
+      margin: 0 auto;
+      padding: 100px 20px 60px;
+    }
+    
+    .done-card {
+      background: #13132a;
+      border-radius: 32px;
+      padding: 40px;
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+      text-align: center;
+    }
+    
+    /* Icon Animation */
+    .status-icon {
+      width: 100px;
+      height: 100px;
+      margin: 0 auto 25px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.5s ease;
+    }
+    
+    .status-icon i {
+      font-size: 50px;
+      color: white;
+    }
+    
+    @keyframes pulse {
+      0%, 100% {
+        box-shadow: 0 0 0 0 rgba(102,126,234,0.4);
+      }
+      50% {
+        box-shadow: 0 0 0 20px rgba(102,126,234,0);
+      }
+    }
+    
+    .status-icon.pulse {
+      animation: pulse 2s infinite;
+    }
+    
+    .done-header h2 {
+      font-size: 28px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #fff, #667eea);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+    
+    .done-header p {
+      color: #a0a0b0;
+      font-size: 14px;
+      margin-bottom: 25px;
+    }
+    
+    /* Order Summary */
+    .order-summary-done {
+      background: rgba(102,126,234,0.08);
+      border-radius: 20px;
+      padding: 20px;
+      margin: 20px 0;
+      text-align: left;
+      border: 1px solid rgba(102,126,234,0.15);
+    }
+    
+    .order-summary-title {
       display: flex;
       align-items: center;
       gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 5px;
+      margin-bottom: 15px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .order-summary-title i {
+      font-size: 18px;
+      color: #667eea;
+    }
+    
+    .order-summary-title span {
+      font-weight: 600;
+      color: #a0a0b0;
+    }
+    
+    /* Order ID Row */
+    .order-id-row-done {
+      background: rgba(0,0,0,0.3);
+      border-radius: 14px;
+      padding: 15px;
       margin-bottom: 15px;
     }
-    .order-id-text {
+    
+    .order-id-label {
+      font-size: 12px;
+      color: #a0a0b0;
+      margin-bottom: 8px;
+    }
+    
+    .order-id-value-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    
+    .order-id-value {
       font-family: monospace;
       font-size: 14px;
-      background: #f0f0f0;
-      padding: 10px 14px;
+      font-weight: 600;
+      background: #1a1a30;
+      padding: 8px 15px;
       border-radius: 10px;
+      letter-spacing: 0.5px;
       word-break: break-all;
-      flex: 1;
     }
-    .copy-btn {
-      background: #667eea;
-      color: white;
+    
+    .copy-btn-done {
+      background: rgba(102,126,234,0.2);
       border: none;
-      padding: 10px 18px;
-      border-radius: 10px;
+      color: #667eea;
+      padding: 8px 16px;
+      border-radius: 30px;
       font-size: 13px;
+      font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
-      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    .copy-btn:hover {
-      background: #5a67d8;
+    
+    .copy-btn-done:hover {
+      background: rgba(102,126,234,0.4);
       transform: scale(1.02);
     }
-    .copy-btn.copied {
+    
+    .copy-btn-done.copied {
       background: #28a745;
+      color: white;
     }
-    .instruction-box {
-      background: #e8f0fe;
-      border-left: 4px solid #667eea;
-      padding: 15px;
+    
+    /* Detail Rows */
+    .detail-row-done {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+    }
+    
+    .detail-row-done:not(:last-child) {
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    .detail-label-done {
+      color: #a0a0b0;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .detail-label-done i {
+      width: 24px;
+      color: #667eea;
+    }
+    
+    .detail-value-done {
+      font-weight: 600;
+      font-size: 15px;
+    }
+    
+    /* Status Badge */
+    .status-badge-done {
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    
+    .status-pending-done { background: #ffc107; color: #000; }
+    .status-waiting_payment-done { background: #ffc107; color: #000; }
+    .status-paid-done { background: #28a745; color: #fff; }
+    .status-delivered-done { background: #17a2b8; color: #fff; }
+    .status-cancelled-done { background: #dc3545; color: #fff; }
+    
+    /* Instruction Box */
+    .instruction-box-done {
+      background: rgba(255, 193, 7, 0.1);
+      border-left: 4px solid #ffc107;
       border-radius: 12px;
+      padding: 18px;
       margin: 20px 0;
       text-align: left;
     }
-    .btn-group {
+    
+    .instruction-box-done strong {
+      color: #ffc107;
       display: flex;
-      gap: 12px;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    
+    .instruction-box-done ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+    
+    .instruction-box-done li {
+      color: #e0e0e0;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+    
+    /* Success Box (untuk paid/delivered) */
+    .success-box-done {
+      background: rgba(40, 167, 69, 0.15);
+      border-left: 4px solid #28a745;
+      border-radius: 12px;
+      padding: 18px;
+      margin: 20px 0;
+      text-align: left;
+    }
+    
+    .success-box-done strong {
+      color: #28a745;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    
+    /* Button Group */
+    .btn-group-done {
+      display: flex;
+      gap: 15px;
       justify-content: center;
       flex-wrap: wrap;
       margin-top: 20px;
     }
-    .btn-primary {
-      background: #667eea;
+    
+    .btn-primary-done {
+      background: linear-gradient(135deg, #667eea, #764ba2);
       color: white;
-      padding: 12px 24px;
+      padding: 12px 28px;
       border-radius: 40px;
       text-decoration: none;
       font-weight: 600;
-      transition: all 0.2s;
-      display: inline-block;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
     }
-    .btn-primary:hover {
-      background: #5a67d8;
+    
+    .btn-primary-done:hover {
       transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102,126,234,0.3);
     }
-    .btn-secondary {
-      background: #6c757d;
+    
+    .btn-secondary-done {
+      background: rgba(255,255,255,0.1);
       color: white;
-      padding: 12px 24px;
+      padding: 12px 28px;
       border-radius: 40px;
       text-decoration: none;
       font-weight: 600;
-      transition: all 0.2s;
-      display: inline-block;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(255,255,255,0.1);
     }
-    .btn-secondary:hover {
-      background: #5a6268;
+    
+    .btn-secondary-done:hover {
+      background: rgba(255,255,255,0.2);
       transform: translateY(-2px);
+    }
+    
+    /* Auto Refresh Indicator */
+    .auto-refresh-indicator {
+      margin-top: 15px;
+      padding: 8px 16px;
+      background: rgba(102,126,234,0.15);
+      border-radius: 30px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #667eea;
+    }
+    
+    .auto-refresh-indicator i {
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Notification Toast */
+    .notification-toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #28a745;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 50px;
+      font-size: 14px;
+      font-weight: 600;
+      z-index: 1000;
+      animation: slideUp 0.3s ease;
+      display: none;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .notification-toast.error {
+      background: #dc3545;
+    }
+    
+    .notification-toast.warning {
+      background: #ffc107;
+      color: #000;
+    }
+    
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+    }
+    
+    /* Responsive */
+    @media (max-width: 480px) {
+      .done-card {
+        padding: 25px;
+      }
+      .status-icon {
+        width: 70px;
+        height: 70px;
+      }
+      .status-icon i {
+        font-size: 35px;
+      }
+      .done-header h2 {
+        font-size: 22px;
+      }
+      .order-id-value {
+        font-size: 11px;
+      }
+      .detail-row-done {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+      }
     }
   </style>
 </head>
 <body>
 
+<!-- Navbar -->
 <nav class="navbar">
-  <div class="nav-logo">🎮 R STORE – ROBUX</div>
-  <a href="track.html" class="btn-track">Lacak Pesanan</a>
+  <div class="nav-container">
+    <div class="nav-logo">
+      <i class="fas fa-gamepad"></i>
+      <span>R STORE</span>
+      <small>ROBUX</small>
+    </div>
+    <a href="track.html" class="btn-track">
+      <i class="fas fa-search"></i> Lacak Pesanan
+    </a>
+  </div>
 </nav>
 
-<main class="main">
-  <div class="card" style="max-width: 550px; margin: 0 auto; text-align: center;">
-    <div style="font-size: 70px; margin-bottom: 20px;">⏳</div>
-    <h2>Menunggu Pembayaran</h2>
-    <p>Pesanan Anda telah dibuat. Silakan selesaikan pembayaran.</p>
+<div class="done-container">
+  <div class="done-card">
     
-    <div style="background: #f5f5f5; padding: 20px; border-radius: 16px; margin: 20px 0; text-align: left;">
-      <p style="margin-bottom: 8px;"><strong>🆔 Order ID:</strong></p>
-      <div id="orderIdContainer" class="order-id-container"></div>
-      
-      <p><strong>💳 Metode Pembayaran:</strong> <span id="payMethod">-</span></p>
-      <p><strong>💰 Total:</strong> <span id="totalAmount">-</span></p>
+    <!-- Animated Icon -->
+    <div class="status-icon pulse" id="statusIcon">
+      <i class="fas fa-clock"></i>
     </div>
+    
+    <!-- Header -->
+    <div class="done-header">
+      <h2 id="statusTitle">Menunggu Pembayaran</h2>
+      <p id="statusDesc">Pesanan Anda telah dibuat. Silakan selesaikan pembayaran.</p>
+    </div>
+    
+    <!-- Order Summary -->
+    <div class="order-summary-done">
+      <div class="order-summary-title">
+        <i class="fas fa-receipt"></i>
+        <span>Ringkasan Pesanan</span>
+      </div>
+      
+      <div class="order-id-row-done">
+        <div class="order-id-label">🆔 ORDER ID</div>
+        <div class="order-id-value-wrapper" id="orderIdWrapper"></div>
+      </div>
+      
+      <div class="detail-row-done">
+        <div class="detail-label-done">
+          <i class="fas fa-credit-card"></i> Metode Pembayaran
+        </div>
+        <div class="detail-value-done" id="payMethod">-</div>
+      </div>
+      
+      <div class="detail-row-done">
+        <div class="detail-label-done">
+          <i class="fas fa-money-bill-wave"></i> Total Pembayaran
+        </div>
+        <div class="detail-value-done" id="totalAmount">-</div>
+      </div>
+    </div>
+    
+    <!-- Dynamic Box (Instruction / Success) -->
+    <div id="dynamicBox"></div>
+    
+    <!-- Status Row (hidden initially) -->
+    <div id="statusRow" style="display: none;" class="order-summary-done">
+      <div class="detail-row-done">
+        <div class="detail-label-done">
+          <i class="fas fa-info-circle"></i> Status Pesanan
+        </div>
+        <div class="detail-value-done">
+          <span id="orderStatus" class="status-badge-done status-pending-done">pending</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Auto Refresh Indicator -->
+    <div class="auto-refresh-indicator" id="autoRefreshIndicator">
+      <i class="fas fa-sync-alt"></i>
+      <span>Memantau status pesanan...</span>
+    </div>
+    
+    <!-- Button Group -->
+    <div class="btn-group-done">
+      <a href="track.html" class="btn-primary-done">
+        <i class="fas fa-search"></i> Lacak Pesanan
+      </a>
+      <a href="index.html" class="btn-secondary-done">
+        <i class="fas fa-shopping-cart"></i> Beli Lagi
+      </a>
+    </div>
+    
+  </div>
+</div>
 
-    <div class="instruction-box">
-      <strong>📌 Instruksi:</strong>
-      <ul style="margin-top: 8px; padding-left: 20px;">
-        <li>Simpan Order ID Anda untuk lacak pesanan</li>
-        <li>Lakukan pembayaran sesuai metode yang dipilih</li>
-        <li>Robux akan dikirim otomatis setelah pembayaran dikonfirmasi</li>
+<!-- Notification Toast -->
+<div id="notificationToast" class="notification-toast">
+  <i class="fas fa-check-circle"></i> <span id="toastMessage"></span>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-container">
+    <div class="footer-brand">
+      <div class="footer-logo">
+        <i class="fas fa-gamepad"></i>
+        <span>R STORE</span>
+      </div>
+      <p>Top Up Robux termurah dan tercepat di Indonesia. Layanan 24/7 dengan harga terbaik.</p>
+    </div>
+    <div class="footer-links">
+      <h4>Menu</h4>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="track.html">Lacak Pesanan</a></li>
       </ul>
     </div>
-
-    <div class="btn-group">
-      <a href="track.html" class="btn-primary">🔍 Lacak Pesanan</a>
-      <a href="index.html" class="btn-secondary">🛒 Beli Lagi</a>
+    <div class="footer-links">
+      <h4>Informasi</h4>
+      <ul>
+        <li><a href="terms.html">Syarat & Ketentuan</a></li>
+        <li><a href="privacy.html">Kebijakan Privasi</a></li>
+      </ul>
+    </div>
+    <div class="footer-contact">
+      <h4>Kontak</h4>
+      <ul>
+        <li><i class="fab fa-discord"></i> R STORE#1234</li>
+        <li><i class="fab fa-whatsapp"></i> +62 812-3456-7890</li>
+      </ul>
     </div>
   </div>
-</main>
-
-<footer class="footer">© 2025 R Store — Unofficial Roblox Store</footer>
+  <div class="footer-bottom">
+    <p>&copy; 2025 R STORE — Unofficial Roblox Store. All rights reserved.</p>
+  </div>
+</footer>
 
 <script type="module">
-  import { db, doc, getDoc } from './firebase-config.js';
+  import { db, doc, getDoc, updateDoc, onSnapshot } from './firebase-config.js';
 
   const urlParams = new URLSearchParams(window.location.search);
   const orderId = urlParams.get('orderId');
@@ -137,11 +527,12 @@
   async function copyToClipboard(text, buttonElement) {
     try {
       await navigator.clipboard.writeText(text);
-      const originalText = buttonElement.textContent;
-      buttonElement.textContent = '✅ Tersalin!';
+      const originalText = buttonElement.innerHTML;
+      buttonElement.innerHTML = '<i class="fas fa-check"></i> Tersalin!';
       buttonElement.classList.add('copied');
+      
       setTimeout(() => {
-        buttonElement.textContent = originalText;
+        buttonElement.innerHTML = originalText;
         buttonElement.classList.remove('copied');
       }, 2000);
     } catch (err) {
@@ -149,65 +540,271 @@
     }
   }
 
-// Tambahkan di awal fungsi loadOrder() di done.html
-async function loadOrder() {
-  // Cek apakah ini redirect dari DOKU
-  const urlParams = new URLSearchParams(window.location.search);
-  const dokuStatus = urlParams.get('status');
-  const dokuInvoice = urlParams.get('invoice');
-  
-  // Jika dari redirect DOKU
-  if (dokuStatus && dokuInvoice) {
-    const orderRef = doc(db, 'orders', dokuInvoice);
+  // Show notification
+  function showNotification(message, type = 'success') {
+    const toast = document.getElementById('notificationToast');
+    const toastMessage = document.getElementById('toastMessage');
+    toastMessage.textContent = message;
+    toast.className = 'notification-toast ' + type;
+    toast.style.display = 'flex';
     
-    if (dokuStatus === 'success') {
-      await updateDoc(orderRef, {
-        status: 'paid',
-        paidAt: new Date(),
-        updatedAt: new Date()
-      });
+    setTimeout(() => {
+      toast.style.display = 'none';
+    }, 5000);
+  }
+
+  // Update UI berdasarkan status
+  function updateUIByStatus(status, orderData = {}) {
+    const statusIcon = document.getElementById('statusIcon');
+    const statusTitle = document.getElementById('statusTitle');
+    const statusDesc = document.getElementById('statusDesc');
+    const dynamicBox = document.getElementById('dynamicBox');
+    const autoRefreshIndicator = document.getElementById('autoRefreshIndicator');
+    const statusRow = document.getElementById('statusRow');
+    const orderStatusSpan = document.getElementById('orderStatus');
+    
+    // Update status badge
+    if (statusRow && orderStatusSpan) {
+      statusRow.style.display = 'block';
+      let statusClass = 'status-pending-done';
+      let statusText = status;
+      
+      if (status === 'paid') {
+        statusClass = 'status-paid-done';
+        statusText = '✅ Dibayar - Sedang diproses';
+      } else if (status === 'delivered') {
+        statusClass = 'status-delivered-done';
+        statusText = '🎉 Robux sudah dikirim!';
+      } else if (status === 'cancelled') {
+        statusClass = 'status-cancelled-done';
+        statusText = '❌ Dibatalkan';
+      } else if (status === 'waiting_payment') {
+        statusClass = 'status-waiting_payment-done';
+        statusText = '💳 Menunggu pembayaran';
+      } else if (status === 'pending') {
+        statusClass = 'status-pending-done';
+        statusText = '⏳ Menunggu pembayaran';
+      }
+      
+      orderStatusSpan.className = `status-badge-done ${statusClass}`;
+      orderStatusSpan.textContent = statusText;
+    }
+    
+    if (status === 'paid') {
+      statusIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
+      statusIcon.style.background = 'linear-gradient(135deg, #28a745, #20c997)';
+      statusIcon.classList.remove('pulse');
+      statusTitle.textContent = '✅ Pembayaran Diterima!';
+      statusDesc.textContent = 'Pembayaran Anda telah kami terima. Pesanan sedang diproses.';
+      
+      dynamicBox.innerHTML = `
+        <div class="success-box-done">
+          <strong><i class="fas fa-check-circle"></i> Pembayaran Berhasil!</strong>
+          <p style="color: #a0a0a0; font-size: 14px; margin-top: 8px;">
+            Pembayaran Anda sebesar <strong>${document.getElementById('totalAmount')?.textContent || '-'}</strong> 
+            telah kami terima. Pesanan sedang kami proses.
+          </p>
+          <p style="color: #a0a0a0; font-size: 13px; margin-top: 10px;">
+            ⏱️ Robux akan segera dikirim ke akun Roblox Anda.
+          </p>
+        </div>
+      `;
+      autoRefreshIndicator.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> <span>Menunggu pengiriman Robux...</span>';
       showNotification('✅ Pembayaran berhasil! Pesanan Anda akan segera diproses.', 'success');
-    } else if (dokuStatus === 'cancel') {
-      await updateDoc(orderRef, {
-        status: 'cancelled',
-        updatedAt: new Date()
-      });
-      showNotification('❌ Pembayaran dibatalkan.', 'error');
+    } 
+    else if (status === 'delivered') {
+      statusIcon.innerHTML = '<i class="fas fa-rocket"></i>';
+      statusIcon.style.background = 'linear-gradient(135deg, #17a2b8, #0dcaf0)';
+      statusIcon.classList.remove('pulse');
+      statusTitle.textContent = '🎉 Robux Telah Dikirim!';
+      statusDesc.textContent = 'Robux sudah masuk ke akun Roblox Anda. Terima kasih telah berbelanja di R STORE!';
+      
+      dynamicBox.innerHTML = `
+        <div class="success-box-done">
+          <strong><i class="fas fa-rocket"></i> Pesanan Selesai!</strong>
+          <p style="color: #a0a0b0; font-size: 14px; margin-top: 8px;">
+            Robux sebanyak <strong>${orderData.robuxAmount?.toLocaleString('id-ID') || '-'} Robux</strong> 
+            telah berhasil dikirim ke akun Roblox Anda.
+          </p>
+          <p style="color: #a0a0b0; font-size: 13px; margin-top: 10px;">
+            ⭐ Terima kasih telah berbelanja di R STORE! ⭐
+          </p>
+        </div>
+      `;
+      autoRefreshIndicator.innerHTML = '<i class="fas fa-check-circle"></i> <span>Pesanan selesai! Terima kasih.</span>';
+      showNotification('🎉 Robux sudah dikirim ke akun Anda!', 'success');
+    }
+    else if (status === 'cancelled') {
+      statusIcon.innerHTML = '<i class="fas fa-times-circle"></i>';
+      statusIcon.style.background = 'linear-gradient(135deg, #dc3545, #c82333)';
+      statusIcon.classList.remove('pulse');
+      statusTitle.textContent = '❌ Pesanan Dibatalkan';
+      statusDesc.textContent = 'Pesanan Anda telah dibatalkan. Silakan hubungi admin jika ada pertanyaan.';
+      
+      dynamicBox.innerHTML = `
+        <div class="instruction-box-done" style="background: rgba(220,53,69,0.15); border-left-color: #dc3545;">
+          <strong style="color: #dc3545;"><i class="fas fa-exclamation-triangle"></i> Pesanan Dibatalkan</strong>
+          <p style="color: #a0a0a0; font-size: 14px; margin-top: 8px;">
+            Pesanan Anda telah dibatalkan. Jika ini kesalahan, silakan hubungi admin kami.
+          </p>
+        </div>
+      `;
+      autoRefreshIndicator.style.display = 'none';
+      showNotification('❌ Pesanan dibatalkan.', 'error');
+    }
+    else {
+      // Default waiting for payment
+      dynamicBox.innerHTML = `
+        <div class="instruction-box-done">
+          <strong><i class="fas fa-info-circle"></i> Instruksi Pembayaran</strong>
+          <ul>
+            <li>✅ Simpan Order ID Anda untuk lacak pesanan</li>
+            <li>✅ Lakukan pembayaran sesuai metode yang dipilih</li>
+            <li>✅ Robux akan dikirim otomatis setelah pembayaran dikonfirmasi</li>
+            <li>⏱️ Anda memiliki waktu 2 jam untuk menyelesaikan pembayaran</li>
+          </ul>
+        </div>
+      `;
+      autoRefreshIndicator.style.display = 'inline-flex';
     }
   }
+
+  // Handle status perubahan dari DOKU callback
+  async function handleDokuCallback() {
+    const dokuStatus = urlParams.get('status');
+    const dokuInvoice = urlParams.get('invoice');
+    
+    if (dokuStatus && dokuInvoice && dokuInvoice === orderId) {
+      const orderRef = doc(db, 'orders', orderId);
+      
+      if (dokuStatus === 'success') {
+        await updateDoc(orderRef, {
+          status: 'paid',
+          paidAt: new Date(),
+          updatedAt: new Date()
+        });
+      } else if (dokuStatus === 'cancel') {
+        await updateDoc(orderRef, {
+          status: 'cancelled',
+          updatedAt: new Date()
+        });
+      }
+      
+      // Hapus parameter dari URL tanpa reload
+      const newUrl = window.location.pathname + `?orderId=${orderId}&method=${method}`;
+      window.history.replaceState({}, document.title, newUrl);
+    }
+  }
+
+  // Real-time listener untuk perubahan status
+  let unsubscribe = null;
   
+  function listenToOrderStatus() {
+    if (!orderId) return;
+    
+    const orderRef = doc(db, 'orders', orderId);
+    
+    unsubscribe = onSnapshot(orderRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        const currentStatus = data.status;
+        
+        console.log('📡 Status updated:', currentStatus);
+        
+        // Update UI berdasarkan status
+        updateUIByStatus(currentStatus, data);
+      }
+    }, (error) => {
+      console.error('Error listening to order:', error);
+    });
+  }
+
+  async function loadOrder() {
     if (!orderId) {
-      document.getElementById('orderIdContainer').innerHTML = '<span>Order ID tidak ditemukan</span>';
+      const orderIdWrapper = document.getElementById('orderIdWrapper');
+      if (orderIdWrapper) {
+        orderIdWrapper.innerHTML = '<span style="color: #dc3545;">Order ID tidak ditemukan</span>';
+      }
       return;
     }
+
+    // Handle DOKU callback terlebih dahulu
+    await handleDokuCallback();
 
     const orderRef = doc(db, 'orders', orderId);
     const orderSnap = await getDoc(orderRef);
     
     if (!orderSnap.exists()) {
-      document.getElementById('orderIdContainer').innerHTML = '<span>❌ Pesanan tidak ditemukan atau sudah kadaluarsa</span>';
+      const orderIdWrapper = document.getElementById('orderIdWrapper');
+      if (orderIdWrapper) {
+        orderIdWrapper.innerHTML = '<span style="color: #dc3545;">❌ Pesanan tidak ditemukan atau sudah kadaluarsa</span>';
+      }
       return;
     }
     
     const data = orderSnap.data();
     
     // Tampilkan Order ID dengan tombol copy
-    const orderIdContainer = document.getElementById('orderIdContainer');
-    orderIdContainer.innerHTML = `
-      <span class="order-id-text">${orderId}</span>
-      <button class="copy-btn" id="copyOrderIdBtn">📋 Copy</button>
+    const orderIdWrapper = document.getElementById('orderIdWrapper');
+    orderIdWrapper.innerHTML = `
+      <span class="order-id-value">${orderId}</span>
+      <button class="copy-btn-done" id="copyOrderIdBtn">
+        <i class="fas fa-copy"></i> Copy
+      </button>
     `;
     
     // Event listener untuk tombol copy
-    document.getElementById('copyOrderIdBtn').addEventListener('click', (e) => {
-      copyToClipboard(orderId, e.target);
-    });
+    const copyBtn = document.getElementById('copyOrderIdBtn');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', (e) => {
+        copyToClipboard(orderId, e.currentTarget);
+      });
+    }
     
-    document.getElementById('payMethod').textContent = method ? method.toUpperCase() : (data.paymentMethod || '-').toUpperCase();
-    document.getElementById('totalAmount').textContent = 'Rp ' + (data.totalPrice || 0).toLocaleString('id-ID');
+    // 🔥 BACA METODE PEMBAYARAN DARI FIRESTORE (bukan dari URL)
+    const payMethod = document.getElementById('payMethod');
+    const totalAmount = document.getElementById('totalAmount');
+    
+    // Map kode bank ke nama yang bagus
+    const methodNames = {
+      'bca': 'BCA Virtual Account',
+      'mandiri': 'Mandiri Virtual Account',
+      'bni': 'BNI Virtual Account',
+      'bri': 'BRI Virtual Account',
+      'qris': 'QRIS',
+      'gopay': 'GoPay',
+      'dana': 'DANA'
+    };
+    
+    // Prioritaskan dari database, fallback ke URL parameter
+    let paymentMethod = data.paymentMethod || method;
+    let displayMethod = methodNames[paymentMethod] || paymentMethod?.toUpperCase() || '-';
+    
+    if (payMethod) {
+      payMethod.textContent = displayMethod;
+    }
+    if (totalAmount) {
+      totalAmount.textContent = 'Rp ' + (data.totalPrice || 0).toLocaleString('id-ID');
+    }
+    
+    console.log('Payment method from DB:', data.paymentMethod);
+    console.log('Display method:', displayMethod);
+    
+    // Update UI berdasarkan status awal
+    updateUIByStatus(data.status, data);
+    
+    // Start real-time listener
+    listenToOrderStatus();
   }
 
   loadOrder();
+  
+  // Cleanup listener on page unload
+  window.addEventListener('beforeunload', () => {
+    if (unsubscribe) {
+      unsubscribe();
+    }
+  });
 </script>
 
 </body>

@@ -4,91 +4,369 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lacak Pesanan - R STORE</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <meta name="description" content="Lacak status pesanan Robux Anda" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <link rel="stylesheet" href="style.css" />
   <style>
-    .order-id-container {
+    /* Track Page Specific Styles */
+    .track-container {
+      max-width: 550px;
+      margin: 0 auto;
+      padding: 100px 20px 60px;
+    }
+    
+    .track-card {
+      background: #13132a;
+      border-radius: 32px;
+      padding: 40px;
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+    }
+    
+    .track-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .track-header h2 {
+      font-size: 28px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #fff, #667eea);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+    
+    .track-header p {
+      color: #a0a0b0;
+      font-size: 14px;
+    }
+    
+    /* Input Group */
+    .input-group-track {
+      margin-bottom: 25px;
+    }
+    
+    .input-group-track label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: 600;
+      color: #e0e0e0;
+    }
+    
+    .input-wrapper-track {
       display: flex;
       align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 5px;
+      background: #1a1a30;
+      border-radius: 16px;
+      padding: 0 18px;
+      border: 1px solid rgba(255,255,255,0.08);
+      transition: all 0.3s;
     }
-    .order-id-text {
-      font-family: monospace;
-      font-size: 14px;
-      background: #f0f0f0;
-      padding: 6px 10px;
-      border-radius: 6px;
-      word-break: break-all;
+    
+    .input-wrapper-track:focus-within {
+      border-color: #667eea;
+      box-shadow: 0 0 0 2px rgba(102,126,234,0.2);
     }
-    .copy-btn {
-      background: #667eea;
+    
+    .input-wrapper-track i {
+      color: #667eea;
+      font-size: 18px;
+    }
+    
+    .input-wrapper-track input {
+      background: transparent;
+      border: none;
+      padding: 16px 12px;
+      width: 100%;
+      color: white;
+      font-size: 16px;
+      outline: none;
+    }
+    
+    .input-wrapper-track input::placeholder {
+      color: #5a5a7a;
+    }
+    
+    /* Track Button */
+    .btn-track-order {
+      width: 100%;
+      background: linear-gradient(135deg, #667eea, #764ba2);
       color: white;
       border: none;
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-size: 12px;
+      padding: 16px;
+      border-radius: 40px;
+      font-size: 16px;
+      font-weight: 700;
       cursor: pointer;
-      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.3s;
     }
-    .copy-btn:hover {
-      background: #5a67d8;
+    
+    .btn-track-order:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102,126,234,0.3);
     }
-    .copy-btn.copied {
-      background: #28a745;
-    }
-    .status-badge {
-      display: inline-block;
-      padding: 4px 12px;
+    
+    /* Result Card */
+    .result-card {
+      margin-top: 30px;
+      background: rgba(102,126,234,0.08);
       border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
+      padding: 25px;
+      border: 1px solid rgba(102,126,234,0.15);
+      animation: fadeInUp 0.5s ease;
     }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .result-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .result-header i {
+      font-size: 28px;
+      color: #667eea;
+    }
+    
+    .result-header h3 {
+      font-size: 18px;
+      font-weight: 700;
+    }
+    
+    /* Order ID Row */
+    .order-id-row {
+      background: rgba(0,0,0,0.3);
+      border-radius: 14px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .order-id-label {
+      font-size: 12px;
+      color: #a0a0b0;
+      margin-bottom: 8px;
+    }
+    
+    .order-id-value-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    
+    .order-id-value {
+      font-family: monospace;
+      font-size: 14px;
+      font-weight: 600;
+      background: #1a1a30;
+      padding: 8px 15px;
+      border-radius: 10px;
+      letter-spacing: 0.5px;
+      word-break: break-all;
+    }
+    
+    .copy-btn-track {
+      background: rgba(102,126,234,0.2);
+      border: none;
+      color: #667eea;
+      padding: 8px 16px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .copy-btn-track:hover {
+      background: rgba(102,126,234,0.4);
+      transform: scale(1.02);
+    }
+    
+    .copy-btn-track.copied {
+      background: #28a745;
+      color: white;
+    }
+    
+    /* Detail Rows */
+    .detail-row-track {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    .detail-row-track:last-child {
+      border-bottom: none;
+    }
+    
+    .detail-label-track {
+      color: #a0a0b0;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .detail-label-track i {
+      width: 24px;
+      color: #667eea;
+    }
+    
+    .detail-value-track {
+      font-weight: 600;
+      font-size: 15px;
+    }
+    
+    /* Status Badge */
+    .status-badge-track {
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    
     .status-pending { background: #ffc107; color: #000; }
     .status-waiting_payment { background: #ffc107; color: #000; }
     .status-paid { background: #28a745; color: #fff; }
     .status-delivered { background: #17a2b8; color: #fff; }
     .status-cancelled { background: #dc3545; color: #fff; }
+    
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: #a0a0b0;
+    }
+    
+    .empty-state i {
+      font-size: 48px;
+      margin-bottom: 15px;
+      opacity: 0.5;
+    }
+    
+    @media (max-width: 480px) {
+      .track-card {
+        padding: 25px;
+      }
+      .track-header h2 {
+        font-size: 24px;
+      }
+      .order-id-value {
+        font-size: 12px;
+      }
+      .detail-row-track {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+      }
+    }
   </style>
 </head>
 <body>
 
+<!-- Navbar -->
 <nav class="navbar">
-  <div class="nav-logo">🎮 R STORE – ROBUX</div>
-  <a href="index.html" class="btn-track">Beli Robux</a>
+  <div class="nav-container">
+    <div class="nav-logo">
+      <i class="fas fa-gamepad"></i>
+      <span>R STORE</span>
+      <small>ROBUX</small>
+    </div>
+    <a href="index.html" class="btn-track">
+      <i class="fas fa-home"></i> Beranda
+    </a>
+  </div>
 </nav>
 
-<main class="main">
-  <div class="card" style="max-width: 500px; margin: 0 auto;">
-    <h2 style="margin-bottom: 20px;">🔍 Lacak Pesanan</h2>
+<div class="track-container">
+  <div class="track-card">
     
-    <div class="input-group">
-      <label>Masukkan Order ID</label>
-      <input type="text" id="trackOrderId" placeholder="Contoh: RBX-1234567890123" />
+    <!-- Header -->
+    <div class="track-header">
+      <h2>🔍 Lacak Pesanan</h2>
+      <p>Masukkan Order ID untuk melihat status pesanan Anda</p>
     </div>
     
-    <button class="btn-buy" id="trackBtn" style="margin-top: 10px;">Lacak</button>
-
-    <div id="trackResult" style="margin-top: 30px; display: none;">
-      <div style="background: #f5f5f5; padding: 20px; border-radius: 12px;">
-        <h3>📋 Detail Pesanan</h3>
-        
-        <div style="margin-bottom: 15px;">
-          <strong>Order ID:</strong>
-          <div class="order-id-container" id="orderIdContainer"></div>
-        </div>
-        
-        <p><strong>💰 Jumlah Robux:</strong> <span id="resultRobux">-</span></p>
-        <p><strong>💵 Total:</strong> <span id="resultTotal">-</span></p>
-        <p><strong>📌 Status:</strong> <span id="resultStatus">-</span></p>
-        <p><strong>💳 Metode Pembayaran:</strong> <span id="resultMethod">-</span></p>
+    <!-- Input Form -->
+    <div class="input-group-track">
+      <label><i class="fas fa-ticket-alt"></i> Order ID</label>
+      <div class="input-wrapper-track">
+        <i class="fas fa-search"></i>
+        <input type="text" id="trackOrderId" placeholder="Contoh: RBX-1234567890123" />
       </div>
     </div>
+    
+    <button class="btn-track-order" id="trackBtn">
+      <i class="fas fa-search"></i> Lacak Pesanan
+    </button>
+    
+    <!-- Result Area -->
+    <div id="trackResult" style="display: none;"></div>
+    
   </div>
-</main>
+</div>
 
-<footer class="footer">© 2025 R Store — Unofficial Roblox Store</footer>
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-container">
+    <div class="footer-brand">
+      <div class="footer-logo">
+        <i class="fas fa-gamepad"></i>
+        <span>R STORE</span>
+      </div>
+      <p>Top Up Robux termurah dan tercepat di Indonesia. Layanan 24/7 dengan harga terbaik.</p>
+    </div>
+    <div class="footer-links">
+      <h4>Menu</h4>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="track.html">Lacak Pesanan</a></li>
+      </ul>
+    </div>
+    <div class="footer-links">
+      <h4>Informasi</h4>
+      <ul>
+        <li><a href="terms.html">Syarat & Ketentuan</a></li>
+        <li><a href="privacy.html">Kebijakan Privasi</a></li>
+      </ul>
+    </div>
+    <div class="footer-contact">
+      <h4>Kontak</h4>
+      <ul>
+        <li><i class="fab fa-discord"></i> R STORE#1234</li>
+        <li><i class="fab fa-whatsapp"></i> +62 812-3456-7890</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2025 R STORE — Unofficial Roblox Store. All rights reserved.</p>
+  </div>
+</footer>
 
 <script type="module">
   import { db, doc, getDoc } from './firebase-config.js';
@@ -101,14 +379,12 @@
   async function copyToClipboard(text, buttonElement) {
     try {
       await navigator.clipboard.writeText(text);
-      // Tampilkan feedback "Copied!"
-      const originalText = buttonElement.textContent;
-      buttonElement.textContent = '✅ Tersalin!';
+      const originalText = buttonElement.innerHTML;
+      buttonElement.innerHTML = '<i class="fas fa-check"></i> Tersalin!';
       buttonElement.classList.add('copied');
       
-      // Kembalikan ke teks semula setelah 2 detik
       setTimeout(() => {
-        buttonElement.textContent = originalText;
+        buttonElement.innerHTML = originalText;
         buttonElement.classList.remove('copied');
       }, 2000);
     } catch (err) {
@@ -126,6 +402,10 @@
       return;
     }
 
+    // Tampilkan loading
+    trackBtn.disabled = true;
+    trackBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Mencari...';
+
     const orderRef = doc(db, 'orders', orderId);
     const orderSnap = await getDoc(orderRef);
 
@@ -134,39 +414,120 @@
       
       // Peta status ke teks dan class
       const statusMap = {
-        'pending': { text: '⏳ Menunggu pembayaran', class: 'status-pending' },
-        'waiting_payment': { text: '💳 Menunggu pembayaran', class: 'status-waiting_payment' },
-        'paid': { text: '✅ Sudah dibayar - Sedang diproses', class: 'status-paid' },
-        'delivered': { text: '🎉 Robux sudah dikirim!', class: 'status-delivered' },
-        'cancelled': { text: '❌ Dibatalkan', class: 'status-cancelled' }
+        'pending': { text: 'Menunggu pembayaran', class: 'status-pending' },
+        'waiting_payment': { text: 'Menunggu pembayaran', class: 'status-waiting_payment' },
+        'redirecting_payment': { text: 'Mengarahkan ke pembayaran', class: 'status-waiting_payment' },
+        'paid': { text: 'Sudah dibayar - Sedang diproses', class: 'status-paid' },
+        'delivered': { text: 'Robux sudah dikirim!', class: 'status-delivered' },
+        'cancelled': { text: 'Dibatalkan', class: 'status-cancelled' }
       };
       
-      const statusInfo = statusMap[data.status] || { text: data.status, class: 'status-pending' };
+      const statusInfo = statusMap[data.status] || { text: data.status || 'Unknown', class: 'status-pending' };
       
-      // Tampilkan Order ID dengan tombol copy
-      const orderIdContainer = document.getElementById('orderIdContainer');
-      orderIdContainer.innerHTML = `
-        <span class="order-id-text">${orderId}</span>
-        <button class="copy-btn" onclick="window.copyOrderId('${orderId}')">📋 Copy</button>
+      // Format tanggal
+      let createdAt = '-';
+      if (data.createdAt?.toDate) {
+        createdAt = data.createdAt.toDate().toLocaleString('id-ID');
+      }
+      
+      let paidAt = '-';
+      if (data.paidAt?.toDate) {
+        paidAt = data.paidAt.toDate().toLocaleString('id-ID');
+      } else if (data.paidAt) {
+        paidAt = new Date(data.paidAt).toLocaleString('id-ID');
+      }
+      
+      // Tampilkan hasil
+      trackResult.innerHTML = `
+        <div class="result-card">
+          <div class="result-header">
+            <i class="fas fa-receipt"></i>
+            <h3>Detail Pesanan</h3>
+          </div>
+          
+          <div class="order-id-row">
+            <div class="order-id-label">🆔 ORDER ID</div>
+            <div class="order-id-value-wrapper">
+              <span class="order-id-value">${orderId}</span>
+              <button class="copy-btn-track" id="copyOrderIdBtn">
+                <i class="fas fa-copy"></i> Copy
+              </button>
+            </div>
+          </div>
+          
+          <div class="detail-row-track">
+            <div class="detail-label-track">
+              <i class="fas fa-robot"></i> Jumlah Robux
+            </div>
+            <div class="detail-value-track">${(data.robuxAmount || 0).toLocaleString('id-ID')} Robux</div>
+          </div>
+          
+          <div class="detail-row-track">
+            <div class="detail-label-track">
+              <i class="fas fa-money-bill-wave"></i> Total Pembayaran
+            </div>
+            <div class="detail-value-track">Rp ${(data.totalPrice || 0).toLocaleString('id-ID')}</div>
+          </div>
+          
+          <div class="detail-row-track">
+            <div class="detail-label-track">
+              <i class="fas fa-tag"></i> Metode Pembayaran
+            </div>
+            <div class="detail-value-track">${(data.paymentMethod || '-').toUpperCase()}</div>
+          </div>
+          
+          <div class="detail-row-track">
+            <div class="detail-label-track">
+              <i class="fas fa-calendar"></i> Tanggal Pesanan
+            </div>
+            <div class="detail-value-track">${createdAt}</div>
+          </div>
+          
+          ${paidAt !== '-' ? `
+          <div class="detail-row-track">
+            <div class="detail-label-track">
+              <i class="fas fa-check-circle"></i> Tanggal Dibayar
+            </div>
+            <div class="detail-value-track">${paidAt}</div>
+          </div>
+          ` : ''}
+          
+          <div class="detail-row-track">
+            <div class="detail-label-track">
+              <i class="fas fa-info-circle"></i> Status
+            </div>
+            <div class="detail-value-track">
+              <span class="status-badge-track ${statusInfo.class}">${statusInfo.text}</span>
+            </div>
+          </div>
+        </div>
       `;
       
-      // Karena fungsi onclick di atas menggunakan window, kita perlu attach function ke window
-      window.copyOrderId = (id) => {
-        const btn = document.querySelector('.copy-btn');
-        copyToClipboard(id, btn);
-      };
-      
-      // Tampilkan data lainnya
-      document.getElementById('resultRobux').textContent = (data.robuxAmount || 0).toLocaleString('id-ID');
-      document.getElementById('resultTotal').textContent = 'Rp ' + (data.totalPrice || 0).toLocaleString('id-ID');
-      document.getElementById('resultStatus').innerHTML = `<span class="status-badge ${statusInfo.class}">${statusInfo.text}</span>`;
-      document.getElementById('resultMethod').textContent = (data.paymentMethod || '-').toUpperCase();
-      
       trackResult.style.display = 'block';
+      
+      // Attach copy event
+      const copyBtn = document.getElementById('copyOrderIdBtn');
+      if (copyBtn) {
+        copyBtn.addEventListener('click', (e) => {
+          copyToClipboard(orderId, e.currentTarget);
+        });
+      }
+      
     } else {
-      alert('❌ Order ID tidak ditemukan!');
-      trackResult.style.display = 'none';
+      trackResult.innerHTML = `
+        <div class="result-card">
+          <div class="empty-state">
+            <i class="fas fa-search"></i>
+            <p>❌ Order ID tidak ditemukan</p>
+            <small style="color: #a0a0b0;">Pastikan Order ID yang Anda masukkan benar</small>
+          </div>
+        </div>
+      `;
+      trackResult.style.display = 'block';
     }
+    
+    trackBtn.disabled = false;
+    trackBtn.innerHTML = '<i class="fas fa-search"></i> Lacak Pesanan';
   }
 
   trackBtn.addEventListener('click', trackOrder);

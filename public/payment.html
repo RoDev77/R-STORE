@@ -4,193 +4,511 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pilih Pembayaran - R STORE</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <meta name="description" content="Pilih metode pembayaran untuk top up Robux" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <link rel="stylesheet" href="style.css" />
   <style>
-    .order-id-container {
+    /* Payment Page Specific Styles */
+    .payment-container {
+      max-width: 550px;
+      margin: 0 auto;
+      padding: 100px 20px 60px;
+    }
+    
+    .payment-card {
+      background: #13132a;
+      border-radius: 32px;
+      padding: 40px;
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+    }
+    
+    .payment-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .payment-header h2 {
+      font-size: 28px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #fff, #667eea);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+    
+    .payment-header p {
+      color: #a0a0b0;
+      font-size: 14px;
+    }
+    
+    .order-summary {
+      background: linear-gradient(135deg, rgba(102,126,234,0.15), rgba(118,75,162,0.15));
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 25px;
+      border: 1px solid rgba(102,126,234,0.2);
+    }
+    
+    .order-summary-title {
       display: flex;
       align-items: center;
       gap: 10px;
+      margin-bottom: 15px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .order-summary-title i {
+      font-size: 20px;
+      color: #667eea;
+    }
+    
+    .order-summary-title span {
+      font-weight: 600;
+      color: #a0a0b0;
+    }
+    
+    .order-id-display {
+      background: rgba(0,0,0,0.3);
+      border-radius: 12px;
+      padding: 12px 15px;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       flex-wrap: wrap;
-      margin-top: 5px;
+      gap: 10px;
     }
-    .order-id-text {
+    
+    .order-id-label {
+      font-size: 12px;
+      color: #a0a0b0;
+    }
+    
+    .order-id-value {
       font-family: monospace;
+      font-size: 16px;
+      font-weight: 700;
+      background: #1a1a30;
+      padding: 8px 15px;
+      border-radius: 10px;
+      letter-spacing: 1px;
+    }
+    
+    .order-details-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+    }
+    
+    .order-details-row:not(:last-child) {
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    .order-details-label {
+      color: #a0a0b0;
       font-size: 14px;
-      background: #e8e8e8;
-      padding: 8px 12px;
-      border-radius: 8px;
-      word-break: break-all;
-      flex: 1;
     }
-    .copy-btn {
-      background: #667eea;
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 8px;
+    
+    .order-details-value {
+      font-weight: 700;
+      font-size: 16px;
+    }
+    
+    .total-amount {
+      margin-top: 10px;
+      padding-top: 12px;
+      border-top: 2px solid rgba(102,126,234,0.3);
+    }
+    
+    .total-amount .order-details-label {
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+    }
+    
+    .total-amount .order-details-value {
+      font-size: 24px;
+      color: #667eea;
+    }
+    
+    .warning-badge-payment {
+      background: rgba(255, 193, 7, 0.15);
+      border: 1px solid rgba(255, 193, 7, 0.3);
+      border-radius: 12px;
+      padding: 12px 15px;
+      margin-bottom: 25px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .warning-badge-payment i {
+      font-size: 20px;
+      color: #ffc107;
+    }
+    
+    .warning-badge-payment p {
       font-size: 13px;
-      cursor: pointer;
-      transition: all 0.2s;
+      color: #ffc107;
+      margin: 0;
     }
-    .copy-btn:hover {
-      background: #5a67d8;
+    
+    .payment-methods-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: #a0a0b0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
-    .payment-method {
+    
+    .payment-methods-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    
+    .payment-method-btn {
       display: flex;
       align-items: center;
       gap: 15px;
       width: 100%;
-      padding: 15px 20px;
-      border: 2px solid #e0e0e0;
+      padding: 16px 20px;
+      background: #1a1a30;
+      border: 1px solid rgba(255,255,255,0.08);
       border-radius: 16px;
-      background: white;
       cursor: pointer;
-      transition: all 0.2s;
-      font-weight: 600;
-      font-size: 16px;
+      transition: all 0.3s ease;
     }
-    .payment-method:hover {
-      border-color: #667eea;
-      background: #f8f9ff;
+    
+    .payment-method-btn:hover {
+      background: rgba(102,126,234,0.15);
+      border-color: rgba(102,126,234,0.3);
       transform: translateX(5px);
     }
-    .payment-method:disabled {
+    
+    .payment-method-btn.disabled {
       opacity: 0.5;
       cursor: not-allowed;
+      filter: grayscale(0.3);
     }
-    .loading-overlay {
+    
+    .payment-method-icon {
+      width: 48px;
+      height: 48px;
+      background: rgba(102,126,234,0.15);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+    
+    .payment-method-icon.bca { color: #0055a0; }
+    .payment-method-icon.mandiri { color: #ff8c00; }
+    .payment-method-icon.bni { color: #1e3a5f; }
+    .payment-method-icon.bri { color: #0066b3; }
+    
+    .payment-method-info {
+      flex: 1;
+    }
+    
+    .payment-method-name {
+      font-weight: 700;
+      font-size: 16px;
+      margin-bottom: 4px;
+    }
+    
+    .payment-method-desc {
+      font-size: 12px;
+      color: #a0a0b0;
+    }
+    
+    .payment-method-check {
+      color: #28a745;
+      font-size: 20px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .payment-method-btn.selected .payment-method-check {
+      opacity: 1;
+    }
+    
+    .error-badge-payment {
+      background: rgba(220, 53, 69, 0.15);
+      border: 1px solid rgba(220, 53, 69, 0.3);
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 25px;
+      display: none;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .error-badge-payment i {
+      font-size: 20px;
+      color: #dc3545;
+    }
+    
+    .error-badge-payment p {
+      font-size: 14px;
+      color: #dc3545;
+      margin: 0;
+    }
+    
+    .loading-overlay-payment {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0,0,0,0.7);
+      background: rgba(15, 15, 26, 0.95);
+      backdrop-filter: blur(8px);
       display: flex;
       justify-content: center;
       align-items: center;
       z-index: 9999;
-      display: none;
+      visibility: hidden;
+      opacity: 0;
+      transition: all 0.3s;
     }
-    .loading-content {
-      background: white;
-      padding: 30px;
-      border-radius: 16px;
+    
+    .loading-overlay-payment.active {
+      visibility: visible;
+      opacity: 1;
+    }
+    
+    .loading-content-payment {
       text-align: center;
     }
-    .spinner {
-      width: 50px;
-      height: 50px;
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #667eea;
+    
+    .loading-spinner {
+      width: 60px;
+      height: 60px;
+      border: 3px solid rgba(102,126,234,0.3);
+      border-top: 3px solid #667eea;
       border-radius: 50%;
       animation: spin 1s linear infinite;
       margin: 0 auto 20px;
     }
+    
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-    .warning-badge {
-      background: #fff3cd;
-      border: 1px solid #ffc107;
-      color: #856404;
-      padding: 12px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      font-size: 14px;
-      text-align: center;
+    
+    .copy-btn-payment {
+      background: rgba(102,126,234,0.2);
+      border: none;
+      color: #667eea;
+      padding: 6px 14px;
+      border-radius: 30px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
     }
-    .error-badge {
-      background: #f8d7da;
-      border: 1px solid #dc3545;
-      color: #721c24;
-      padding: 12px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      font-size: 14px;
-      text-align: center;
-      display: none;
+    
+    .copy-btn-payment:hover {
+      background: rgba(102,126,234,0.4);
     }
+    
     .debug-info {
-      background: #2d2d2d;
+      background: #1a1a30;
       color: #0f0;
       padding: 10px;
       border-radius: 8px;
       font-family: monospace;
       font-size: 11px;
-      margin-top: 20px;
+      margin-top: 15px;
       word-break: break-all;
       display: none;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+    
+    @media (max-width: 480px) {
+      .payment-card {
+        padding: 25px;
+      }
+      .payment-header h2 {
+        font-size: 24px;
+      }
+      .payment-method-btn {
+        padding: 12px 16px;
+      }
+      .payment-method-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+      }
+      .order-id-value {
+        font-size: 13px;
+      }
     }
   </style>
 </head>
 <body>
 
 <nav class="navbar">
-  <div class="nav-logo">🎮 R STORE – ROBUX</div>
-  <a href="track.html" class="btn-track">Lacak Pesanan</a>
+  <div class="nav-container">
+    <div class="nav-logo">
+      <i class="fas fa-gamepad"></i>
+      <span>R STORE</span>
+      <small>ROBUX</small>
+    </div>
+    <a href="index.html" class="btn-track">
+      <i class="fas fa-home"></i> Beranda
+    </a>
+  </div>
 </nav>
 
-<main class="main">
-  <div class="card" style="max-width: 500px; margin: 0 auto;">
-    <h2 style="margin-bottom: 20px;">💳 Pilih Metode Pembayaran</h2>
+<div class="payment-container">
+  <div class="payment-card">
     
-    <div id="errorBadge" class="error-badge">
-      ⚠️ Gagal memuat data pesanan. Silakan kembali ke halaman utama.
+    <div class="payment-header">
+      <h2>💳 Pilih Metode Pembayaran</h2>
+      <p>Pilih metode pembayaran yang tersedia</p>
     </div>
     
-    <div class="warning-badge">
-      ⚡ Saat ini hanya tersedia pembayaran melalui Virtual Account (BCA, Mandiri, BNI, BRI)
+    <div id="errorBadge" class="error-badge-payment">
+      <i class="fas fa-exclamation-circle"></i>
+      <p>Gagal memuat data pesanan. Silakan kembali ke halaman utama.</p>
     </div>
     
-    <div id="orderInfo" style="margin-bottom: 30px; padding: 20px; background: #f5f5f5; border-radius: 16px;">
-      <p style="margin-bottom: 12px;"><strong>🆔 Order ID:</strong></p>
-      <div id="orderIdContainer" class="order-id-container"></div>
+    <div class="warning-badge-payment">
+      <i class="fas fa-info-circle"></i>
+      <p>Saat ini hanya tersedia pembayaran melalui Virtual Account (BCA, Mandiri, BNI, BRI)</p>
+    </div>
+    
+    <div class="order-summary">
+      <div class="order-summary-title">
+        <i class="fas fa-receipt"></i>
+        <span>Ringkasan Pesanan</span>
+      </div>
       
-      <div style="margin-top: 15px;">
-        <p><strong>🎮 Jumlah Robux:</strong> <span id="payRobux">0</span></p>
-        <p><strong>💰 Total:</strong> <span id="payTotal">Rp 0</span></p>
+      <div class="order-id-display">
+        <span class="order-id-label">🆔 Order ID</span>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span class="order-id-value" id="orderIdValue">-</span>
+          <button class="copy-btn-payment" id="copyOrderIdBtn">
+            <i class="fas fa-copy"></i> Copy
+          </button>
+        </div>
+      </div>
+      
+      <div class="order-details-row">
+        <span class="order-details-label">🎮 Jumlah Robux</span>
+        <span class="order-details-value" id="payRobux">0</span>
+      </div>
+      
+      <div class="order-details-row total-amount">
+        <span class="order-details-label">💰 Total Pembayaran</span>
+        <span class="order-details-value" id="payTotal">Rp 0</span>
       </div>
     </div>
-
-    <div class="payment-methods" style="display: flex; flex-direction: column; gap: 12px;">
-      <button class="payment-method" data-method="bca" data-bank="BCA">
-        <span>🏦 BCA Virtual Account</span>
+    
+    <div class="payment-methods-title">
+      <i class="fas fa-credit-card"></i>
+      <span>Metode Pembayaran</span>
+    </div>
+    
+    <div class="payment-methods-grid">
+      <button class="payment-method-btn" data-method="bca" data-bank="BCA">
+        <div class="payment-method-icon bca"><i class="fas fa-university"></i></div>
+        <div class="payment-method-info">
+          <div class="payment-method-name">BCA Virtual Account</div>
+          <div class="payment-method-desc">Bayar melalui BCA Mobile / ATM</div>
+        </div>
+        <div class="payment-method-check"><i class="fas fa-check-circle"></i></div>
       </button>
-      <button class="payment-method" data-method="mandiri" data-bank="MANDIRI">
-        <span>🏦 Mandiri Virtual Account</span>
+      
+      <button class="payment-method-btn" data-method="mandiri" data-bank="MANDIRI">
+        <div class="payment-method-icon mandiri"><i class="fas fa-building"></i></div>
+        <div class="payment-method-info">
+          <div class="payment-method-name">Mandiri Virtual Account</div>
+          <div class="payment-method-desc">Bayar melalui Livin' / ATM</div>
+        </div>
+        <div class="payment-method-check"><i class="fas fa-check-circle"></i></div>
       </button>
-      <button class="payment-method" data-method="bni" data-bank="BNI">
-        <span>🏦 BNI Virtual Account</span>
+      
+      <button class="payment-method-btn" data-method="bni" data-bank="BNI">
+        <div class="payment-method-icon bni"><i class="fas fa-bank"></i></div>
+        <div class="payment-method-info">
+          <div class="payment-method-name">BNI Virtual Account</div>
+          <div class="payment-method-desc">Bayar melalui BNI Mobile / ATM</div>
+        </div>
+        <div class="payment-method-check"><i class="fas fa-check-circle"></i></div>
       </button>
-      <button class="payment-method" data-method="bri" data-bank="BRI">
-        <span>🏦 BRI Virtual Account</span>
+      
+      <button class="payment-method-btn" data-method="bri" data-bank="BRI">
+        <div class="payment-method-icon bri"><i class="fas fa-landmark"></i></div>
+        <div class="payment-method-info">
+          <div class="payment-method-name">BRI Virtual Account</div>
+          <div class="payment-method-desc">Bayar melalui BRImo / ATM</div>
+        </div>
+        <div class="payment-method-check"><i class="fas fa-check-circle"></i></div>
       </button>
     </div>
     
     <div id="debugInfo" class="debug-info"></div>
   </div>
-</main>
+</div>
 
-<footer class="footer">© 2025 R Store — Unofficial Roblox Store</footer>
-
-<div id="loadingOverlay" class="loading-overlay">
-  <div class="loading-content">
-    <div class="spinner"></div>
+<div id="loadingOverlay" class="loading-overlay-payment">
+  <div class="loading-content-payment">
+    <div class="loading-spinner"></div>
     <p>Memproses pembayaran...</p>
   </div>
 </div>
 
+<footer class="footer">
+  <div class="footer-container">
+    <div class="footer-brand">
+      <div class="footer-logo"><i class="fas fa-gamepad"></i><span>R STORE</span></div>
+      <p>Top Up Robux termurah dan tercepat di Indonesia. Layanan 24/7 dengan harga terbaik.</p>
+    </div>
+    <div class="footer-links">
+      <h4>Menu</h4>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="track.html">Lacak Pesanan</a></li>
+      </ul>
+    </div>
+    <div class="footer-links">
+      <h4>Informasi</h4>
+      <ul>
+        <li><a href="terms.html">Syarat & Ketentuan</a></li>
+        <li><a href="privacy.html">Kebijakan Privasi</a></li>
+      </ul>
+    </div>
+    <div class="footer-contact">
+      <h4>Kontak</h4>
+      <ul>
+        <li><i class="fab fa-discord"></i> R STORE#1234</li>
+        <li><i class="fab fa-whatsapp"></i> +62 812-3456-7890</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2025 R STORE — Unofficial Roblox Store. All rights reserved.</p>
+  </div>
+</footer>
+
 <script type="module">
   import { db, doc, getDoc, updateDoc } from './firebase-config.js';
   
-  // DOKU Config langsung didefinisikan di sini untuk menghindari error import
   const DOKU_CONFIG = {
     production: {
-      clientId: 'BRN-0292-1776814732519',  // GANTI DENGAN CLIENT ID ASLI
-      secretKey: 'SK-sTXgCWsr9eEV0pALHrE0', // GANTI DENGAN SECRET KEY ASLI
-      baseUrl: 'https://checkout.doku.com'
+      clientId: 'BRN-0292-1776814732519',
+      secretKey: 'SK-sTXgCWsr9eEV0pALHrE0',
+      baseUrl: 'https://api.doku.com'
     },
     mode: 'production',
     redirectUrl: window.location.origin + '/done.html',
@@ -207,175 +525,156 @@
 
   let currentAmount = 0;
   let currentRobux = 0;
+  let isProcessing = false;
 
-  // Debug function
   function addDebugLog(message, data) {
     const debugDiv = document.getElementById('debugInfo');
-    debugDiv.style.display = 'block';
-    const timestamp = new Date().toLocaleTimeString();
-    debugDiv.innerHTML += `[${timestamp}] ${message}: ${JSON.stringify(data, null, 2)}\n`;
+    if (debugDiv) {
+      debugDiv.style.display = 'block';
+      const timestamp = new Date().toLocaleTimeString();
+      debugDiv.innerHTML += `[${timestamp}] ${message}: ${JSON.stringify(data, null, 2)}\n`;
+      debugDiv.scrollTop = debugDiv.scrollHeight;
+    }
     console.log(message, data);
   }
 
-  async function copyToClipboard(text, buttonElement) {
+  async function copyToClipboard(text) {
     try {
       await navigator.clipboard.writeText(text);
-      const originalText = buttonElement.textContent;
-      buttonElement.textContent = '✅ Tersalin!';
+      const copyBtn = document.getElementById('copyOrderIdBtn');
+      const originalText = copyBtn.innerHTML;
+      copyBtn.innerHTML = '<i class="fas fa-check"></i> Tersalin!';
       setTimeout(() => {
-        buttonElement.textContent = originalText;
+        copyBtn.innerHTML = originalText;
       }, 2000);
     } catch (err) {
       alert('Gagal menyalin.');
     }
   }
 
-  // Redirect ke DOKU Checkout
-// Ganti fungsi redirectToDoku dengan ini
-async function redirectToDoku(bankCode) {
-  // Validasi amount
-  if (!currentAmount || currentAmount <= 0) {
-    throw new Error('Nominal pembayaran tidak valid: ' + currentAmount);
-  }
-  
-  addDebugLog('Calling proxy API', { orderId, currentAmount, bankCode });
-  
-  try {
-    // Panggil proxy API
-    const response = await fetch('/api/doku-checkout', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        orderId: orderId,
-        amount: currentAmount,
-        customerName: 'Customer R STORE',
-        customerEmail: 'customer@rstore.com',
-        redirectUrl: window.location.origin + '/done.html'
-      })
-    });
+  async function redirectToDoku(bankCode) {
+    if (isProcessing) return;
+    isProcessing = true;
     
-    const result = await response.json();
-    addDebugLog('Proxy response', result);
+    if (!currentAmount || currentAmount <= 0) {
+      throw new Error('Nominal pembayaran tidak valid: ' + currentAmount);
+    }
     
-    if (result.success && result.checkout_url) {
-      // Simpan metode pembayaran
-      await updateDoc(doc(db, 'orders', orderId), {
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    loadingOverlay.classList.add('active');
+    
+    try {
+      addDebugLog('Calling API /api/doku-checkout', { orderId, currentAmount, bankCode });
+      
+      // 🔥 SIMPAN PAYMENT METHOD TERLEBIH DAHULU
+      const orderRef = doc(db, 'orders', orderId);
+      await updateDoc(orderRef, {
         paymentMethod: bankCode,
-        status: 'redirecting_payment',
+        status: 'waiting_payment',
         updatedAt: new Date()
       });
+      addDebugLog('Payment method saved to Firestore', { paymentMethod: bankCode });
       
-      addDebugLog('Redirecting to DOKU', result.checkout_url);
-      // Redirect ke DOKU
-      window.location.href = result.checkout_url;
-    } else {
-      throw new Error(result.error || 'Gagal membuat transaksi');
+      // PANGGIL API DOKU
+      const response = await fetch('/api/doku-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderId: orderId,
+          amount: currentAmount,
+          bankCode: bankCode,
+          customerName: 'Customer R STORE',
+          customerEmail: 'customer@rstore.com',
+          redirectUrl: window.location.origin + '/done.html'
+        })
+      });
+      
+      const result = await response.json();
+      addDebugLog('API Response', result);
+      
+      if (result.success && result.checkout_url) {
+        await updateDoc(orderRef, {
+          paymentUrl: result.checkout_url,
+          updatedAt: new Date()
+        });
+        
+        addDebugLog('Redirecting to DOKU', result.checkout_url);
+        window.location.href = result.checkout_url;
+      } else {
+        throw new Error(result.error || 'Gagal membuat transaksi');
+      }
+    } catch (error) {
+      addDebugLog('Error in redirectToDoku', error.message);
+      alert('Gagal memproses pembayaran: ' + error.message);
+      loadingOverlay.classList.remove('active');
+    } finally {
+      isProcessing = false;
     }
-  } catch (error) {
-    addDebugLog('Error in redirectToDoku', error.message);
-    throw error;
   }
-}
 
   async function loadOrder() {
     try {
-      addDebugLog('Loading order', orderId);
-      
       const orderRef = doc(db, 'orders', orderId);
       const orderSnap = await getDoc(orderRef);
       
       if (!orderSnap.exists()) {
-        addDebugLog('Order not found', orderId);
-        document.getElementById('errorBadge').style.display = 'block';
-        document.getElementById('errorBadge').textContent = '❌ Pesanan tidak ditemukan!';
-        document.querySelectorAll('.payment-method').forEach(btn => {
+        document.getElementById('errorBadge').style.display = 'flex';
+        document.querySelectorAll('.payment-method-btn').forEach(btn => {
           btn.disabled = true;
+          btn.classList.add('disabled');
         });
         return;
       }
       
       const data = orderSnap.data();
-      addDebugLog('Order data', { robuxAmount: data.robuxAmount, totalPrice: data.totalPrice, status: data.status });
       
-      // Validasi data order
       if (!data.totalPrice || data.totalPrice <= 0) {
-        addDebugLog('Invalid totalPrice', data.totalPrice);
-        document.getElementById('errorBadge').style.display = 'block';
-        document.getElementById('errorBadge').textContent = '❌ Data pesanan tidak valid (totalPrice: ' + data.totalPrice + ')';
+        document.getElementById('errorBadge').style.display = 'flex';
         return;
       }
       
       currentAmount = data.totalPrice;
       currentRobux = data.robuxAmount || 0;
       
-      // Cek expired
       const expireAt = data.expireAt?.toDate();
       if (expireAt && new Date() > expireAt) {
-        addDebugLog('Order expired', expireAt);
         alert('❌ Pesanan sudah kadaluarsa (2 jam). Silakan buat pesanan baru.');
         window.location.href = 'index.html';
         return;
       }
       
-      // Tampilkan Order ID
-      const orderIdContainer = document.getElementById('orderIdContainer');
-      orderIdContainer.innerHTML = `
-        <span class="order-id-text">${orderId}</span>
-        <button class="copy-btn" id="copyOrderIdBtn">📋 Copy</button>
-      `;
-      
-      document.getElementById('copyOrderIdBtn').addEventListener('click', (e) => {
-        copyToClipboard(orderId, e.target);
-      });
-      
+      document.getElementById('orderIdValue').textContent = orderId;
       document.getElementById('payRobux').textContent = currentRobux.toLocaleString('id-ID');
       document.getElementById('payTotal').textContent = 'Rp ' + currentAmount.toLocaleString('id-ID');
       
-      addDebugLog('Order loaded successfully', { currentAmount, currentRobux });
+      document.getElementById('copyOrderIdBtn').addEventListener('click', () => {
+        copyToClipboard(orderId);
+      });
+      
+      addDebugLog('Order loaded', { currentAmount, currentRobux, orderId });
       
     } catch (error) {
-      addDebugLog('Error loading order', error.message);
       console.error('Error loading order:', error);
-      document.getElementById('errorBadge').style.display = 'block';
-      document.getElementById('errorBadge').textContent = '❌ Error: ' + error.message;
+      document.getElementById('errorBadge').style.display = 'flex';
     }
   }
 
-  // Handle tombol pembayaran
-  const loadingOverlay = document.getElementById('loadingOverlay');
-  
-  document.querySelectorAll('.payment-method').forEach(btn => {
+  document.querySelectorAll('.payment-method-btn').forEach(btn => {
     btn.addEventListener('click', async () => {
+      if (btn.disabled || isProcessing) return;
+      
       const method = btn.dataset.method;
-      const bankName = btn.dataset.bank || method.toUpperCase();
+      const bankName = btn.dataset.bank;
       
-      addDebugLog('Payment button clicked', { method, bankName, currentAmount });
-      
-      // Validasi amount
       if (!currentAmount || currentAmount <= 0) {
-        alert('Error: Data pesanan tidak lengkap. Silakan refresh halaman.');
-        addDebugLog('Invalid amount on click', currentAmount);
+        alert('Error: Data pesanan tidak lengkap.');
         return;
       }
       
-      // Konfirmasi ke pelanggan
       const confirmMsg = `Anda akan membayar Rp ${currentAmount.toLocaleString('id-ID')} melalui ${bankName} Virtual Account.\n\nLanjutkan?`;
       if (!confirm(confirmMsg)) return;
       
-      // Tampilkan loading
-      loadingOverlay.style.display = 'flex';
-      btn.disabled = true;
-      
-      try {
-        await redirectToDoku(method);
-      } catch (error) {
-        addDebugLog('Error in redirectToDoku', error.message);
-        alert('Gagal memproses pembayaran: ' + error.message);
-        loadingOverlay.style.display = 'none';
-        btn.disabled = false;
-      }
+      await redirectToDoku(method);
     });
   });
 

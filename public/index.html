@@ -3,72 +3,582 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Beli Robux - R STORE</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <title>R STORE - Top Up Robux Murah & Instant</title>
+  <meta name="description" content="Beli Robux dengan harga terbaik, proses cepat, aman, dan terpercaya. Top up Roblox instant 24 jam." />
+  <meta name="keywords" content="top up robux, beli robux, robux murah, roblox, topup roblox" />
+  <meta name="author" content="R STORE" />
+  <meta property="og:title" content="R STORE - Top Up Robux Murah & Instant" />
+  <meta property="og:description" content="Dapatkan Robux dengan harga terbaik, proses cepat, dan aman" />
+  <meta property="og:type" content="website" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
+<!-- Loading Screen -->
 <div class="loading-screen" id="loadingScreen">
-  <div class="load-spinner"></div>
-  <div class="load-title">R STORE</div>
-  <div class="load-subtitle">Loading...</div>
+  <div class="load-container">
+    <div class="load-cube">
+      <div class="load-face load-face-front"></div>
+      <div class="load-face load-face-back"></div>
+      <div class="load-face load-face-left"></div>
+      <div class="load-face load-face-right"></div>
+      <div class="load-face load-face-top"></div>
+      <div class="load-face load-face-bottom"></div>
+    </div>
+    <div class="load-title">R STORE</div>
+    <div class="load-subtitle">Loading...</div>
+  </div>
 </div>
 
+<!-- Navbar -->
 <nav class="navbar">
-  <div class="nav-logo">🎮 R STORE – ROBUX</div>
-  <a href="track.html" class="btn-track">Lacak Pesanan</a>
+  <div class="nav-container">
+    <div class="nav-logo">
+      <i class="fas fa-gamepad"></i>
+      <span>R STORE</span>
+      <small>ROBUX</small>
+    </div>
+    <div class="nav-menu">
+      <a href="index.html" class="nav-link active">Home</a>
+      <a href="#pricing" class="nav-link">Harga</a>
+      <a href="#testimonials" class="nav-link">Testimoni</a>
+      <a href="track.html" class="nav-link">Lacak</a>
+    </div>
+    <a href="track.html" class="btn-track">
+      <i class="fas fa-search"></i> Lacak Pesanan
+    </a>
+    <div class="menu-toggle" id="menuToggle">
+      <i class="fas fa-bars"></i>
+    </div>
+  </div>
 </nav>
 
-<section class="hero">
-  <h1>Beli Robux Murah</h1>
-  <p>Pengiriman instant & harga terbaik untuk Robux kamu</p>
+<!-- ⚠️ COMMUNITY REQUIREMENT BANNER -->
+<section class="community-banner">
+  <div class="container">
+    <div class="community-banner-content">
+      <div class="community-icon">
+        <i class="fab fa-roblox"></i>
+      </div>
+      <div class="community-text">
+        <h3>⚠️ SYARAT PENTING SEBELUM MEMBELI!</h3>
+        <p>Untuk mendapatkan pengiriman <strong>INSTANT</strong>, Anda WAJIB join <strong>Community Roblox R STORE</strong> minimal <strong>15 hari</strong> sebelum melakukan pembelian.</p>
+        <p>Belum join? <a href="#" class="community-link" id="communityLink">Klik di sini untuk join community →</a></p>
+      </div>
+      <div class="community-badge">
+        <span class="badge-important">WAJIB</span>
+      </div>
+    </div>
+  </div>
 </section>
 
-<main class="main">
-  <div id="stockAlert" class="stock-alert available">
-    <strong id="stockTitle">✅ Stock Tersedia</strong>
-    <div id="stockDesc">Loading stok...</div>
+<!-- Hero Section -->
+<section class="hero-modern">
+  <div class="hero-bg"></div>
+  <div class="hero-container">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <i class="fas fa-bolt"></i> Top Up Roblox Resmi
+      </div>
+      <h1 class="hero-title">
+        Top Up <span class="gradient-text">Robux</span><br>
+        <span class="hero-subtitle-text">Murah & Instant</span>
+      </h1>
+      <p class="hero-description">
+        Dapatkan Robux dengan harga terbaik, proses cepat, dan aman 100%. 
+        Langsung masuk ke akun Roblox Anda dalam hitungan detik.
+      </p>
+      <div class="hero-buttons">
+        <button class="btn-primary" id="scrollToBuy">
+          <i class="fas fa-shopping-cart"></i> Beli Sekarang
+        </button>
+        <a href="#how-it-works" class="btn-outline">
+          <i class="fas fa-play"></i> Cara Kerja
+        </a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat">
+          <div class="stat-number" data-count="10000">0</div>
+          <div class="stat-label">Pesanan Berhasil</div>
+        </div>
+        <div class="stat">
+          <div class="stat-number">⭐ 4.9</div>
+          <div class="stat-label">Rating Pelanggan</div>
+        </div>
+        <div class="stat">
+          <div class="stat-number">24/7</div>
+          <div class="stat-label">Customer Support</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-image">
+      <div class="floating-card card-1">
+        <i class="fab fa-discord"></i>
+        <span>Discord Support</span>
+      </div>
+      <div class="floating-card card-2">
+        <i class="fab fa-whatsapp"></i>
+        <span>WhatsApp 24/7</span>
+      </div>
+      <div class="floating-card card-3">
+        <i class="fas fa-tachometer-alt"></i>
+        <span>Instant Delivery</span>
+      </div>
+      <img src="https://cdn-icons-png.flaticon.com/512/5555/5555947.png" alt="Roblox Character" class="hero-character">
+    </div>
   </div>
+</section>
 
-  <div class="card">
-    <div class="grid">
-      <div class="input-group">
-        <label>Jumlah Robux</label>
-        <input type="number" id="robuxInput" min="10" step="10" placeholder="Minimal 10" />
-        <div id="robuxError" class="error">Minimal pembelian 10 Robux</div>
+<!-- How It Works -->
+<section class="how-it-works" id="how-it-works">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-badge">Cara Kerja</span>
+      <h2>Mudah & Cepat</h2>
+      <p>Cukup 3 langkah mudah untuk mendapatkan Robux</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-icon"><i class="fas fa-edit"></i></div>
+        <h3>Masukkan Jumlah</h3>
+        <p>Tentukan jumlah Robux yang ingin dibeli</p>
       </div>
-      <div class="input-group">
-        <label>Harga / Robux</label>
-        <input type="text" id="pricePerRobux" disabled />
+      <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-icon"><i class="fas fa-credit-card"></i></div>
+        <h3>Pilih Pembayaran</h3>
+        <p>Bayar via QRIS, Virtual Account, atau E-Wallet</p>
+      </div>
+      <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-icon"><i class="fas fa-rocket"></i></div>
+        <h3>Robux Masuk</h3>
+        <p>Robux akan masuk ke akun Anda secara instant</p>
       </div>
     </div>
-
-    <div class="stock-info">
-      <div><span>Stock Ready</span><strong id="stockReady">0</strong></div>
-      <div><span>Pre-Order Available</span><strong id="poAvailable">0</strong></div>
-    </div>
-
-    <div class="summary">
-      <div class="summary-header">
-        <span>Total Pembayaran</span>
-        <div class="delivery-badge"><span id="deliveryInfo">⚡ Pengiriman Instant</span></div>
-      </div>
-      <h2 id="totalPrice">Rp 0</h2>
-      <div class="order-details">
-        <div class="detail-row"><span>Jumlah Robux:</span><strong id="detailRobux">0</strong></div>
-        <div class="detail-row"><span>Rate per Robux:</span><strong id="detailRate">Rp 0</strong></div>
-        <div class="detail-divider"></div>
-        <div class="detail-row total"><span>Total:</span><strong id="detailTotal">Rp 0</strong></div>
-      </div>
-    </div>
-
-    <button class="btn-buy" id="btnBuy">Lanjutkan Pembayaran</button>
   </div>
-</main>
+</section>
 
-<footer class="footer">© 2025 R Store — Unofficial Roblox Store</footer>
+<!-- Pricing Cards -->
+<section class="pricing" id="pricing">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-badge">Paket Populer</span>
+      <h2>Pilih Paket Robux</h2>
+      <p>Harga terbaik untuk setiap kebutuhan Anda</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <div class="pricing-badge">Hemat</div>
+        <div class="pricing-icon"><i class="fas fa-coins"></i></div>
+        <h3>400 Robux</h3>
+        <div class="pricing-price">Rp 50.000</div>
+        <ul class="pricing-features">
+          <li><i class="fas fa-check"></i> Instant Delivery</li>
+          <li><i class="fas fa-check"></i> Garansi 100%</li>
+          <li><i class="fas fa-check"></i> Support 24/7</li>
+        </ul>
+        <button class="btn-pricing" data-robux="400">Beli Sekarang</button>
+      </div>
+      <div class="pricing-card popular">
+        <div class="pricing-badge">Best Seller</div>
+        <div class="pricing-icon"><i class="fas fa-crown"></i></div>
+        <h3>1.200 Robux</h3>
+        <div class="pricing-price">Rp 150.000</div>
+        <ul class="pricing-features">
+          <li><i class="fas fa-check"></i> Instant Delivery</li>
+          <li><i class="fas fa-check"></i> Garansi 100%</li>
+          <li><i class="fas fa-check"></i> Support 24/7</li>
+          <li><i class="fas fa-check"></i> Bonus 50 Robux</li>
+        </ul>
+        <button class="btn-pricing" data-robux="1200">Beli Sekarang</button>
+      </div>
+      <div class="pricing-card">
+        <div class="pricing-badge">Pro</div>
+        <div class="pricing-icon"><i class="fas fa-gem"></i></div>
+        <h3>2.500 Robux</h3>
+        <div class="pricing-price">Rp 300.000</div>
+        <ul class="pricing-features">
+          <li><i class="fas fa-check"></i> Instant Delivery</li>
+          <li><i class="fas fa-check"></i> Garansi 100%</li>
+          <li><i class="fas fa-check"></i> Support 24/7</li>
+          <li><i class="fas fa-check"></i> Bonus 100 Robux</li>
+        </ul>
+        <button class="btn-pricing" data-robux="2500">Beli Sekarang</button>
+      </div>
+      <div class="pricing-card">
+        <div class="pricing-badge">Gamer</div>
+        <div class="pricing-icon"><i class="fas fa-trophy"></i></div>
+        <h3>5.000 Robux</h3>
+        <div class="pricing-price">Rp 600.000</div>
+        <ul class="pricing-features">
+          <li><i class="fas fa-check"></i> Instant Delivery</li>
+          <li><i class="fas fa-check"></i> Garansi 100%</li>
+          <li><i class="fas fa-check"></i> Support 24/7</li>
+          <li><i class="fas fa-check"></i> Bonus 250 Robux</li>
+        </ul>
+        <button class="btn-pricing" data-robux="5000">Beli Sekarang</button>
+      </div>
+    </div>
+    <div class="custom-order">
+      <p>Butuh jumlah lain? <a href="#" id="customOrderLink">Order Custom</a></p>
+    </div>
+  </div>
+</section>
+
+<!-- Order Section -->
+<section class="order-section" id="order-section">
+  <div class="container">
+    <div class="order-wrapper">
+      <div class="order-info">
+        <h2>Top Up Sekarang</h2>
+        <p>Isi jumlah Robux yang Anda inginkan</p>
+        <div class="info-list">
+          <div class="info-item">
+            <i class="fas fa-shield-alt"></i>
+            <span>100% Aman & Terpercaya</span>
+          </div>
+          <div class="info-item">
+            <i class="fas fa-clock"></i>
+            <span>Proses Kurang dari 1 Menit</span>
+          </div>
+          <div class="info-item">
+            <i class="fas fa-headset"></i>
+            <span>Customer Support 24/7</span>
+          </div>
+        </div>
+      </div>
+      <div class="order-card">
+        <div id="stockAlert" class="stock-alert available">
+          <i class="fas fa-check-circle"></i>
+          <div>
+            <strong id="stockTitle">Stock Tersedia</strong>
+            <div id="stockDesc">Loading stok...</div>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label>Jumlah Robux</label>
+          <div class="input-wrapper">
+            <i class="fas fa-robot"></i>
+            <input type="number" id="robuxInput" min="10" step="10" placeholder="Minimal 10" />
+          </div>
+          <div id="robuxError" class="error">Minimal pembelian 10 Robux</div>
+        </div>
+
+        <div class="input-group">
+          <label>Harga / Robux</label>
+          <div class="input-wrapper">
+            <i class="fas fa-tag"></i>
+            <input type="text" id="pricePerRobux" disabled />
+          </div>
+        </div>
+
+        <div class="stock-info">
+          <div class="stock-item">
+            <i class="fas fa-boxes"></i>
+            <div>
+              <span>Stock Ready</span>
+              <strong id="stockReady">0</strong>
+            </div>
+          </div>
+          <div class="stock-item">
+            <i class="fas fa-calendar-alt"></i>
+            <div>
+              <span>Pre-Order</span>
+              <strong id="poAvailable">0</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="summary">
+          <div class="summary-header">
+            <span>Total Pembayaran</span>
+            <div class="delivery-badge">
+              <i class="fas fa-bolt"></i>
+              <span id="deliveryInfo">Pengiriman Instant</span>
+            </div>
+          </div>
+          <h2 id="totalPrice">Rp 0</h2>
+          <button class="btn-buy" id="btnBuy">
+            <i class="fas fa-arrow-right"></i> Lanjutkan Pembayaran
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section class="testimonials" id="testimonials">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-badge">Testimoni</span>
+      <h2>Apa Kata Pembeli?</h2>
+      <p>Lebih dari 10.000+ pelanggan puas dengan layanan kami</p>
+    </div>
+    <div class="testimonial-grid">
+      <div class="testimonial-card">
+        <div class="testimonial-header">
+          <div class="testimonial-avatar">A</div>
+          <div>
+            <h4>Andi Wijaya</h4>
+            <div class="stars">★★★★★</div>
+          </div>
+        </div>
+        <p>"Prosesnya cepat banget, langsung dapet Robux! Gak sampai 1 menit sudah masuk. Recommended!"</p>
+        <div class="testimonial-footer">
+          <i class="fab fa-roblox"></i> Roblox Player
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-header">
+          <div class="testimonial-avatar">P</div>
+          <div>
+            <h4>Putri Maharani</h4>
+            <div class="stars">★★★★★</div>
+          </div>
+        </div>
+        <p>"Harga murah, admin ramah banget. Kalau ada masalah langsung dibantu. Pasti beli lagi disini!"</p>
+        <div class="testimonial-footer">
+          <i class="fab fa-roblox"></i> Roblox Player
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-header">
+          <div class="testimonial-avatar">B</div>
+          <div>
+            <h4>Budi Santoso</h4>
+            <div class="stars">★★★★★</div>
+          </div>
+        </div>
+        <p>"Top up puluhan kali, gak pernah kecewa. Proses instant, harga bersaing. The best!"</p>
+        <div class="testimonial-footer">
+          <i class="fab fa-roblox"></i> Roblox Player
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="faq">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-badge">FAQ</span>
+      <h2>Pertanyaan Umum</h2>
+      <p>Informasi yang sering ditanyakan</p>
+    </div>
+    <div class="faq-grid">
+      <div class="faq-item">
+        <div class="faq-question">
+          <h3>Berapa lama proses pengiriman Robux?</h3>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="faq-answer">
+          <p>Proses pengiriman Robux sangat cepat, biasanya kurang dari 1 menit setelah pembayaran dikonfirmasi.</p>
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">
+          <h3>Apakah aman beli Robux di R STORE?</h3>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="faq-answer">
+          <p>100% aman! Kami menggunakan sistem otomatis dan terintegrasi dengan payment gateway resmi.</p>
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">
+          <h3>Metode pembayaran apa saja?</h3>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="faq-answer">
+          <p>QRIS, BCA Virtual Account, Mandiri Virtual Account, BNI, BRI, GoPay, dan DANA.</p>
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">
+          <h3>Bagaimana jika Robux tidak masuk?</h3>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="faq-answer">
+          <p>Hubungi customer support kami 24/7 melalui WhatsApp atau Discord, kami akan bantu proses refund atau kirim ulang.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WhatsApp Float -->
+<a href="https://wa.me/6281234567890?text=Halo%20R%20STORE%2C%20saya%20mau%20tanya%20tentang%20Robux" 
+   class="whatsapp-float" target="_blank" rel="noopener noreferrer">
+  <i class="fab fa-whatsapp"></i>
+  <span class="whatsapp-tooltip">Chat Admin</span>
+</a>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-container">
+    <div class="footer-brand">
+      <div class="footer-logo">
+        <i class="fas fa-gamepad"></i>
+        <span>R STORE</span>
+      </div>
+      <p>Top Up Robux termurah dan tercepat di Indonesia. Layanan 24/7 dengan harga terbaik.</p>
+      <div class="footer-social">
+        <a href="#"><i class="fab fa-discord"></i></a>
+        <a href="#"><i class="fab fa-instagram"></i></a>
+        <a href="#"><i class="fab fa-tiktok"></i></a>
+        <a href="#"><i class="fab fa-twitter"></i></a>
+      </div>
+    </div>
+    <div class="footer-links">
+      <h4>Menu</h4>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="#pricing">Harga</a></li>
+        <li><a href="#testimonials">Testimoni</a></li>
+        <li><a href="track.html">Lacak Pesanan</a></li>
+      </ul>
+    </div>
+    <div class="footer-links">
+      <h4>Informasi</h4>
+      <ul>
+        <li><a href="terms.html">Syarat & Ketentuan</a></li>
+        <li><a href="privacy.html">Kebijakan Privasi</a></li>
+        <li><a href="#">Cara Pembayaran</a></li>
+        <li><a href="#">FAQ</a></li>
+      </ul>
+    </div>
+    <div class="footer-contact">
+      <h4>Kontak</h4>
+      <ul>
+        <li><i class="fab fa-discord"></i> R STORE#1234</li>
+        <li><i class="fab fa-whatsapp"></i> +62 812-3456-7890</li>
+        <li><i class="far fa-envelope"></i> support@rstore.com</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2025 R STORE — Unofficial Roblox Store. All rights reserved.</p>
+    <p>Roblox and Robux are trademarks of Roblox Corporation.</p>
+  </div>
+</footer>
 
 <script type="module" src="main.js"></script>
+<script>
+  // Hide loading screen after page load
+  window.addEventListener('load', () => {
+    const loadingScreen = document.getElementById('loadingScreen');
+    if (loadingScreen) {
+      setTimeout(() => {
+        loadingScreen.style.opacity = '0';
+        setTimeout(() => {
+          loadingScreen.style.display = 'none';
+        }, 500);
+      }, 500);
+    }
+  });
+
+  // Mobile menu toggle
+  const menuToggle = document.getElementById('menuToggle');
+  const navMenu = document.querySelector('.nav-menu');
+  
+  if (menuToggle) {
+    menuToggle.addEventListener('click', () => {
+      navMenu.classList.toggle('active');
+    });
+  }
+  
+  // Close mobile menu when clicking a link
+  document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', () => {
+      navMenu.classList.remove('active');
+    });
+  });
+  
+  // Scroll to order section
+  const scrollToBuy = document.getElementById('scrollToBuy');
+  if (scrollToBuy) {
+    scrollToBuy.addEventListener('click', () => {
+      document.getElementById('order-section').scrollIntoView({ behavior: 'smooth' });
+    });
+  }
+  
+  const customOrderLink = document.getElementById('customOrderLink');
+  if (customOrderLink) {
+    customOrderLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      document.getElementById('order-section').scrollIntoView({ behavior: 'smooth' });
+    });
+  }
+  
+  // Community link
+  const communityLink = document.getElementById('communityLink');
+  if (communityLink) {
+    communityLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      // Ganti dengan link community Roblox asli Anda
+      window.open('https://www.roblox.com/communities/xxxxxxxxxxxxxxxxx', '_blank');
+    });
+  }
+  
+  // Pricing buttons
+  document.querySelectorAll('.btn-pricing').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const robux = btn.dataset.robux;
+      const robuxInput = document.getElementById('robuxInput');
+      if (robuxInput) {
+        robuxInput.value = robux;
+        robuxInput.dispatchEvent(new Event('input'));
+      }
+      document.getElementById('order-section').scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+  
+  // FAQ Accordion
+  document.querySelectorAll('.faq-question').forEach(question => {
+    question.addEventListener('click', () => {
+      const faqItem = question.parentElement;
+      faqItem.classList.toggle('active');
+    });
+  });
+  
+  // Animate stats counter
+  const animateStats = () => {
+    const statNumbers = document.querySelectorAll('.stat-number[data-count]');
+    statNumbers.forEach(el => {
+      const target = parseInt(el.dataset.count);
+      let current = 0;
+      const increment = target / 50;
+      const timer = setInterval(() => {
+        current += increment;
+        if (current >= target) {
+          el.textContent = target.toLocaleString();
+          clearInterval(timer);
+        } else {
+          el.textContent = Math.floor(current).toLocaleString();
+        }
+      }, 30);
+    });
+  };
+  
+  // Trigger animation when element is visible
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        animateStats();
+        observer.disconnect();
+      }
+    });
+  });
+  
+  const heroStats = document.querySelector('.hero-stats');
+  if (heroStats) observer.observe(heroStats);
+</script>
 </body>
 </html>

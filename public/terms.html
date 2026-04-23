@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Syarat & Ketentuan - R STORE</title>
+  <meta name="description" content="Syarat dan ketentuan layanan R STORE untuk top up Robux" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0f0f1a;
+      color: #fff;
+      overflow-x: hidden;
+    }
+    
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(15, 15, 26, 0.95);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      padding: 15px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 24px;
+      font-weight: 800;
+    }
+    
+    .nav-logo i {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .nav-logo span {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .btn-track {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 30px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: transform 0.3s;
+    }
+    
+    .btn-track:hover {
+      transform: translateY(-2px);
+    }
+    
+    .main-content {
+      padding-top: 100px;
+      padding-bottom: 60px;
+    }
+    
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    
+    .page-header {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+    
+    .page-header h1 {
+      font-size: 48px;
+      font-weight: 800;
+      margin-bottom: 15px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .page-header .badge {
+      display: inline-block;
+      background: rgba(102,126,234,0.2);
+      padding: 6px 14px;
+      border-radius: 30px;
+      font-size: 12px;
+      color: #667eea;
+      margin-bottom: 15px;
+    }
+    
+    .page-header .last-updated {
+      color: #a0a0b0;
+      font-size: 14px;
+    }
+    
+    .content-card {
+      background: #13132a;
+      border-radius: 24px;
+      padding: 50px;
+      margin-bottom: 30px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .section {
+      margin-bottom: 40px;
+    }
+    
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 24px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid rgba(102,126,234,0.3);
+    }
+    
+    .section-icon {
+      font-size: 28px;
+    }
+    
+    .section-content {
+      color: #c0c0d0;
+      font-size: 15px;
+      line-height: 1.8;
+    }
+    
+    .section-content p {
+      margin-bottom: 16px;
+    }
+    
+    .info-list {
+      list-style: none;
+      padding: 0;
+      margin: 16px 0;
+    }
+    
+    .info-list li {
+      padding: 10px 0 10px 30px;
+      position: relative;
+      color: #c0c0d0;
+    }
+    
+    .info-list li::before {
+      content: '▹';
+      position: absolute;
+      left: 8px;
+      color: #667eea;
+    }
+    
+    .warning-box, .success-box, .info-box, .community-box {
+      padding: 20px;
+      border-radius: 16px;
+      margin: 20px 0;
+    }
+    
+    .warning-box {
+      background: rgba(220, 53, 69, 0.15);
+      border-left: 4px solid #dc3545;
+    }
+    
+    .warning-box p {
+      color: #f8d7da;
+    }
+    
+    .success-box {
+      background: rgba(40, 167, 69, 0.15);
+      border-left: 4px solid #28a745;
+    }
+    
+    .success-box p {
+      color: #d4edda;
+    }
+    
+    .info-box {
+      background: rgba(255, 193, 7, 0.15);
+      border-left: 4px solid #ffc107;
+    }
+    
+    .info-box p {
+      color: #fff3cd;
+    }
+    
+    .community-box {
+      background: rgba(102, 126, 234, 0.2);
+      border-left: 4px solid #667eea;
+      text-align: center;
+    }
+    
+    .community-box h3 {
+      color: #667eea;
+      margin-bottom: 15px;
+    }
+    
+    .community-box .btn-community {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 12px 28px;
+      border-radius: 40px;
+      text-decoration: none;
+      font-weight: 600;
+      margin-top: 15px;
+      transition: transform 0.3s;
+    }
+    
+    .community-box .btn-community:hover {
+      transform: translateY(-2px);
+    }
+    
+    .terms-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    
+    .terms-table th {
+      background: rgba(102,126,234,0.3);
+      color: white;
+      padding: 12px;
+      text-align: left;
+    }
+    
+    .terms-table td {
+      padding: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      color: #c0c0d0;
+    }
+    
+    .contact-box {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      padding: 40px;
+      border-radius: 24px;
+      text-align: center;
+      margin-top: 40px;
+    }
+    
+    .contact-box h3 {
+      font-size: 24px;
+      margin-bottom: 15px;
+    }
+    
+    .contact-box p {
+      color: rgba(255,255,255,0.95);
+      margin-bottom: 25px;
+    }
+    
+    .contact-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: white;
+      color: #667eea;
+      padding: 14px 32px;
+      border-radius: 40px;
+      text-decoration: none;
+      font-weight: 700;
+      transition: transform 0.3s;
+    }
+    
+    .contact-button:hover {
+      transform: translateY(-3px);
+    }
+    
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.1);
+      color: white;
+      padding: 12px 28px;
+      border-radius: 40px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s;
+      margin-top: 20px;
+    }
+    
+    .back-button:hover {
+      background: rgba(255,255,255,0.2);
+      transform: translateY(-2px);
+    }
+    
+    .footer {
+      text-align: center;
+      padding: 30px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      color: #a0a0b0;
+      font-size: 14px;
+    }
+    
+    @media (max-width: 768px) {
+      .page-header h1 { font-size: 32px; }
+      .content-card { padding: 30px 20px; }
+      .section-title { font-size: 20px; }
+      .terms-table { font-size: 13px; }
+      .terms-table th, .terms-table td { padding: 8px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-container">
+    <div class="nav-logo">
+      <i class="fas fa-gamepad"></i>
+      <span>R STORE</span>
+    </div>
+    <a href="index.html" class="btn-track">
+      <i class="fas fa-home"></i> Beranda
+    </a>
+  </div>
+</nav>
+
+<div class="main-content">
+  <div class="container">
+    
+    <div class="page-header">
+      <div class="badge">Legal</div>
+      <h1>Syarat & Ketentuan</h1>
+      <p class="last-updated">Terakhir diperbarui: 22 April 2025</p>
+    </div>
+    
+    <div class="content-card">
+      
+      <!-- COMMUNITY REQUIREMENT - SYARAT UTAMA -->
+      <div class="community-box">
+        <i class="fab fa-roblox" style="font-size: 48px; color: #667eea; margin-bottom: 15px; display: inline-block;"></i>
+        <h3>⚠️ SYARAT WAJIB SEBELUM MEMBELI ⚠️</h3>
+        <p style="font-size: 16px; margin-bottom: 10px;"><strong>Untuk mendapatkan pengiriman INSTANT, Anda WAJIB join Community Roblox R STORE minimal 15 hari sebelum melakukan pembelian!</strong></p>
+        <p>Jika belum join atau belum mencapai 15 hari, pesanan Anda akan masuk ke sistem <strong>PRE-ORDER</strong> (maksimal 15 hari kerja).</p>
+        <a href="https://www.roblox.com/communities/xxxxxxxxxxxxxxxxx" class="btn-community">
+          <i class="fab fa-roblox"></i> Join Community R STORE Sekarang
+        </a>
+        <p style="font-size: 12px; margin-top: 15px; opacity: 0.8;">*Ganti link dengan link community Roblox Anda</p>
+      </div>
+      
+      <!-- Section 1 -->
+      <div class="section">
+        <h2 class="section-title">
+          <span class="section-icon">📜</span>
+          1. Penerimaan Ketentuan
+        </h2>
+        <div class="section-content">
+          <p>Dengan menggunakan layanan R STORE, Anda menyatakan bahwa Anda telah membaca, memahami, dan menyetujui seluruh isi Syarat dan Ketentuan ini. Jika Anda tidak setuju, mohon untuk tidak menggunakan layanan kami.</p>
+        </div>
+      </div>
+      
+      <!-- Section 2 - SYARAT JOIN COMMUNITY (DIPERJELAS) -->
+      <div class="section">
+        <h2 class="section-title">
+          <span class="section-icon">👥</span>
+          2. Syarat Join Community Roblox
+        </h2>
+        <div class="section-content">
+          <p><strong>Ini adalah syarat utama untuk mendapatkan layanan pengiriman INSTANT di R STORE.</strong></p>
+          <ul class="info-list">
+            <li><strong>Wajib join Community Roblox R STORE</strong> - Link community tersedia di atas dan di website</li>
+            <li><strong>Minimal 15 hari</strong> sejak join community sebelum melakukan pembelian</li>
+            <li>Jika sudah memenuhi syarat join 15 hari <strong>DAN</strong> stock tersedia, pengiriman akan diproses secara <strong>INSTANT (1-5 menit)</strong></li>
+            <li>Jika belum join atau belum mencapai 15 hari, pesanan akan diproses sebagai <strong>PRE-ORDER (maksimal 15 hari kerja)</strong></li>
+            <li>Admin berhak mengecek keanggotaan community Anda sebelum memproses pesanan</li>
+          </ul>
+          <div class="warning-box">
+            <p><i class="fas fa-exclamation-triangle"></i> <strong>Perhatian!</strong> Kami tidak dapat memproses pengiriman instant jika Anda belum join community selama 15 hari, meskipun stock tersedia. Pesanan akan otomatis masuk ke sistem pre-order.</p>
+          </div>
+          <div class="success-box">
+            <p><i class="fas fa-check-circle"></i> <strong>Keuntungan Join Community:</strong> Harga khusus member, prioritas pengiriman, akses event eksklusif, dan giveaway rutin!</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Section 3 -->
+      <div class="section">
+        <h2 class="section-title">
+          <span class="section-icon">🛒</span>
+          3. Layanan Kami
+        </h2>
+        <div class="section-content">
+          <p>R STORE menyediakan layanan penjualan Robux untuk game Roblox dengan ketentuan:</p>
+          <ul class="info-list">
+            <li>Harga mulai dari Rp 115 per Robux</li>
+            <li><strong>Pengiriman instant (1-5 menit)</strong> - Hanya untuk member yang sudah join community 15 hari & stock tersedia</li>
+            <li><strong>Pre-order (1-15 hari kerja)</strong> - Untuk non-member atau saat stock habis</li>
+            <li>Metode pembayaran: QRIS, Virtual Account (BCA, Mandiri, BNI, BRI), GoPay, DANA</li>
+          </ul>
+          
+          <table class="terms-table">
+            <thead>
+              <tr>
+                <th>Status Member</th>
+                <th>Syarat Join</th>
+                <th>Waktu Proses</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>✅ Member (Instant)</strong></td>
+                <td>Join community ≥ 15 hari</td>
+                <td>1-5 menit</td>
+              </tr>
+              <tr>
+                <td><strong>⏳ Non-Member / Baru Join</strong></td>
+                <td>Join community &lt; 15 hari</td>
+                <td>Pre-Order (1-15 hari kerja)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- Section 4 -->
+      <div class="section">
+        <h2 class="section-title">
+          <span class="section-icon">👤</span>
+          4. Kewajiban Pengguna
+        </h2>
+        <div class="section-content">
+          <p>Sebagai pengguna, Anda wajib:</p>
+          <ul class="info-list">
+            <li><strong>JOIN COMMUNITY R STORE minimal 15 hari sebelum membeli</strong> (untuk mendapatkan layanan instant)</li>
+            <li>Memberikan username Roblox yang valid dan benar</li>
+            <li>Melakukan pembayaran sesuai nominal yang tertera</li>
+            <li>Tidak melakukan tindakan penipuan atau kecurangan</li>
+            <li>Bertanggung jawab atas keamanan akun Roblox Anda sendiri</li>
+          </ul>
+          <div class="warning-box">
+            <p><i class="fas fa-exclamation-triangle"></i> Kesalahan username atau belum join community bukan tanggung jawab R STORE. Pastikan semua syarat terpenuhi sebelum melakukan pembelian!</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Section 5 -->
+      <div class="section">
+        <h2 class="section-title">
+          <span class="section-icon">💳</span>
+          5. Pembayaran
+        </h2>
+        <div class="section-content">
+          <ul class="info-list">
+            <li>Pembayaran melalui metode yang tersedia (QRIS, VA, E-Wallet)</li>
+            <li>Harga dapat berubah sewaktu-waktu tanpa pemberitahuan</li>
+            <li>Pembayaran yang tidak sesuai nominal akan memperlambat proses</li>
+          </ul>
+        </div>
+      </div>
+      
+      <!-- Section 6 -->
+      <div class="section">
+        <h2 class="section-title">
+          <span class="section-icon">🔄</span>
+          6. Kebijakan Refund
+        </h2>
+        <div class="section-content">
+          <ul class="info-list">
+            <li><strong>Refund 100%:</strong> Jika Robux tidak dapat dikirim karena kesalahan sistem kami</li>
+            <li><strong>Refund 100%:</strong> Jika proses PO melebihi 15 hari kerja</li>
+            <li><strong>Tidak dapat refund:</strong> Setelah Robux berhasil dikirim</li>
+            <li><strong>Tidak dapat refund:</strong> Jika terjadi kesalahan username dari pembeli</li>
+            <li><strong>Tidak dapat refund:</strong> Jika pembeli belum memenuhi syarat join community 15 hari</li>
+          </ul>
+          <div class="info-box">
+            <p><i class="fas fa-clock"></i> Proses refund memakan waktu 1-3 hari kerja setelah disetujui.</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Section 7 -->
+      <div class="section">
+        <h2 class="section-title">
+          <span class="section-icon">⚖️</span>
+          7. Batasan Tanggung Jawab
+        </h2>
+        <div class="section-content">
+          <p>R STORE tidak bertanggung jawab atas:</p>
+          <ul class="info-list">
+            <li>Kesalahan username yang diberikan oleh pembeli</li>
+            <li>Akun Roblox yang terkena ban karena aktivitas pembeli</li>
+            <li>Kehilangan Robux akibat hacking pada akun pembeli</li>
+            <li>Keterlambatan karena force majeure</li>
+            <li>Pembeli yang belum memenuhi syarat join community 15 hari</li>
+          </ul>
+        </div>
+      </div>
+      
+      <!-- Section 8 -->
+      <div class="section">
+        <h2 class="section-title">
+          <span class="section-icon">🔒</span>
+          8. Keamanan
+        </h2>
+        <div class="section-content">
+          <div class="success-box">
+            <p><i class="fas fa-shield-alt"></i> Robux dikirim melalui metode grup payout yang legal dan aman. Kami tidak pernah meminta password Roblox Anda!</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Contact Box -->
+      <div class="contact-box">
+        <h3>💬 Ada Pertanyaan?</h3>
+        <p>Jika ada yang kurang jelas tentang syarat join community atau ketentuan lainnya, jangan ragu untuk menghubungi admin kami!</p>
+        <a href="https://discord.gg/AUAzsxPP27" class="contact-button">
+          <i class="fab fa-discord"></i> Hubungi Admin
+        </a>
+      </div>
+      
+    </div>
+    
+    <div style="text-align: center;">
+      <a href="index.html" class="back-button">
+        <i class="fas fa-arrow-left"></i> Kembali ke Beranda
+      </a>
+    </div>
+    
+  </div>
+</div>
+
+<footer class="footer">
+  <p>&copy; 2025 R STORE — Unofficial Roblox Store. All rights reserved.</p>
+</footer>
+
+</body>
+</html>

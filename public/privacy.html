@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kebijakan Privasi - R STORE</title>
+  <meta name="description" content="Kebijakan privasi R STORE untuk melindungi data pribadi Anda" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0f0f1a;
+      color: #fff;
+      overflow-x: hidden;
+    }
+    
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(15, 15, 26, 0.95);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      padding: 15px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 24px;
+      font-weight: 800;
+    }
+    
+    .nav-logo i {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .btn-track {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 30px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: transform 0.3s;
+    }
+    
+    .main-content {
+      padding-top: 100px;
+      padding-bottom: 60px;
+    }
+    
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    
+    .page-header {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+    
+    .page-header h1 {
+      font-size: 48px;
+      font-weight: 800;
+      margin-bottom: 15px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .page-header .badge {
+      display: inline-block;
+      background: rgba(102,126,234,0.2);
+      padding: 6px 14px;
+      border-radius: 30px;
+      font-size: 12px;
+      color: #667eea;
+      margin-bottom: 15px;
+    }
+    
+    .content-card {
+      background: #13132a;
+      border-radius: 24px;
+      padding: 50px;
+      margin-bottom: 30px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .section {
+      margin-bottom: 40px;
+    }
+    
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 24px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid rgba(102,126,234,0.3);
+    }
+    
+    .section-icon {
+      font-size: 28px;
+    }
+    
+    .section-content {
+      color: #c0c0d0;
+      font-size: 15px;
+      line-height: 1.8;
+    }
+    
+    .section-content p {
+      margin-bottom: 16px;
+    }
+    
+    .info-list {
+      list-style: none;
+      padding: 0;
+      margin: 16px 0;
+    }
+    
+    .info-list li {
+      padding: 10px 0 10px 30px;
+      position: relative;
+      color: #c0c0d0;
+    }
+    
+    .info-list li::before {
+      content: '✓';
+      position: absolute;
+      left: 8px;
+      color: #28a745;
+    }
+    
+    .highlight-box, .warning-box, .success-box {
+      padding: 20px;
+      border-radius: 16px;
+      margin: 20px 0;
+    }
+    
+    .highlight-box {
+      background: rgba(255, 193, 7, 0.15);
+      border-left: 4px solid #ffc107;
+    }
+    
+    .highlight-box p {
+      color: #fff3cd;
+    }
+    
+    .warning-box {
+      background: rgba(220, 53, 69, 0.15);
+      border-left: 4px solid #dc3545;
+    }
+    
+    .success-box {
+      background: rgba(40, 167, 69, 0.15);
+      border-left: 4px solid #28a745;
+    }
+    
+    .contact-box {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      padding: 40px;
+      border-radius: 24px;
+      text-align: center;
+      margin-top: 40px;
+    }
+    
+    .contact-box h3 {
+      font-size: 24px;
+      margin-bottom: 15px;
+    }
+    
+    .contact-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: white;
+      color: #667eea;
+      padding: 14px 32px;
+      border-radius: 40px;
+      text-decoration: none;
+      font-weight: 700;
+      transition: transform 0.3s;
+    }
+    
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.1);
+      color: white;
+      padding: 12px 28px;
+      border-radius: 40px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s;
+      margin-top: 20px;
+    }
+    
+    .footer {
+      text-align: center;
+      padding: 30px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      color: #a0a0b0;
+      font-size: 14px;
+    }
+    
+    @media (max-width: 768px) {
+      .page-header h1 { font-size: 32px; }
+      .content-card { padding: 30px 20px; }
+      .section-title { font-size: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-container">
+    <div class="nav-logo">
+      <i class="fas fa-gamepad"></i>
+      <span>R STORE</span>
+    </div>
+    <a href="index.html" class="btn-track">
+      <i class="fas fa-home"></i> Beranda
+    </a>
+  </div>
+</nav>
+
+<div class="main-content">
+  <div class="container">
+    
+    <div class="page-header">
+      <div class="badge">Privacy</div>
+      <h1>Kebijakan Privasi</h1>
+      <p class="last-updated">Terakhir diperbarui: 22 April 2025</p>
+    </div>
+    
+    <div class="content-card">
+      
+      <div class="highlight-box">
+        <p><i class="fas fa-shield-alt"></i> R STORE berkomitmen untuk melindungi privasi dan keamanan data pribadi Anda.</p>
+      </div>
+      
+      <div class="section">
+        <h2 class="section-title">
+          <span class="section-icon">📋</span>
+          1. Informasi yang Kami Kumpulkan
+        </h2>
+        <div class="section-content">
+          <ul class="info-list">
+            <li><strong>Username Roblox:</strong> Untuk pengiriman Robux</li>
+            <li><strong>Data Transaksi:</strong> Jumlah Robux, harga, waktu pembelian</li>
+            <li><strong>Metode Pembayaran:</strong> Informasi pembayaran yang dipilih</li>
+          </ul>
+          <div class="warning-box">
+            <p><i class="fas fa-lock"></i> Kami TIDAK mengumpulkan password Roblox atau informasi login sensitif lainnya!</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="section">
+        <h2 class="section-title">
+          <span class="section-icon">🎯</span>
+          2. Penggunaan Informasi
+        </h2>
+        <div class="section-content">
+          <ul class="info-list">
+            <li>Memproses dan mengirimkan pesanan Robux</li>
+            <li>Verifikasi pembayaran dan mencegah penipuan</li>
+            <li>Menghubungi Anda terkait status pesanan</li>
+            <li>Meningkatkan kualitas layanan</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="section">
+        <h2 class="section-title">
+          <span class="section-icon">🔐</span>
+          3. Keamanan Data
+        </h2>
+        <div class="section-content">
+          <ul class="info-list">
+            <li>Enkripsi data saat transmisi</li>
+            <li>Akses terbatas hanya untuk admin yang berwenang</li>
+            <li>Penyimpanan data di server yang aman (Firebase)</li>
+            <li>Tidak membagikan data pribadi ke pihak ketiga</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="section">
+        <h2 class="section-title">
+          <span class="section-icon">🤝</span>
+          4. Pembagian Informasi
+        </h2>
+        <div class="section-content">
+          <p>Kami TIDAK akan membagikan, menjual, atau menyewakan data pribadi Anda kepada pihak ketiga, kecuali:</p>
+          <ul class="info-list">
+            <li>Diwajibkan oleh hukum atau peraturan pemerintah</li>
+            <li>Untuk melindungi hak dan keamanan R STORE</li>
+            <li>Dengan izin eksplisit dari Anda</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="section">
+        <h2 class="section-title">
+          <span class="section-icon">⏳</span>
+          5. Retensi Data
+        </h2>
+        <div class="section-content">
+          <ul class="info-list">
+            <li><strong>Data Transaksi:</strong> Disimpan selama 1 tahun untuk keperluan audit</li>
+            <li><strong>Riwayat Chat:</strong> Disimpan selama 90 hari</li>
+            <li><strong>Data tidak aktif:</strong> Dihapus setelah 2 tahun</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="section">
+        <h2 class="section-title">
+          <span class="section-icon">✏️</span>
+          6. Hak Anda
+        </h2>
+        <div class="section-content">
+          <ul class="info-list">
+            <li>Mengakses data pribadi yang kami simpan</li>
+            <li>Meminta koreksi data yang tidak akurat</li>
+            <li>Meminta penghapusan data Anda</li>
+            <li>Menarik persetujuan penggunaan data</li>
+          </ul>
+          <div class="success-box">
+            <p><i class="fas fa-envelope"></i> Untuk menggunakan hak-hak ini, hubungi admin melalui kontak yang tersedia.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="section">
+        <h2 class="section-title">
+          <span class="section-icon">🔄</span>
+          7. Perubahan Kebijakan
+        </h2>
+        <div class="section-content">
+          <p>Kami dapat memperbarui kebijakan privasi ini sewaktu-waktu. Perubahan akan diinformasikan melalui website dan Discord. Dengan terus menggunakan layanan kami, Anda dianggap menyetujui kebijakan privasi yang diperbarui.</p>
+        </div>
+      </div>
+      
+      <div class="contact-box">
+        <h3>💬 Punya Pertanyaan?</h3>
+        <p>Jika ada pertanyaan tentang kebijakan privasi, jangan ragu untuk menghubungi kami!</p>
+        <a href="https://discord.gg/AUAzsxPP27" class="contact-button">
+          <i class="fab fa-discord"></i> Hubungi Admin
+        </a>
+      </div>
+      
+    </div>
+    
+    <div style="text-align: center;">
+      <a href="index.html" class="back-button">
+        <i class="fas fa-arrow-left"></i> Kembali ke Beranda
+      </a>
+    </div>
+    
+  </div>
+</div>
+
+<footer class="footer">
+  <p>&copy; 2025 R STORE — Unofficial Roblox Store. All rights reserved.</p>
+</footer>
+
+</body>
+</html>
