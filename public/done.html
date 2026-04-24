@@ -346,6 +346,76 @@
       color: #ffc107;
       font-size: 10px;
     }
+
+    .delivery-delayed {
+      background: rgba(255, 193, 7, 0.2);
+      color: #856404;
+      border: 1px solid rgba(255, 193, 7, 0.3);
+    }
+
+    .delivery-delayed i {
+      color: #ffc107;
+    }
+
+    .history-reason-done {
+      color: #ffc107;
+      flex: 1;
+      font-size: 11px;
+      background: rgba(255, 193, 7, 0.1);
+      padding: 4px 8px;
+      border-radius: 20px;
+      display: inline-block;
+      max-width: 250px;
+      white-space: normal;
+      word-break: break-word;
+    }
+
+    /* Community Link Box untuk status Ditunda */
+    .community-link-box-done {
+      background: rgba(102,126,234,0.15);
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin: 15px 0;
+      border-left: 3px solid #667eea;
+    }
+
+    .community-link-title-done {
+      font-size: 11px;
+      color: #667eea;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .community-link-button-done {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(102,126,234,0.2);
+      color: #667eea;
+      padding: 10px 16px;
+      border-radius: 30px;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.3s;
+      margin-top: 8px;
+      word-break: break-all;
+    }
+
+    .community-link-button-done:hover {
+      background: rgba(102,126,234,0.4);
+      transform: translateY(-2px);
+    }
+
+    .community-note-done {
+      font-size: 11px;
+      color: #a0a0b0;
+      margin-top: 8px;
+    }
     
     /* Instruction Box */
     .instruction-box-done {
@@ -633,9 +703,7 @@
     
     <!-- Button Group -->
     <div class="btn-group-done">
-      <a href="track.html" class="btn-primary-done">
-        <i class="fas fa-search"></i> Lacak Pesanan
-      </a>
+      
       <a href="index.html" class="btn-secondary-done">
         <i class="fas fa-shopping-cart"></i> Beli Lagi
       </a>
@@ -698,6 +766,9 @@
     if (!deliveryInfo) return { type: 'instant', text: '⚡ Instant', class: 'delivery-instant' };
     if (deliveryInfo.includes('PO') || deliveryInfo.includes('Pre-Order') || deliveryInfo.includes('📦')) {
       return { type: 'po', text: '📦 Pre-Order (15 Hari Kerja)', class: 'delivery-po' };
+    }
+    if (deliveryInfo.includes('Ditunda') || deliveryInfo.includes('⏸️') || deliveryInfo.includes('delayed')) {
+      return { type: 'delayed', text: '⏸️ Ditunda', class: 'delivery-delayed' };
     }
     return { type: 'instant', text: '⚡ Instant', class: 'delivery-instant' };
   }
@@ -849,99 +920,148 @@
   }
 
   // Update tampilan pengiriman dan kontak
-// Update tampilan pengiriman dan kontak
-function updateDeliveryAndContact(orderData) {
-  // Update status pengiriman
-  const delivery = getDeliveryType(orderData.deliveryInfo);
-  const deliveryRow = document.getElementById('deliveryRow');
-  const deliveryBadge = document.getElementById('deliveryBadge');
-  
-  if (deliveryRow && deliveryBadge) {
-    deliveryRow.style.display = 'block';
-    deliveryBadge.textContent = delivery.text;
-    deliveryBadge.className = `delivery-badge-done ${delivery.class}`;
-  }
-  
-  // Update kontak customer
-  const customerEmail = orderData.customerEmail || '';
-  const customerPhone = orderData.customerPhone || '';
-  const hasContact = customerEmail || customerPhone;
-  const contactSection = document.getElementById('contactSection');
-  
-  if (contactSection && hasContact) {
-    contactSection.style.display = 'block';
-    contactSection.innerHTML = `
-      <div class="contact-title-done">
-        <i class="fas fa-address-card"></i> Kontak Customer
-        <span style="font-size: 10px; color: #a0a0b0;">(Untuk keperluan konfirmasi)</span>
-      </div>
-      <div class="contact-details-done">
-        ${customerEmail ? `<span><i class="fas fa-envelope"></i> ${customerEmail}</span>` : ''}
-        ${customerPhone ? `<span><i class="fab fa-whatsapp"></i> ${customerPhone}</span>` : ''}
-      </div>
-    `;
-  }
-  
-  // 🔥 Update riwayat perubahan pengiriman (SAMA SEPERTI DI TRACK.HTML)
-  const deliveryHistory = orderData.deliveryHistory || [];
-  const historySection = document.getElementById('historySection');
-  
-  if (historySection) {
-    if (deliveryHistory.length > 0) {
-      historySection.style.display = 'block';
-      let historyHtml = `
-        <div class="history-title-done">
-          <i class="fas fa-history"></i> Riwayat Perubahan Pengiriman
+  function updateDeliveryAndContact(orderData) {
+    // Update status pengiriman
+    const delivery = getDeliveryType(orderData.deliveryInfo);
+    const deliveryRow = document.getElementById('deliveryRow');
+    const deliveryBadge = document.getElementById('deliveryBadge');
+    
+    if (deliveryRow && deliveryBadge) {
+      deliveryRow.style.display = 'block';
+      deliveryBadge.textContent = delivery.text;
+      deliveryBadge.className = `delivery-badge-done ${delivery.class}`;
+    }
+    
+    // Update kontak customer
+    const customerEmail = orderData.customerEmail || '';
+    const customerPhone = orderData.customerPhone || '';
+    const hasContact = customerEmail || customerPhone;
+    const contactSection = document.getElementById('contactSection');
+    
+    if (contactSection && hasContact) {
+      contactSection.style.display = 'block';
+      contactSection.innerHTML = `
+        <div class="contact-title-done">
+          <i class="fas fa-address-card"></i> Kontak Customer
+          <span style="font-size: 10px; color: #a0a0b0;">(Untuk keperluan konfirmasi)</span>
         </div>
-        <div class="history-list-done">
+        <div class="contact-details-done">
+          ${customerEmail ? `<span><i class="fas fa-envelope"></i> ${customerEmail}</span>` : ''}
+          ${customerPhone ? `<span><i class="fab fa-whatsapp"></i> ${customerPhone}</span>` : ''}
+        </div>
       `;
-      
-      deliveryHistory.forEach(h => {
-        const fromText = h.from === 'instant' ? '⚡ Instant' : '📦 Pre-Order (15 Hari)';
-        const toText = h.to === 'instant' ? '⚡ Instant' : '📦 Pre-Order (15 Hari)';
-        
-        // Format tanggal dengan aman
-        let changedAtFormatted = '-';
-        if (h.changedAt) {
-          try {
-            if (h.changedAt.toDate) {
-              changedAtFormatted = h.changedAt.toDate().toLocaleString('id-ID');
-            } else if (typeof h.changedAt === 'string') {
-              const date = new Date(h.changedAt);
-              if (!isNaN(date.getTime())) changedAtFormatted = date.toLocaleString('id-ID');
-            } else if (typeof h.changedAt === 'number') {
-              const date = new Date(h.changedAt);
-              if (!isNaN(date.getTime())) changedAtFormatted = date.toLocaleString('id-ID');
-            } else if (h.changedAt instanceof Date) {
-              if (!isNaN(h.changedAt.getTime())) changedAtFormatted = h.changedAt.toLocaleString('id-ID');
-            }
-          } catch (e) {
-            changedAtFormatted = 'Tanggal tidak tersedia';
-          }
+    }
+    
+    // 🔥 TAMBAHKAN LINK COMMUNITY JIKA STATUS DITUNDA
+    const deliveryHistory = orderData.deliveryHistory || [];
+    const currentDeliveryType = delivery.type;
+    
+    // Cek apakah status saat ini adalah Ditunda
+    if (currentDeliveryType === 'delayed') {
+      const communityBox = document.getElementById('communityLinkBox');
+      if (!communityBox) {
+        // Buat elemen community box jika belum ada
+        const deliveryRowParent = document.getElementById('deliveryRow');
+        if (deliveryRowParent && deliveryRowParent.parentNode) {
+          const newCommunityBox = document.createElement('div');
+          newCommunityBox.id = 'communityLinkBox';
+          newCommunityBox.className = 'community-link-box-done';
+          newCommunityBox.innerHTML = `
+            <div class="community-link-title-done">
+              <i class="fab fa-roblox"></i> Perlu Join Community
+            </div>
+            <p style="font-size: 13px; color: #c0c0d0; margin-bottom: 8px;">
+              Pesanan Anda ditunda karena akun belum join community Roblox R STORE.
+              Silakan join community terlebih dahulu:
+            </p>
+            <a href="https://www.roblox.com/communities/13174452" target="_blank" class="community-link-button-done">
+              <i class="fab fa-roblox"></i> Join Community R STORE
+            </a>
+            <div class="community-note-done">
+              <i class="fas fa-info-circle"></i> Setelah join, hubungi admin untuk memproses pesanan.
+            </div>
+          `;
+          deliveryRowParent.parentNode.insertBefore(newCommunityBox, deliveryRowParent.nextSibling);
         }
+      }
+    } else {
+      // Sembunyikan community box jika status bukan Ditunda
+      const communityBox = document.getElementById('communityLinkBox');
+      if (communityBox) {
+        communityBox.style.display = 'none';
+      }
+    }
+    
+    // Update riwayat perubahan pengiriman
+    const historySection = document.getElementById('historySection');
+    
+    if (historySection) {
+      if (deliveryHistory.length > 0) {
+        historySection.style.display = 'block';
+        let historyHtml = `
+          <div class="history-title-done">
+            <i class="fas fa-history"></i> Riwayat Perubahan Pengiriman
+          </div>
+          <div class="history-list-done">
+        `;
+        
+        deliveryHistory.forEach(h => {
+          // Format from dan to ke teks yang lebih bagus
+          let fromText = '';
+          let toText = '';
+          
+          if (h.from === 'instant') fromText = '⚡ Instant';
+          else if (h.from === 'po') fromText = '📦 Pre-Order';
+          else if (h.from === 'delayed') fromText = '⏸️ Ditunda';
+          else fromText = h.from || '⚡ Instant';
+          
+          if (h.to === 'instant') toText = '⚡ Instant';
+          else if (h.to === 'po') toText = '📦 Pre-Order';
+          else if (h.to === 'delayed') toText = '⏸️ Ditunda';
+          else toText = h.to || '⚡ Instant';
+          
+          // Format tanggal dengan aman
+          let changedAtFormatted = '-';
+          if (h.changedAt) {
+            try {
+              if (h.changedAt.toDate) {
+                changedAtFormatted = h.changedAt.toDate().toLocaleString('id-ID');
+              } else if (typeof h.changedAt === 'string') {
+                const date = new Date(h.changedAt);
+                if (!isNaN(date.getTime())) changedAtFormatted = date.toLocaleString('id-ID');
+              } else if (typeof h.changedAt === 'number') {
+                const date = new Date(h.changedAt);
+                if (!isNaN(date.getTime())) changedAtFormatted = date.toLocaleString('id-ID');
+              } else if (h.changedAt instanceof Date) {
+                if (!isNaN(h.changedAt.getTime())) changedAtFormatted = h.changedAt.toLocaleString('id-ID');
+              }
+            } catch (e) {
+              changedAtFormatted = 'Tanggal tidak tersedia';
+            }
+          }
+          
+          historyHtml += `
+            <div class="history-item-done">
+              <span class="history-change-done">${fromText} → ${toText}</span>
+              <span class="history-reason-done">${h.reason || 'Tidak ada alasan'}</span>
+              <span class="history-time-done">${changedAtFormatted}</span>
+            </div>
+          `;
+        });
         
         historyHtml += `
-          <div class="history-item-done">
-            <span class="history-change-done">${fromText} → ${toText}</span>
-            <span class="history-reason-done">${h.reason || 'Tidak ada alasan'}</span>
-            <span class="history-time-done">${changedAtFormatted}</span>
+          </div>
+          <div class="history-note-done">
+            <i class="fas fa-info-circle"></i>
+            <span>Perubahan status pengiriman dilakukan oleh admin karena kondisi tertentu</span>
           </div>
         `;
-      });
-      
-      historyHtml += `
-        </div>
-        <div class="history-note-done">
-          <i class="fas fa-info-circle"></i>
-          <span>Perubahan status pengiriman dilakukan oleh admin karena kondisi tertentu</span>
-        </div>
-      `;
-      historySection.innerHTML = historyHtml;
-    } else {
-      historySection.style.display = 'none';
+        historySection.innerHTML = historyHtml;
+      } else {
+        historySection.style.display = 'none';
+      }
     }
   }
-}
 
   // Handle status perubahan dari DOKU callback
   async function handleDokuCallback() {

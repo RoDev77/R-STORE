@@ -826,6 +826,79 @@
       font-size: 10px;
     }
 
+    .delivery-delayed {
+      background: rgba(255, 193, 7, 0.2);
+      color: #856404;
+      border: 1px solid rgba(255, 193, 7, 0.3);
+    }
+
+    .delivery-delayed i {
+      color: #ffc107;
+    }
+    .history-time {
+      color: #a0a0b0;
+      font-size: 10px;
+      white-space: nowrap;
+    }
+
+    .history-change {
+      background: rgba(102,126,234,0.2);
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-weight: 600;
+      color: #667eea;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .history-reason {
+      color: #ffc107;
+      flex: 1;
+      font-size: 12px;
+      background: rgba(255, 193, 7, 0.1);
+      padding: 4px 8px;
+      border-radius: 20px;
+      display: inline-block;
+      max-width: 250px;
+      white-space: normal;
+      word-break: break-word;
+    }
+
+    /* Community Link Box */
+      .community-link-box {
+        background: rgba(102,126,234,0.15);
+        border-radius: 12px;
+        padding: 12px;
+        margin-top: 8px;
+        border: 1px solid rgba(102,126,234,0.3);
+      }
+
+      .community-link-box p {
+        font-size: 12px;
+        color: #a0a0b0;
+        margin-bottom: 8px;
+      }
+
+      .community-link-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(102,126,234,0.2);
+        color: #667eea;
+        padding: 8px 16px;
+        border-radius: 30px;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 600;
+        transition: all 0.3s;
+        word-break: break-all;
+      }
+
+      .community-link-btn:hover {
+        background: rgba(102,126,234,0.4);
+        transform: translateY(-2px);
+      }
+
     /* Responsive */
     @media (max-width: 768px) {
       .nav-container {
@@ -919,12 +992,14 @@
         </div>
         
         <!-- 🔥 FILTER JENIS PENGIRIMAN (BARU) -->
+        <!-- Filter Delivery - Tambahkan opsi Ditunda -->
         <div class="filter-group">
           <i class="fas fa-truck"></i>
           <select id="deliveryFilter">
             <option value="all">Semua Pengiriman</option>
             <option value="instant">⚡ Instant</option>
             <option value="po">📦 Pre-Order (15 Hari)</option>
+            <option value="delayed">⏸️ Ditunda</option>
           </select>
         </div>
         
@@ -961,9 +1036,21 @@
         <select id="editDeliveryType">
           <option value="instant">⚡ Instant (Pengiriman cepat)</option>
           <option value="po">📦 Pre-Order (15 Hari Kerja)</option>
+          <option value="delayed">⏸️ Ditunda (Belum Join Community)</option>
         </select>
       </div>
       
+      <div class="form-group" id="communityLinkGroup" style="display: none;">
+        <label><i class="fab fa-roblox"></i> Link Community Roblox</label>
+        <div class="community-link-box">
+          <p>Pastikan customer join community terlebih dahulu:</p>
+          <a href="https://www.roblox.com/communities/13174452" target="_blank" class="community-link-btn">
+            <i class="fab fa-roblox"></i> https://www.roblox.com/communities/13174452
+          </a>
+        </div>
+        <div class="form-hint">Copy link ini dan kirim ke customer jika perlu</div>
+      </div>
+
       <div class="form-group">
         <label><i class="fas fa-pen-alt"></i> Alasan Perubahan (Opsional)</label>
         <textarea id="editReason" placeholder="Contoh: Stok habis, Pembeli belum join community 15 hari, dll..."></textarea>
@@ -1124,6 +1211,49 @@
     });
   }
 
+  // Fungsi untuk memformat tanggal dengan aman (mencegah Invalid Date)
+  function formatDateSafe(dateValue) {
+    if (!dateValue) return '-';
+    
+    try {
+      // Jika Firestore Timestamp
+      if (dateValue && typeof dateValue.toDate === 'function') {
+        return dateValue.toDate().toLocaleString('id-ID');
+      }
+      // Jika string ISO
+      if (typeof dateValue === 'string') {
+        const date = new Date(dateValue);
+        if (!isNaN(date.getTime())) {
+          return date.toLocaleString('id-ID');
+        }
+      }
+      // Jika number (timestamp dalam milidetik)
+      if (typeof dateValue === 'number') {
+        const date = new Date(dateValue);
+        if (!isNaN(date.getTime())) {
+          return date.toLocaleString('id-ID');
+        }
+      }
+      // Jika Date object
+      if (dateValue instanceof Date) {
+        if (!isNaN(dateValue.getTime())) {
+          return dateValue.toLocaleString('id-ID');
+        }
+      }
+      // Jika ada field seconds (Firestore Timestamp alternate)
+      if (dateValue.seconds) {
+        const date = new Date(dateValue.seconds * 1000);
+        if (!isNaN(date.getTime())) {
+          return date.toLocaleString('id-ID');
+        }
+      }
+      return 'Tanggal tidak tersedia';
+    } catch (e) {
+      console.warn('Error formatting date:', e);
+      return 'Tanggal tidak tersedia';
+    }
+  }
+
   // Fungsi untuk filter dan search
   // Fungsi untuk filter dan search
   function applyFilterAndSearch() {
@@ -1139,6 +1269,7 @@
     }
     
     // 🔥 FILTER BY DELIVERY TYPE (Instant / PO)
+    // Di dalam applyFilterAndSearch()
     if (deliveryFilter !== 'all') {
       filteredOrders = filteredOrders.filter(order => {
         const deliveryInfo = order.deliveryInfo || '';
@@ -1146,6 +1277,8 @@
           return deliveryInfo.includes('⚡') || deliveryInfo.includes('Instant');
         } else if (deliveryFilter === 'po') {
           return deliveryInfo.includes('📦') || deliveryInfo.includes('PO') || deliveryInfo.includes('Pre-Order');
+        } else if (deliveryFilter === 'delayed') {
+          return deliveryInfo.includes('⏸️') || deliveryInfo.includes('Ditunda') || deliveryInfo.includes('delayed');
         }
         return true;
       });
@@ -1195,16 +1328,20 @@
       let createdAt = '-';
       if (order.createdAt?.toDate) createdAt = order.createdAt.toDate().toLocaleString('id-ID');
       
-      // 🔥 TENTUKAN JENIS PENGIRIMAN (Instant / PO 15 Hari)
+      // Di dalam renderOrders(), bagian penentuan jenis pengiriman
       const deliveryInfo = order.deliveryInfo || '';
       let deliveryType = 'instant';
       let deliveryText = '⚡ Instant';
       let deliveryClass = 'delivery-instant';
-      
+
       if (deliveryInfo.includes('PO') || deliveryInfo.includes('Pre-Order') || deliveryInfo.includes('📦')) {
         deliveryType = 'po';
         deliveryText = '📦 Pre-Order (15 Hari)';
         deliveryClass = 'delivery-po';
+      } else if (deliveryInfo.includes('Ditunda') || deliveryInfo.includes('⏸️') || deliveryInfo.includes('delayed')) {
+        deliveryType = 'delayed';
+        deliveryText = '⏸️ Ditunda';
+        deliveryClass = 'delivery-delayed';
       } else if (deliveryInfo.includes('Instant') || deliveryInfo.includes('⚡')) {
         deliveryType = 'instant';
         deliveryText = '⚡ Instant';
@@ -1265,13 +1402,20 @@
           <div class="delivery-history">
             <div class="history-title"><i class="fas fa-history"></i> Riwayat Perubahan Pengiriman</div>
             <div class="history-list">
-              ${deliveryHistory.map(h => `
-                <div class="history-item">
-                  <span class="history-change">${h.from} → ${h.to}</span>
-                  <span class="history-reason">${h.reason || 'Tidak ada alasan'}</span>
-                  <span class="history-time">${new Date(h.changedAt).toLocaleString('id-ID')}</span>
-                </div>
-              `).join('')}
+              ${deliveryHistory.map(h => {
+                // Format from dan to ke teks yang lebih bagus
+                const fromText = h.from === 'instant' ? '⚡ Instant' : (h.from === 'po' ? '📦 Pre-Order' : '⏸️ Ditunda');
+                const toText = h.to === 'instant' ? '⚡ Instant' : (h.to === 'po' ? '📦 Pre-Order' : '⏸️ Ditunda');
+                const changedAtFormatted = formatDateSafe(h.changedAt);
+                
+                return `
+                  <div class="history-item">
+                    <span class="history-change">${fromText} → ${toText}</span>
+                    <span class="history-reason">${h.reason || 'Tidak ada alasan'}</span>
+                    <span class="history-time">${changedAtFormatted}</span>
+                  </div>
+                `;
+              }).join('')}
             </div>
           </div>
           ` : ''}
@@ -1362,8 +1506,18 @@
     // Set nilai dropdown sesuai delivery type saat ini
     if (currentDeliveryType === 'instant') {
       editDeliveryType.value = 'instant';
-    } else {
+    } else if (currentDeliveryType === 'po') {
       editDeliveryType.value = 'po';
+    } else if (currentDeliveryType === 'delayed') {
+      editDeliveryType.value = 'delayed';
+    } else {
+      editDeliveryType.value = 'instant';
+    }
+    
+    // Tampilkan/sembunyikan link community
+    const communityLinkGroup = document.getElementById('communityLinkGroup');
+    if (communityLinkGroup) {
+      communityLinkGroup.style.display = editDeliveryType.value === 'delayed' ? 'block' : 'none';
     }
     
     // Kosongkan reason
@@ -1393,33 +1547,43 @@
     if (newDeliveryType === 'instant') {
       newDeliveryInfo = '⚡ Pengiriman Instant';
       newDeliveryText = '⚡ Instant';
-    } else {
+    } else if (newDeliveryType === 'po') {
       newDeliveryInfo = '📦 Pre-Order (15 hari kerja)';
       newDeliveryText = '📦 Pre-Order (15 Hari)';
+    } else if (newDeliveryType === 'delayed') {
+      newDeliveryInfo = '⏸️ Ditunda - Belum Join Community Roblox';
+      newDeliveryText = '⏸️ Ditunda';
     }
     
     // Siapkan data update
     const updateData = {
       deliveryInfo: newDeliveryInfo,
       deliveryType: newDeliveryType,
-      updatedAt: new Date()
+      updatedAt: new Date() // 🔥 PASTIKAN MENGGUNAKAN new Date()
     };
     
+    // Jika tidak ada reason dan jenisnya delayed, berikan default reason
+    let finalReason = reason;
+    if (newDeliveryType === 'delayed' && !reason) {
+      finalReason = 'Akun belum join community Roblox R STORE. Silakan join terlebih dahulu agar dapat diproses.';
+    }
+    
     // Jika ada alasan, tambahkan ke riwayat
-    if (reason) {
-      // Ambil riwayat sebelumnya atau buat array baru
+    if (finalReason) {
       const orderRef = doc(db, 'orders', currentEditOrderId);
       const orderSnap = await getDoc(orderRef);
       const existingHistory = orderSnap.data()?.deliveryHistory || [];
+      const currentDeliveryType = orderSnap.data()?.deliveryType || 'instant';
       
+      // 🔥 PASTIKAN changedAt DISIMPAN SEBAGAI Date OBJECT (bukan string)
       updateData.deliveryHistory = [
         ...existingHistory,
         {
-          from: existingHistory.length > 0 ? existingHistory[existingHistory.length - 1].to : (orderSnap.data()?.deliveryType || 'instant'),
+          from: currentDeliveryType,
           to: newDeliveryType,
-          reason: reason,
+          reason: finalReason,
           changedBy: 'Admin',
-          changedAt: new Date()
+          changedAt: new Date()  // 🔥 PASTIKAN new Date() BUKAN STRING
         }
       ];
     }
@@ -1428,7 +1592,6 @@
       await updateDoc(doc(db, 'orders', currentEditOrderId), updateData);
       alert('✅ Status pengiriman berhasil diubah!');
       closeEditDeliveryModal();
-      // Refresh tampilan
       applyFilterAndSearch();
     } catch (error) {
       console.error('Error updating delivery:', error);
@@ -1445,6 +1608,20 @@
   editModal?.addEventListener('click', (e) => {
     if (e.target === editModal) closeEditDeliveryModal();
   });
+
+  // Tampilkan/sembunyikan link community berdasarkan pilihan
+  const deliveryTypeSelect = document.getElementById('editDeliveryType');
+  const communityLinkGroup = document.getElementById('communityLinkGroup');
+
+  if (deliveryTypeSelect && communityLinkGroup) {
+    deliveryTypeSelect.addEventListener('change', () => {
+      if (deliveryTypeSelect.value === 'delayed') {
+        communityLinkGroup.style.display = 'block';
+      } else {
+        communityLinkGroup.style.display = 'none';
+      }
+    });
+  }
 
   // Event listeners untuk filter & search
   if (document.getElementById('statusFilter')) {
