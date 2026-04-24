@@ -931,6 +931,7 @@ body {
   background: #0a0a14;
   border-top: 1px solid rgba(255,255,255,0.1);
   padding: 50px 0 20px;
+  margin-top: 60px;
 }
 
 .footer-container {
@@ -940,6 +941,10 @@ body {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1.5fr;
   gap: 40px;
+}
+
+.footer-brand {
+  text-align: left;
 }
 
 .footer-logo {
@@ -957,20 +962,27 @@ body {
   -webkit-text-fill-color: transparent;
 }
 
+.footer-logo span {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 .footer-brand p {
   color: #a0a0b0;
   line-height: 1.6;
   margin-bottom: 20px;
+  font-size: 14px;
 }
 
 .footer-social {
   display: flex;
-  gap: 15px;
+  gap: 12px;
 }
 
 .footer-social a {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   background: #1a1a30;
   border-radius: 50%;
   display: flex;
@@ -978,18 +990,42 @@ body {
   justify-content: center;
   color: #fff;
   transition: all 0.3s;
+  text-decoration: none;
 }
 
 .footer-social a:hover {
   background: #667eea;
+  transform: translateY(-3px);
+}
+
+.footer-links {
+  text-align: left;
 }
 
 .footer-links h4 {
+  font-size: 16px;
+  font-weight: 700;
   margin-bottom: 20px;
+  color: #fff;
+  position: relative;
+  padding-bottom: 10px;
+}
+
+.footer-links h4::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 40px;
+  height: 2px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 2px;
 }
 
 .footer-links ul {
   list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .footer-links li {
@@ -999,6 +1035,7 @@ body {
 .footer-links a {
   color: #a0a0b0;
   text-decoration: none;
+  font-size: 14px;
   transition: color 0.3s;
 }
 
@@ -1006,8 +1043,34 @@ body {
   color: #667eea;
 }
 
+.footer-contact {
+  text-align: left;
+}
+
+.footer-contact h4 {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #fff;
+  position: relative;
+  padding-bottom: 10px;
+}
+
+.footer-contact h4::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 40px;
+  height: 2px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 2px;
+}
+
 .footer-contact ul {
   list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .footer-contact li {
@@ -1015,12 +1078,15 @@ body {
   align-items: center;
   gap: 10px;
   color: #a0a0b0;
-  margin-bottom: 15px;
+  margin-bottom: 12px;
+  font-size: 14px;
 }
 
 .footer-contact li i {
-  width: 30px;
+  width: 24px;
   color: #667eea;
+  font-size: 16px;
+  text-align: center;
 }
 
 .footer-bottom {
@@ -1030,6 +1096,35 @@ body {
   border-top: 1px solid rgba(255,255,255,0.1);
   font-size: 12px;
   color: #a0a0b0;
+}
+
+/* Responsive Footer */
+@media (max-width: 768px) {
+  .footer-container {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    text-align: center;
+  }
+  
+  .footer-brand,
+  .footer-links,
+  .footer-contact {
+    text-align: center;
+  }
+  
+  .footer-links h4::after,
+  .footer-contact h4::after {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .footer-social {
+    justify-content: center;
+  }
+  
+  .footer-contact li {
+    justify-content: center;
+  }
 }
 
 /* Main Content untuk payment & track */
