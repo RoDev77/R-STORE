@@ -447,12 +447,6 @@
       font-size: 14px;
     }
 
-    /* Responsive */
-    @media (max-width: 768px) {
-      .nav-container {
-        flex-direction: column;
-        gap: 15px;
-      }
       .container {
         padding: 15px;
       }
@@ -469,6 +463,374 @@
         margin: 20px;
         padding: 30px;
         width: auto;
+      }
+      /* Filter Bar */
+      .filter-bar {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+      }
+
+      .filter-group {
+        display: flex;
+        align-items: center;
+        background: #1a1a30;
+        border-radius: 40px;
+        padding: 0 16px;
+        border: 1px solid rgba(255,255,255,0.1);
+        transition: all 0.3s;
+      }
+
+      .filter-group:focus-within {
+        border-color: #667eea;
+        box-shadow: 0 0 0 2px rgba(102,126,234,0.2);
+      }
+
+      .filter-group i {
+        color: #667eea;
+        font-size: 14px;
+      }
+
+      .filter-group select,
+      .filter-group input {
+        background: transparent;
+        border: none;
+        padding: 12px 12px 12px 8px;
+        color: white;
+        font-size: 14px;
+        outline: none;
+        cursor: pointer;
+      }
+
+      .filter-group select option {
+        background: #1a1a30;
+        color: white;
+      }
+
+      .filter-group input {
+        width: 250px;
+      }
+
+      .filter-group input::placeholder {
+        color: #5a5a7a;
+      }
+
+      .btn-refresh {
+        background: rgba(102,126,234,0.2);
+        border: none;
+        color: #667eea;
+        padding: 0 20px;
+        border-radius: 40px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .btn-refresh:hover {
+        background: rgba(102,126,234,0.4);
+        transform: translateY(-2px);
+      }
+
+      /* Contact Section di Order Item */
+      .order-contact {
+        background: rgba(102,126,234,0.08);
+        border-radius: 12px;
+        padding: 12px 16px;
+        margin: 12px 0;
+        border-left: 3px solid #667eea;
+      }
+
+      .contact-title {
+        font-size: 11px;
+        color: #667eea;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .contact-details {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+      }
+
+      .contact-details span {
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: #c0c0d0;
+      }
+
+      .contact-details i {
+        color: #667eea;
+        width: 16px;
+      }
+
+      /* Status Pengiriman */
+      .delivery-badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+      }
+
+      .delivery-instant {
+        background: rgba(40, 167, 69, 0.2);
+        color: #28a745;
+        border: 1px solid rgba(40, 167, 69, 0.3);
+      }
+
+      .delivery-po {
+        background: rgba(255, 193, 7, 0.2);
+        color: #ffc107;
+        border: 1px solid rgba(255, 193, 7, 0.3);
+      }
+
+    /* Modal Edit Pengiriman */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(5px);
+      z-index: 2000;
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-edit {
+      background: #13132a;
+      border-radius: 28px;
+      max-width: 450px;
+      width: 90%;
+      border: 1px solid rgba(102,126,234,0.3);
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+      overflow: hidden;
+    }
+
+    .modal-edit-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 20px 24px;
+      background: linear-gradient(135deg, rgba(102,126,234,0.15), rgba(118,75,162,0.15));
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .modal-edit-header i {
+      font-size: 24px;
+      color: #667eea;
+    }
+
+    .modal-edit-header h3 {
+      font-size: 18px;
+      font-weight: 700;
+      flex: 1;
+    }
+
+    .modal-edit-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #a0a0b0;
+      transition: color 0.2s;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+
+    .modal-edit-close:hover {
+      color: #dc3545;
+      background: rgba(220,53,69,0.1);
+    }
+
+    .modal-edit-body {
+      padding: 24px;
+    }
+
+    .modal-edit-body .order-id-display {
+      background: #1a1a30;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 20px;
+      font-family: monospace;
+      font-size: 14px;
+      text-align: center;
+      word-break: break-all;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      font-size: 13px;
+      color: #a0a0b0;
+    }
+
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px 16px;
+      background: #1a1a30;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      color: white;
+      font-size: 14px;
+      outline: none;
+      transition: all 0.3s;
+    }
+
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 2px rgba(102,126,234,0.2);
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .form-hint {
+      font-size: 11px;
+      color: #6c6c8a;
+      margin-top: 5px;
+    }
+
+    .modal-edit-footer {
+      display: flex;
+      gap: 15px;
+      padding: 20px 24px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .modal-edit-footer button {
+      flex: 1;
+      padding: 12px;
+      border-radius: 40px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-modal-cancel {
+      background: rgba(255,255,255,0.1);
+      border: none;
+      color: white;
+    }
+
+    .btn-modal-cancel:hover {
+      background: rgba(255,255,255,0.2);
+    }
+
+    .btn-modal-save {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border: none;
+      color: white;
+    }
+
+    .btn-modal-save:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102,126,234,0.3);
+    }
+
+    .btn-edit-delivery {
+    background: rgba(23, 162, 184, 0.2);
+    color: #17a2b8;
+    border: 1px solid rgba(23, 162, 184, 0.3);
+    }
+
+    .btn-edit-delivery:hover {
+      background: rgba(23, 162, 184, 0.4);
+    }
+
+    /* Delivery History */
+    .delivery-history {
+      background: rgba(23, 162, 184, 0.08);
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin: 12px 0;
+      border-left: 3px solid #17a2b8;
+    }
+
+    .history-title {
+      font-size: 11px;
+      color: #17a2b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .history-item {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 8px;
+      font-size: 12px;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .history-item:last-child {
+      border-bottom: none;
+    }
+
+    .history-change {
+      background: rgba(102,126,234,0.2);
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-weight: 600;
+      color: #667eea;
+    }
+
+    .history-reason {
+      color: #ffc107;
+      flex: 1;
+    }
+
+    .history-time {
+      color: #a0a0b0;
+      font-size: 10px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .nav-container {
+        flex-direction: column;
+        gap: 15px;
       }
     }
   </style>
@@ -534,12 +896,47 @@
       <span id="saveFeedback" class="save-feedback"></span>
     </div>
 
-    <!-- Orders Card -->
+    <!-- Orders Card - Tambahkan filter & search -->
     <div class="card">
       <div class="orders-header">
         <h2><i class="fas fa-shopping-cart"></i> Daftar Pesanan</h2>
         <span id="orderCount" class="order-count">(0)</span>
       </div>
+      
+      <!-- 🔥 FILTER & SEARCH BARU -->
+      <!-- Filter Bar - Tambahkan filter delivery type -->
+      <div class="filter-bar">
+        <div class="filter-group">
+          <i class="fas fa-filter"></i>
+          <select id="statusFilter">
+            <option value="all">Semua Status</option>
+            <option value="pending">⏳ Menunggu</option>
+            <option value="waiting_payment">💳 Menunggu Bayar</option>
+            <option value="paid">✅ Dibayar</option>
+            <option value="delivered">🎉 Terkirim</option>
+            <option value="cancelled">❌ Dibatalkan</option>
+          </select>
+        </div>
+        
+        <!-- 🔥 FILTER JENIS PENGIRIMAN (BARU) -->
+        <div class="filter-group">
+          <i class="fas fa-truck"></i>
+          <select id="deliveryFilter">
+            <option value="all">Semua Pengiriman</option>
+            <option value="instant">⚡ Instant</option>
+            <option value="po">📦 Pre-Order (15 Hari)</option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <i class="fas fa-search"></i>
+          <input type="text" id="searchOrder" placeholder="Cari Order ID..." />
+        </div>
+        <button id="refreshOrders" class="btn-refresh">
+          <i class="fas fa-sync-alt"></i> Refresh
+        </button>
+      </div>
+      
       <div id="ordersList">
         <div class="empty-state">
           <i class="fas fa-inbox"></i>
@@ -547,7 +944,38 @@
         </div>
       </div>
     </div>
+
+    <!-- Modal Edit Pengiriman -->
+<div id="editDeliveryModal" class="modal-overlay">
+  <div class="modal-edit">
+    <div class="modal-edit-header">
+      <i class="fas fa-truck"></i>
+      <h3>Edit Status Pengiriman</h3>
+      <button class="modal-edit-close" id="closeModalEdit">&times;</button>
+    </div>
+    <div class="modal-edit-body">
+      <div class="order-id-display" id="editOrderId"></div>
+      
+      <div class="form-group">
+        <label><i class="fas fa-tachometer-alt"></i> Jenis Pengiriman</label>
+        <select id="editDeliveryType">
+          <option value="instant">⚡ Instant (Pengiriman cepat)</option>
+          <option value="po">📦 Pre-Order (15 Hari Kerja)</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label><i class="fas fa-pen-alt"></i> Alasan Perubahan (Opsional)</label>
+        <textarea id="editReason" placeholder="Contoh: Stok habis, Pembeli belum join community 15 hari, dll..."></textarea>
+        <div class="form-hint">Catatan ini akan tersimpan di riwayat order</div>
+      </div>
+    </div>
+    <div class="modal-edit-footer">
+      <button class="btn-modal-cancel" id="cancelModalEdit">Batal</button>
+      <button class="btn-modal-save" id="saveDeliveryEdit">Simpan Perubahan</button>
+    </div>
   </div>
+</div>
 
   <footer class="footer">
     <p>&copy; 2025 R STORE — Unofficial Roblox Store. All rights reserved.</p>
@@ -673,108 +1101,374 @@
   document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
 
   // Real-time Orders
+  // Variabel untuk menyimpan semua orders (untuk filter)
+  let allOrders = [];
+  let unsubscribe = null;
+
+  // Real-time Orders dengan filter
   function listenOrders() {
     const ordersQuery = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
-    onSnapshot(ordersQuery, (snapshot) => {
-      const ordersList = document.getElementById('ordersList');
-      const orderCount = document.getElementById('orderCount');
+    
+    if (unsubscribe) unsubscribe();
+    
+    unsubscribe = onSnapshot(ordersQuery, (snapshot) => {
+      allOrders = [];
+      snapshot.forEach(doc => {
+        allOrders.push({
+          id: doc.id,
+          ...doc.data()
+        });
+      });
       
-      if (snapshot.empty) {
-        ordersList.innerHTML = `
-          <div class="empty-state">
-            <i class="fas fa-inbox"></i>
-            <p>✨ Belum ada pesanan</p>
-          </div>
-        `;
-        orderCount.textContent = '(0)';
-        return;
+      applyFilterAndSearch();
+    });
+  }
+
+  // Fungsi untuk filter dan search
+  // Fungsi untuk filter dan search
+  function applyFilterAndSearch() {
+    const statusFilter = document.getElementById('statusFilter')?.value || 'all';
+    const deliveryFilter = document.getElementById('deliveryFilter')?.value || 'all'; // 🔥 BARU
+    const searchQuery = document.getElementById('searchOrder')?.value?.toLowerCase() || '';
+    
+    let filteredOrders = [...allOrders];
+    
+    // Filter by status
+    if (statusFilter !== 'all') {
+      filteredOrders = filteredOrders.filter(order => order.status === statusFilter);
+    }
+    
+    // 🔥 FILTER BY DELIVERY TYPE (Instant / PO)
+    if (deliveryFilter !== 'all') {
+      filteredOrders = filteredOrders.filter(order => {
+        const deliveryInfo = order.deliveryInfo || '';
+        if (deliveryFilter === 'instant') {
+          return deliveryInfo.includes('⚡') || deliveryInfo.includes('Instant');
+        } else if (deliveryFilter === 'po') {
+          return deliveryInfo.includes('📦') || deliveryInfo.includes('PO') || deliveryInfo.includes('Pre-Order');
+        }
+        return true;
+      });
+    }
+    
+    // Search by Order ID
+    if (searchQuery) {
+      filteredOrders = filteredOrders.filter(order => 
+        order.id.toLowerCase().includes(searchQuery)
+      );
+    }
+    
+    renderOrders(filteredOrders);
+  }
+
+  // Render orders ke halaman
+  // Render orders ke halaman
+  function renderOrders(orders) {
+    const ordersList = document.getElementById('ordersList');
+    const orderCount = document.getElementById('orderCount');
+    
+    if (!ordersList) return;
+    
+    if (orders.length === 0) {
+      ordersList.innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-inbox"></i>
+          <p>✨ Tidak ada pesanan</p>
+        </div>
+      `;
+      orderCount.textContent = '(0)';
+      return;
+    }
+    
+    orderCount.textContent = `(${orders.length})`;
+    let html = '';
+    
+    orders.forEach(order => {
+      const orderId = order.id;
+      
+      let statusClass = 'status-pending';
+      if (order.status === 'paid') statusClass = 'status-paid';
+      else if (order.status === 'delivered') statusClass = 'status-delivered';
+      else if (order.status === 'cancelled') statusClass = 'status-cancelled';
+      else if (order.status === 'waiting_payment') statusClass = 'status-waiting_payment';
+      
+      let createdAt = '-';
+      if (order.createdAt?.toDate) createdAt = order.createdAt.toDate().toLocaleString('id-ID');
+      
+      // 🔥 TENTUKAN JENIS PENGIRIMAN (Instant / PO 15 Hari)
+      const deliveryInfo = order.deliveryInfo || '';
+      let deliveryType = 'instant';
+      let deliveryText = '⚡ Instant';
+      let deliveryClass = 'delivery-instant';
+      
+      if (deliveryInfo.includes('PO') || deliveryInfo.includes('Pre-Order') || deliveryInfo.includes('📦')) {
+        deliveryType = 'po';
+        deliveryText = '📦 Pre-Order (15 Hari)';
+        deliveryClass = 'delivery-po';
+      } else if (deliveryInfo.includes('Instant') || deliveryInfo.includes('⚡')) {
+        deliveryType = 'instant';
+        deliveryText = '⚡ Instant';
+        deliveryClass = 'delivery-instant';
       }
       
-      orderCount.textContent = `(${snapshot.size})`;
-      let html = '';
+      // Tampilkan email/phone jika ada
+      const customerEmail = order.customerEmail || '-';
+      const customerPhone = order.customerPhone || '-';
+      const hasContact = (customerEmail !== '-' || customerPhone !== '-');
+
+      // Tampilkan riwayat perubahan pengiriman jika ada
+      const deliveryHistory = order.deliveryHistory || [];
+      const hasHistory = deliveryHistory.length > 0;
       
-      snapshot.forEach(doc => {
-        const order = doc.data();
-        const orderId = doc.id;
-        
-        let statusClass = 'status-pending';
-        if (order.status === 'paid') statusClass = 'status-paid';
-        else if (order.status === 'delivered') statusClass = 'status-delivered';
-        else if (order.status === 'cancelled') statusClass = 'status-cancelled';
-        else if (order.status === 'waiting_payment') statusClass = 'status-waiting_payment';
-        
-        let createdAt = '-';
-        if (order.createdAt?.toDate) createdAt = order.createdAt.toDate().toLocaleString('id-ID');
-        
-        html += `
-          <div class="order-item" data-id="${orderId}">
-            <div class="order-header">
-              <div>
-                <span class="order-id"><i class="fas fa-hashtag"></i> ${orderId}</span>
-              </div>
+      html += `
+        <div class="order-item" data-id="${orderId}">
+          <div class="order-header">
+            <div>
+              <span class="order-id"><i class="fas fa-hashtag"></i> ${orderId}</span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center;">
+              <span class="delivery-badge ${deliveryClass}">${deliveryText}</span>
               <span class="status-badge ${statusClass}">${order.status || 'pending'}</span>
             </div>
-            
-            <div class="order-details">
-              <div class="order-detail">
-                <div class="order-detail-label"><i class="fas fa-robot"></i> Robux</div>
-                <div class="order-detail-value">${(order.robuxAmount || 0).toLocaleString('id-ID')}</div>
-              </div>
-              <div class="order-detail">
-                <div class="order-detail-label"><i class="fas fa-money-bill-wave"></i> Total</div>
-                <div class="order-detail-value">Rp ${(order.totalPrice || 0).toLocaleString('id-ID')}</div>
-              </div>
-              <div class="order-detail">
-                <div class="order-detail-label"><i class="fas fa-credit-card"></i> Metode</div>
-                <div class="order-detail-value">${(order.paymentMethod || '-').toUpperCase()}</div>
-              </div>
-              <div class="order-detail">
-                <div class="order-detail-label"><i class="fas fa-calendar"></i> Dibuat</div>
-                <div class="order-detail-value">${createdAt}</div>
-              </div>
+          </div>
+          
+          <div class="order-details">
+            <div class="order-detail">
+              <div class="order-detail-label"><i class="fas fa-robot"></i> Robux</div>
+              <div class="order-detail-value">${(order.robuxAmount || 0).toLocaleString('id-ID')}</div>
             </div>
-            
-            <div class="order-actions">
-              <select class="status-select" data-id="${orderId}">
-                <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>⏳ Menunggu</option>
-                <option value="waiting_payment" ${order.status === 'waiting_payment' ? 'selected' : ''}>💳 Menunggu Bayar</option>
-                <option value="paid" ${order.status === 'paid' ? 'selected' : ''}>✅ Dibayar</option>
-                <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>🎉 Terkirim</option>
-                <option value="cancelled" ${order.status === 'cancelled' ? 'selected' : ''}>❌ Dibatalkan</option>
-              </select>
-              <button class="btn-status btn-paid" data-id="${orderId}" data-status="paid">✅ Paid</button>
-              <button class="btn-status btn-delivered" data-id="${orderId}" data-status="delivered">🎉 Delivered</button>
-              <button class="btn-status btn-cancel" data-id="${orderId}" data-status="cancelled">❌ Cancel</button>
+            <div class="order-detail">
+              <div class="order-detail-label"><i class="fas fa-money-bill-wave"></i> Total</div>
+              <div class="order-detail-value">Rp ${(order.totalPrice || 0).toLocaleString('id-ID')}</div>
+            </div>
+            <div class="order-detail">
+              <div class="order-detail-label"><i class="fas fa-credit-card"></i> Metode</div>
+              <div class="order-detail-value">${getMethodDisplayName(order.paymentMethod)}</div>
+            </div>
+            <div class="order-detail">
+              <div class="order-detail-label"><i class="fas fa-calendar"></i> Dibuat</div>
+              <div class="order-detail-value">${createdAt}</div>
             </div>
           </div>
-        `;
-      });
-      
-      ordersList.innerHTML = html;
-      
-      // Status select change
-      document.querySelectorAll('.status-select').forEach(select => {
-        select.addEventListener('change', async (e) => {
-          const orderId = e.target.dataset.id;
-          const newStatus = e.target.value;
-          await updateDoc(doc(db, 'orders', orderId), { 
-            status: newStatus, 
-            updatedAt: new Date() 
-          });
+          
+          ${hasContact ? `
+          <div class="order-contact">
+            <div class="contact-title"><i class="fas fa-address-card"></i> Kontak Customer</div>
+            <div class="contact-details">
+              ${customerEmail !== '-' ? `<span><i class="fas fa-envelope"></i> ${customerEmail}</span>` : ''}
+              ${customerPhone !== '-' ? `<span><i class="fab fa-whatsapp"></i> ${customerPhone}</span>` : ''}
+            </div>
+          </div>
+          ` : ''}
+          
+          ${hasHistory ? `
+          <div class="delivery-history">
+            <div class="history-title"><i class="fas fa-history"></i> Riwayat Perubahan Pengiriman</div>
+            <div class="history-list">
+              ${deliveryHistory.map(h => `
+                <div class="history-item">
+                  <span class="history-change">${h.from} → ${h.to}</span>
+                  <span class="history-reason">${h.reason || 'Tidak ada alasan'}</span>
+                  <span class="history-time">${new Date(h.changedAt).toLocaleString('id-ID')}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+          ` : ''}
+
+          <div class="order-actions">
+            <select class="status-select" data-id="${orderId}">
+              <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>⏳ Menunggu</option>
+              <option value="waiting_payment" ${order.status === 'waiting_payment' ? 'selected' : ''}>💳 Menunggu Bayar</option>
+              <option value="paid" ${order.status === 'paid' ? 'selected' : ''}>✅ Dibayar</option>
+              <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>🎉 Terkirim</option>
+              <option value="cancelled" ${order.status === 'cancelled' ? 'selected' : ''}>❌ Dibatalkan</option>
+            </select>
+            <button class="btn-status btn-paid" data-id="${orderId}" data-status="paid">✅ Paid</button>
+            <button class="btn-status btn-delivered" data-id="${orderId}" data-status="delivered">🎉 Delivered</button>
+            <button class="btn-status btn-cancel" data-id="${orderId}" data-status="cancelled">❌ Cancel</button>
+              <!-- 🔥 TOMBOL EDIT PENGIRIMAN BARU -->
+            <button class="btn-status btn-edit-delivery" data-id="${orderId}" data-delivery="${deliveryType}" data-delivery-info="${deliveryInfo.replace(/"/g, '&quot;')}">
+              <i class="fas fa-truck"></i> Edit Pengiriman
+            </button>
+          </div>
+
+        </div>
+      `;
+    });
+    
+    ordersList.innerHTML = html;
+    
+    // Attach event listeners
+    document.querySelectorAll('.status-select').forEach(select => {
+      select.addEventListener('change', async (e) => {
+        const orderId = e.target.dataset.id;
+        const newStatus = e.target.value;
+        await updateDoc(doc(db, 'orders', orderId), { 
+          status: newStatus, 
+          updatedAt: new Date() 
         });
       });
-      
-      // Quick action buttons
-      document.querySelectorAll('.btn-status').forEach(btn => {
-        btn.addEventListener('click', async () => {
-          const orderId = btn.dataset.id;
-          const newStatus = btn.dataset.status;
-          await updateDoc(doc(db, 'orders', orderId), { 
-            status: newStatus, 
-            updatedAt: new Date() 
-          });
+    });
+    
+    document.querySelectorAll('.btn-status').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const orderId = btn.dataset.id;
+        const newStatus = btn.dataset.status;
+        await updateDoc(doc(db, 'orders', orderId), { 
+          status: newStatus, 
+          updatedAt: new Date() 
         });
       });
+    });
+
+    // Tombol edit pengiriman
+    document.querySelectorAll('.btn-edit-delivery').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const orderId = btn.dataset.id;
+        const deliveryType = btn.dataset.delivery;
+        const deliveryInfo = btn.dataset.deliveryInfo;
+        openEditDeliveryModal(orderId, deliveryType, deliveryInfo);
+      });
+    });
+  }
+
+  // Helper function untuk menampilkan nama metode pembayaran
+  function getMethodDisplayName(method) {
+    const methodNames = {
+      'bca': 'BCA VA',
+      'mandiri': 'Mandiri VA',
+      'bni': 'BNI VA',
+      'bri': 'BRI VA',
+      'qris': 'QRIS',
+      'gopay': 'GoPay',
+      'dana': 'DANA'
+    };
+    return methodNames[method] || (method || '-').toUpperCase();
+  }
+
+  // DOM Elements untuk Modal Edit
+  const editModal = document.getElementById('editDeliveryModal');
+  const editOrderIdSpan = document.getElementById('editOrderId');
+  const editDeliveryType = document.getElementById('editDeliveryType');
+  const editReason = document.getElementById('editReason');
+  let currentEditOrderId = null;
+
+  // Buka modal edit
+  function openEditDeliveryModal(orderId, currentDeliveryType, currentDeliveryInfo) {
+    currentEditOrderId = orderId;
+    editOrderIdSpan.textContent = orderId;
+    
+    // Set nilai dropdown sesuai delivery type saat ini
+    if (currentDeliveryType === 'instant') {
+      editDeliveryType.value = 'instant';
+    } else {
+      editDeliveryType.value = 'po';
+    }
+    
+    // Kosongkan reason
+    editReason.value = '';
+    
+    editModal.classList.add('active');
+  }
+
+  // Tutup modal
+  function closeEditDeliveryModal() {
+    editModal.classList.remove('active');
+    currentEditOrderId = null;
+    editReason.value = '';
+  }
+
+  // Simpan perubahan pengiriman
+  async function saveDeliveryEdit() {
+    if (!currentEditOrderId) return;
+    
+    const newDeliveryType = editDeliveryType.value;
+    const reason = editReason.value.trim();
+    
+    // Tentukan text delivery info baru
+    let newDeliveryInfo = '';
+    let newDeliveryText = '';
+    
+    if (newDeliveryType === 'instant') {
+      newDeliveryInfo = '⚡ Pengiriman Instant';
+      newDeliveryText = '⚡ Instant';
+    } else {
+      newDeliveryInfo = '📦 Pre-Order (15 hari kerja)';
+      newDeliveryText = '📦 Pre-Order (15 Hari)';
+    }
+    
+    // Siapkan data update
+    const updateData = {
+      deliveryInfo: newDeliveryInfo,
+      deliveryType: newDeliveryType,
+      updatedAt: new Date()
+    };
+    
+    // Jika ada alasan, tambahkan ke riwayat
+    if (reason) {
+      // Ambil riwayat sebelumnya atau buat array baru
+      const orderRef = doc(db, 'orders', currentEditOrderId);
+      const orderSnap = await getDoc(orderRef);
+      const existingHistory = orderSnap.data()?.deliveryHistory || [];
+      
+      updateData.deliveryHistory = [
+        ...existingHistory,
+        {
+          from: existingHistory.length > 0 ? existingHistory[existingHistory.length - 1].to : (orderSnap.data()?.deliveryType || 'instant'),
+          to: newDeliveryType,
+          reason: reason,
+          changedBy: 'Admin',
+          changedAt: new Date()
+        }
+      ];
+    }
+    
+    try {
+      await updateDoc(doc(db, 'orders', currentEditOrderId), updateData);
+      alert('✅ Status pengiriman berhasil diubah!');
+      closeEditDeliveryModal();
+      // Refresh tampilan
+      applyFilterAndSearch();
+    } catch (error) {
+      console.error('Error updating delivery:', error);
+      alert('❌ Gagal mengubah status pengiriman: ' + error.message);
+    }
+  }
+
+  // Event listeners untuk modal
+  document.getElementById('closeModalEdit')?.addEventListener('click', closeEditDeliveryModal);
+  document.getElementById('cancelModalEdit')?.addEventListener('click', closeEditDeliveryModal);
+  document.getElementById('saveDeliveryEdit')?.addEventListener('click', saveDeliveryEdit);
+
+  // Klik di luar modal untuk tutup
+  editModal?.addEventListener('click', (e) => {
+    if (e.target === editModal) closeEditDeliveryModal();
+  });
+
+  // Event listeners untuk filter & search
+  if (document.getElementById('statusFilter')) {
+    document.getElementById('statusFilter').addEventListener('change', () => {
+      applyFilterAndSearch();
+    });
+  }
+
+  // 🔥 EVENT LISTENER UNTUK DELIVERY FILTER (BARU)
+  if (document.getElementById('deliveryFilter')) {
+    document.getElementById('deliveryFilter').addEventListener('change', () => {
+      applyFilterAndSearch();
+    });
+  }
+
+  if (document.getElementById('searchOrder')) {
+    document.getElementById('searchOrder').addEventListener('input', () => {
+      applyFilterAndSearch();
+    });
+  }
+
+  if (document.getElementById('refreshOrders')) {
+    document.getElementById('refreshOrders').addEventListener('click', () => {
+      applyFilterAndSearch();
     });
   }
 

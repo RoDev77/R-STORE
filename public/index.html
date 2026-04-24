@@ -60,7 +60,6 @@
       <a href="index.html" class="nav-link active">Home</a>
       <a href="#pricing" class="nav-link">Harga</a>
       <a href="#testimonials" class="nav-link">Testimoni</a>
-      <a href="track.html" class="nav-link">Lacak</a>
     </div>
     <a href="track.html" class="btn-track">
       <i class="fas fa-search"></i> Lacak Pesanan
@@ -81,7 +80,7 @@
       <div class="community-text">
         <h3>⚠️ SYARAT PENTING SEBELUM MEMBELI!</h3>
         <p>Untuk mendapatkan pengiriman <strong>INSTANT</strong>, Anda WAJIB join <strong>Community Roblox R STORE</strong> minimal <strong>15 hari</strong> sebelum melakukan pembelian.</p>
-        <p>Belum join? <a href="#" class="community-link" id="communityLink">Klik di sini untuk join community →</a></p>
+        <p>Belum join? <a href="https://www.roblox.com/communities/13174452" class="community-link" id="communityLink">Klik di sini untuk join community →</a></p>
       </div>
       <div class="community-badge">
         <span class="badge-important">WAJIB</span>
@@ -310,6 +309,47 @@
           </div>
         </div>
 
+        <!-- Tambahan Form: Email & No HP -->
+        <div class="customer-info">
+          <div class="info-title">
+            <i class="fas fa-user-check"></i>
+            <span>Informasi Kontak</span>
+          </div>
+          <p class="info-subtitle">⚠️ Wajib mengisi minimal salah satu (Email atau WhatsApp) untuk konfirmasi order jika ada masalah.</p>
+          
+          <div class="input-group">
+            <label><i class="fas fa-envelope"></i> Email</label>
+            <div class="input-wrapper">
+              <i class="fas fa-envelope"></i>
+              <input type="email" id="customerEmail" placeholder="contoh: email@domain.com" />
+            </div>
+            <small class="input-hint">Untuk notifikasi status pesanan.</small>
+          </div>
+          
+          <div class="input-group">
+            <label><i class="fas fa-phone-alt"></i> Nomor WhatsApp</label>
+            <div class="input-wrapper">
+              <i class="fab fa-whatsapp"></i>
+              <input type="tel" id="customerPhone" placeholder="Contoh: 081234567890" />
+            </div>
+            <small class="input-hint">Untuk konfirmasi order jika diperlukan.</small>
+          </div>
+        </div>
+
+        <!-- Checkbox Konfirmasi Syarat & Ketentuan -->
+        <div class="terms-checkbox">
+          <label class="checkbox-container">
+            <input type="checkbox" id="termsCheckbox" />
+            <span class="checkmark"></span>
+            <span class="checkbox-text">
+              Saya telah membaca dan menyetujui 
+              <a href="terms.html" target="_blank">Syarat & Ketentuan</a> dan 
+              <a href="privacy.html" target="_blank">Kebijakan Privasi</a> R STORE
+            </span>
+          </label>
+          <div id="termsError" class="error">Anda harus menyetujui Syarat & Ketentuan untuk melanjutkan</div>
+        </div>
+
         <div class="summary">
           <div class="summary-header">
             <span>Total Pembayaran</span>
@@ -327,6 +367,50 @@
     </div>
   </div>
 </section>
+
+<!-- Modal Konfirmasi Order -->
+<div id="confirmModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <i class="fas fa-clipboard-list"></i>
+      <h3>Konfirmasi Pesanan</h3>
+      <button class="modal-close" id="closeModalBtn">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="confirm-summary">
+        <div class="confirm-item">
+          <span class="confirm-label">🎮 Jumlah Robux</span>
+          <span class="confirm-value" id="confirmRobux">0</span>
+        </div>
+        <div class="confirm-item">
+          <span class="confirm-label">💰 Total Pembayaran</span>
+          <span class="confirm-value" id="confirmTotal">Rp 0</span>
+        </div>
+        <div class="confirm-item">
+          <span class="confirm-label">⚡ Estimasi Pengiriman</span>
+          <span class="confirm-value" id="confirmDelivery">Pengiriman Instant</span>
+        </div>
+        <div class="confirm-divider"></div>
+        <div class="confirm-item">
+          <span class="confirm-label">📧 Email</span>
+          <span class="confirm-value" id="confirmEmail">-</span>
+        </div>
+        <div class="confirm-item">
+          <span class="confirm-label">📱 WhatsApp</span>
+          <span class="confirm-value" id="confirmPhone">-</span>
+        </div>
+      </div>
+      <div class="confirm-warning">
+        <i class="fas fa-info-circle"></i>
+        <p>Pastikan data di atas sudah benar. Pesanan tidak dapat dibatalkan setelah pembayaran.</p>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" id="cancelModalBtn">Batal</button>
+      <button class="btn-confirm" id="confirmOrderBtn">Ya, Lanjutkan Pembayaran</button>
+    </div>
+  </div>
+</div>
 
 <!-- Testimonials -->
 <section class="testimonials" id="testimonials">
@@ -430,7 +514,7 @@
 </section>
 
 <!-- WhatsApp Float -->
-<a href="https://wa.me/6281234567890?text=Halo%20R%20STORE%2C%20saya%20mau%20tanya%20tentang%20Robux" 
+<a href="https://wa.me/621233?text=Halo%20R%20STORE%2C%20saya%20mau%20tanya%20tentang%20Robux" 
    class="whatsapp-float" target="_blank" rel="noopener noreferrer">
   <i class="fab fa-whatsapp"></i>
   <span class="whatsapp-tooltip">Chat Admin</span>
@@ -473,9 +557,9 @@
     <div class="footer-contact">
       <h4>Kontak</h4>
       <ul>
-        <li><i class="fab fa-discord"></i> R STORE#1234</li>
-        <li><i class="fab fa-whatsapp"></i> +62 812-3456-7890</li>
-        <li><i class="far fa-envelope"></i> support@rstore.com</li>
+        <li><i class="fab fa-discord"></i> ahmadrodiii</li>
+        <li><i class="fab fa-whatsapp"></i> +62 812 123 123</li>
+        <li><i class="far fa-envelope"></i> rstudiolab77@gmail.com</li>
       </ul>
     </div>
   </div>
@@ -539,7 +623,7 @@
     communityLink.addEventListener('click', (e) => {
       e.preventDefault();
       // Ganti dengan link community Roblox asli Anda
-      window.open('https://www.roblox.com/communities/xxxxxxxxxxxxxxxxx', '_blank');
+      window.open('https://www.roblox.com/communities/13174452', '_blank');
     });
   }
   

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Status Orderan- R STORE</title>
+  <title>Status Orderan - R STORE</title>
   <meta name="description" content="Konfirmasi pembayaran Robux" />
   <link rel="icon" type="image/png" href="/images/favicon.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
@@ -62,7 +62,6 @@
       font-weight: 800;
       background: linear-gradient(135deg, #fff, #667eea);
       -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
       margin-bottom: 10px;
     }
     
@@ -189,6 +188,27 @@
       font-size: 15px;
     }
     
+    /* Delivery Badge */
+    .delivery-badge-done {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .delivery-instant {
+      background: rgba(40, 167, 69, 0.2);
+      color: #28a745;
+      border: 1px solid rgba(40, 167, 69, 0.3);
+    }
+    
+    .delivery-po {
+      background: rgba(255, 193, 7, 0.2);
+      color: #ffc107;
+      border: 1px solid rgba(255, 193, 7, 0.3);
+    }
+    
     /* Status Badge */
     .status-badge-done {
       display: inline-block;
@@ -203,6 +223,129 @@
     .status-paid-done { background: #28a745; color: #fff; }
     .status-delivered-done { background: #17a2b8; color: #fff; }
     .status-cancelled-done { background: #dc3545; color: #fff; }
+    
+    /* Contact Section */
+    .contact-section-done {
+      background: rgba(102,126,234,0.08);
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin: 15px 0;
+      border-left: 3px solid #667eea;
+    }
+    
+    .contact-title-done {
+      font-size: 11px;
+      color: #667eea;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .contact-details-done {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    
+    .contact-details-done span {
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #c0c0d0;
+    }
+    
+    .contact-details-done i {
+      color: #667eea;
+      width: 16px;
+    }
+    
+    /* Delivery History - Sama seperti di track.html */
+    .delivery-history-done {
+      background: rgba(23, 162, 184, 0.08);
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin: 15px 0;
+      border-left: 3px solid #17a2b8;
+    }
+
+    .history-title-done {
+      font-size: 11px;
+      color: #17a2b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .history-list-done {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .history-item-done {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 8px;
+      font-size: 12px;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .history-item-done:last-child {
+      border-bottom: none;
+    }
+
+    .history-change-done {
+      background: rgba(102,126,234,0.2);
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-weight: 600;
+      color: #667eea;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .history-reason-done {
+      color: #ffc107;
+      flex: 1;
+      font-size: 10px;
+      padding: 4px 8px;
+      border-radius: 20px;
+      display: inline-block;
+      max-width: 200px;
+      white-space: normal;
+      word-break: break-word;
+    }
+
+    .history-time-done {
+      color: #a0a0b0;
+      font-size: 10px;
+      white-space: nowrap;
+    }
+
+    .history-note-done {
+      margin-top: 8px;
+      padding-top: 6px;
+      font-size: 11px;
+      color: #a0a0b0;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .history-note-done i {
+      color: #ffc107;
+      font-size: 10px;
+    }
     
     /* Instruction Box */
     .instruction-box-done {
@@ -233,7 +376,7 @@
       margin-bottom: 8px;
     }
     
-    /* Success Box (untuk paid/delivered) */
+    /* Success Box */
     .success-box-done {
       background: rgba(40, 167, 69, 0.15);
       border-left: 4px solid #28a745;
@@ -381,6 +524,10 @@
         align-items: flex-start;
         gap: 5px;
       }
+      .contact-details-done {
+        flex-direction: column;
+        gap: 8px;
+      }
     }
   </style>
 </head>
@@ -441,6 +588,22 @@
       </div>
     </div>
     
+    <!-- Status Pengiriman Row -->
+    <div id="deliveryRow" style="display: none;" class="order-summary-done">
+      <div class="order-summary-title">
+        <i class="fas fa-truck"></i>
+        <span>Status Pengiriman</span>
+      </div>
+      <div class="detail-row-done">
+        <div class="detail-label-done">
+          <i class="fas fa-box"></i> Jenis Pengiriman
+        </div>
+        <div class="detail-value-done">
+          <span id="deliveryBadge" class="delivery-badge-done delivery-instant">⚡ Instant</span>
+        </div>
+      </div>
+    </div>
+    
     <!-- Dynamic Box (Instruction / Success) -->
     <div id="dynamicBox"></div>
     
@@ -455,6 +618,12 @@
         </div>
       </div>
     </div>
+    
+    <!-- Contact Section (hidden initially) -->
+    <div id="contactSection" style="display: none;" class="contact-section-done"></div>
+    
+    <!-- Delivery History Section (hidden initially) -->
+    <div id="historySection" style="display: none;" class="delivery-history-done"></div>
     
     <!-- Auto Refresh Indicator -->
     <div class="auto-refresh-indicator" id="autoRefreshIndicator">
@@ -523,6 +692,15 @@
   const urlParams = new URLSearchParams(window.location.search);
   const orderId = urlParams.get('orderId');
   const method = urlParams.get('method');
+
+  // Fungsi untuk menentukan jenis pengiriman
+  function getDeliveryType(deliveryInfo) {
+    if (!deliveryInfo) return { type: 'instant', text: '⚡ Instant', class: 'delivery-instant' };
+    if (deliveryInfo.includes('PO') || deliveryInfo.includes('Pre-Order') || deliveryInfo.includes('📦')) {
+      return { type: 'po', text: '📦 Pre-Order (15 Hari Kerja)', class: 'delivery-po' };
+    }
+    return { type: 'instant', text: '⚡ Instant', class: 'delivery-instant' };
+  }
 
   // Fungsi copy ke clipboard
   async function copyToClipboard(text, buttonElement) {
@@ -623,11 +801,11 @@
       dynamicBox.innerHTML = `
         <div class="success-box-done">
           <strong><i class="fas fa-rocket"></i> Pesanan Selesai!</strong>
-          <p style="color: #a0a0b0; font-size: 14px; margin-top: 8px;">
+          <p style="color: #a0a0a0; font-size: 14px; margin-top: 8px;">
             Robux sebanyak <strong>${orderData.robuxAmount?.toLocaleString('id-ID') || '-'} Robux</strong> 
             telah berhasil dikirim ke akun Roblox Anda.
           </p>
-          <p style="color: #a0a0b0; font-size: 13px; margin-top: 10px;">
+          <p style="color: #a0a0a0; font-size: 13px; margin-top: 10px;">
             ⭐ Terima kasih telah berbelanja di R STORE! ⭐
           </p>
         </div>
@@ -670,6 +848,101 @@
     }
   }
 
+  // Update tampilan pengiriman dan kontak
+// Update tampilan pengiriman dan kontak
+function updateDeliveryAndContact(orderData) {
+  // Update status pengiriman
+  const delivery = getDeliveryType(orderData.deliveryInfo);
+  const deliveryRow = document.getElementById('deliveryRow');
+  const deliveryBadge = document.getElementById('deliveryBadge');
+  
+  if (deliveryRow && deliveryBadge) {
+    deliveryRow.style.display = 'block';
+    deliveryBadge.textContent = delivery.text;
+    deliveryBadge.className = `delivery-badge-done ${delivery.class}`;
+  }
+  
+  // Update kontak customer
+  const customerEmail = orderData.customerEmail || '';
+  const customerPhone = orderData.customerPhone || '';
+  const hasContact = customerEmail || customerPhone;
+  const contactSection = document.getElementById('contactSection');
+  
+  if (contactSection && hasContact) {
+    contactSection.style.display = 'block';
+    contactSection.innerHTML = `
+      <div class="contact-title-done">
+        <i class="fas fa-address-card"></i> Kontak Customer
+        <span style="font-size: 10px; color: #a0a0b0;">(Untuk keperluan konfirmasi)</span>
+      </div>
+      <div class="contact-details-done">
+        ${customerEmail ? `<span><i class="fas fa-envelope"></i> ${customerEmail}</span>` : ''}
+        ${customerPhone ? `<span><i class="fab fa-whatsapp"></i> ${customerPhone}</span>` : ''}
+      </div>
+    `;
+  }
+  
+  // 🔥 Update riwayat perubahan pengiriman (SAMA SEPERTI DI TRACK.HTML)
+  const deliveryHistory = orderData.deliveryHistory || [];
+  const historySection = document.getElementById('historySection');
+  
+  if (historySection) {
+    if (deliveryHistory.length > 0) {
+      historySection.style.display = 'block';
+      let historyHtml = `
+        <div class="history-title-done">
+          <i class="fas fa-history"></i> Riwayat Perubahan Pengiriman
+        </div>
+        <div class="history-list-done">
+      `;
+      
+      deliveryHistory.forEach(h => {
+        const fromText = h.from === 'instant' ? '⚡ Instant' : '📦 Pre-Order (15 Hari)';
+        const toText = h.to === 'instant' ? '⚡ Instant' : '📦 Pre-Order (15 Hari)';
+        
+        // Format tanggal dengan aman
+        let changedAtFormatted = '-';
+        if (h.changedAt) {
+          try {
+            if (h.changedAt.toDate) {
+              changedAtFormatted = h.changedAt.toDate().toLocaleString('id-ID');
+            } else if (typeof h.changedAt === 'string') {
+              const date = new Date(h.changedAt);
+              if (!isNaN(date.getTime())) changedAtFormatted = date.toLocaleString('id-ID');
+            } else if (typeof h.changedAt === 'number') {
+              const date = new Date(h.changedAt);
+              if (!isNaN(date.getTime())) changedAtFormatted = date.toLocaleString('id-ID');
+            } else if (h.changedAt instanceof Date) {
+              if (!isNaN(h.changedAt.getTime())) changedAtFormatted = h.changedAt.toLocaleString('id-ID');
+            }
+          } catch (e) {
+            changedAtFormatted = 'Tanggal tidak tersedia';
+          }
+        }
+        
+        historyHtml += `
+          <div class="history-item-done">
+            <span class="history-change-done">${fromText} → ${toText}</span>
+            <span class="history-reason-done">${h.reason || 'Tidak ada alasan'}</span>
+            <span class="history-time-done">${changedAtFormatted}</span>
+          </div>
+        `;
+      });
+      
+      historyHtml += `
+        </div>
+        <div class="history-note-done">
+          <i class="fas fa-info-circle"></i>
+          <span>Perubahan status pengiriman dilakukan oleh admin karena kondisi tertentu</span>
+        </div>
+      `;
+      historySection.innerHTML = historyHtml;
+    } else {
+      historySection.style.display = 'none';
+    }
+  }
+}
+
   // Handle status perubahan dari DOKU callback
   async function handleDokuCallback() {
     const dokuStatus = urlParams.get('status');
@@ -691,7 +964,6 @@
         });
       }
       
-      // Hapus parameter dari URL tanpa reload
       const newUrl = window.location.pathname + `?orderId=${orderId}&method=${method}`;
       window.history.replaceState({}, document.title, newUrl);
     }
@@ -714,6 +986,8 @@
         
         // Update UI berdasarkan status
         updateUIByStatus(currentStatus, data);
+        // Update pengiriman dan kontak
+        updateDeliveryAndContact(data);
       }
     }, (error) => {
       console.error('Error listening to order:', error);
@@ -729,7 +1003,6 @@
       return;
     }
 
-    // Handle DOKU callback terlebih dahulu
     await handleDokuCallback();
 
     const orderRef = doc(db, 'orders', orderId);
@@ -754,7 +1027,6 @@
       </button>
     `;
     
-    // Event listener untuk tombol copy
     const copyBtn = document.getElementById('copyOrderIdBtn');
     if (copyBtn) {
       copyBtn.addEventListener('click', (e) => {
@@ -762,11 +1034,10 @@
       });
     }
     
-    // 🔥 BACA METODE PEMBAYARAN DARI FIRESTORE (bukan dari URL)
+    // Metode pembayaran
     const payMethod = document.getElementById('payMethod');
     const totalAmount = document.getElementById('totalAmount');
     
-    // Map kode bank ke nama yang bagus
     const methodNames = {
       'bca': 'BCA Virtual Account',
       'mandiri': 'Mandiri Virtual Account',
@@ -777,19 +1048,14 @@
       'dana': 'DANA'
     };
     
-    // Prioritaskan dari database, fallback ke URL parameter
     let paymentMethod = data.paymentMethod || method;
     let displayMethod = methodNames[paymentMethod] || paymentMethod?.toUpperCase() || '-';
     
-    if (payMethod) {
-      payMethod.textContent = displayMethod;
-    }
-    if (totalAmount) {
-      totalAmount.textContent = 'Rp ' + (data.totalPrice || 0).toLocaleString('id-ID');
-    }
+    if (payMethod) payMethod.textContent = displayMethod;
+    if (totalAmount) totalAmount.textContent = 'Rp ' + (data.totalPrice || 0).toLocaleString('id-ID');
     
-    console.log('Payment method from DB:', data.paymentMethod);
-    console.log('Display method:', displayMethod);
+    // Update pengiriman dan kontak
+    updateDeliveryAndContact(data);
     
     // Update UI berdasarkan status awal
     updateUIByStatus(data.status, data);
@@ -800,11 +1066,8 @@
 
   loadOrder();
   
-  // Cleanup listener on page unload
   window.addEventListener('beforeunload', () => {
-    if (unsubscribe) {
-      unsubscribe();
-    }
+    if (unsubscribe) unsubscribe();
   });
 </script>
 

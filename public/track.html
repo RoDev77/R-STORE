@@ -211,6 +211,27 @@
       color: white;
     }
     
+    /* Delivery Badge */
+    .delivery-badge-track {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .delivery-instant {
+      background: rgba(40, 167, 69, 0.2);
+      color: #28a745;
+      border: 1px solid rgba(40, 167, 69, 0.3);
+    }
+    
+    .delivery-po {
+      background: rgba(255, 193, 7, 0.2);
+      color: #ffc107;
+      border: 1px solid rgba(255, 193, 7, 0.3);
+    }
+    
     /* Detail Rows */
     .detail-row-track {
       display: flex;
@@ -257,6 +278,45 @@
     .status-delivered { background: #17a2b8; color: #fff; }
     .status-cancelled { background: #dc3545; color: #fff; }
     
+    /* Contact Section */
+    .contact-section {
+      background: rgba(102,126,234,0.08);
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin: 15px 0;
+      border-left: 3px solid #667eea;
+    }
+    
+    .contact-title {
+      font-size: 11px;
+      color: #667eea;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .contact-details {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    
+    .contact-details span {
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #c0c0d0;
+    }
+    
+    .contact-details i {
+      color: #667eea;
+      width: 16px;
+    }
+    
     /* Empty State */
     .empty-state {
       text-align: center;
@@ -268,6 +328,82 @@
       font-size: 48px;
       margin-bottom: 15px;
       opacity: 0.5;
+    }
+
+    /* Delivery History - Untuk menampilkan alasan perubahan */
+    .delivery-history-track {
+      background: rgba(23, 162, 184, 0.08);
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin: 15px 0;
+      border-left: 3px solid #17a2b8;
+    }
+
+    .history-title-track {
+      font-size: 11px;
+      color: #17a2b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .history-list-track {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .history-item-track {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 8px;
+      font-size: 12px;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .history-item-track:last-child {
+      border-bottom: none;
+    }
+
+    .history-change-track {
+      background: rgba(102,126,234,0.2);
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-weight: 600;
+      color: #667eea;
+      font-size: 11px;
+    }
+
+    .history-reason-track {
+      color: #ffc107;
+      flex: 1;
+      font-size: 12px;
+    }
+
+    .history-time-track {
+      color: #a0a0b0;
+      font-size: 10px;
+    }
+
+    .history-note {
+      margin-top: 8px;
+      padding-top: 6px;
+      font-size: 11px;
+      color: #a0a0b0;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .history-note i {
+      color: #ffc107;
+      font-size: 10px;
     }
     
     @media (max-width: 480px) {
@@ -284,6 +420,10 @@
         flex-direction: column;
         align-items: flex-start;
         gap: 5px;
+      }
+      .contact-details {
+        flex-direction: column;
+        gap: 8px;
       }
     }
   </style>
@@ -376,6 +516,29 @@
   const trackOrderId = document.getElementById('trackOrderId');
   const trackResult = document.getElementById('trackResult');
 
+  // Fungsi untuk menampilkan nama metode pembayaran
+  function getMethodDisplayName(method) {
+    const methodNames = {
+      'bca': 'BCA Virtual Account',
+      'mandiri': 'Mandiri Virtual Account',
+      'bni': 'BNI Virtual Account',
+      'bri': 'BRI Virtual Account',
+      'qris': 'QRIS',
+      'gopay': 'GoPay',
+      'dana': 'DANA'
+    };
+    return methodNames[method] || (method || '-').toUpperCase();
+  }
+
+  // Fungsi untuk menentukan jenis pengiriman
+  function getDeliveryType(deliveryInfo) {
+    if (!deliveryInfo) return { type: 'instant', text: '⚡ Instant', class: 'delivery-instant' };
+    if (deliveryInfo.includes('PO') || deliveryInfo.includes('Pre-Order') || deliveryInfo.includes('📦')) {
+      return { type: 'po', text: '📦 Pre-Order (15 Hari Kerja)', class: 'delivery-po' };
+    }
+    return { type: 'instant', text: '⚡ Instant', class: 'delivery-instant' };
+  }
+
   // Fungsi untuk copy teks ke clipboard
   async function copyToClipboard(text, buttonElement) {
     try {
@@ -394,142 +557,252 @@
     }
   }
 
-  // Fungsi untuk menampilkan hasil tracking
-  async function trackOrder() {
-    const orderId = trackOrderId.value.trim();
-    
-    if (!orderId) {
-      alert('❌ Masukkan Order ID!');
-      return;
+// Fungsi untuk memformat tanggal dengan aman
+function formatDate(dateValue) {
+  if (!dateValue) return '-';
+  
+  try {
+    // Jika Firestore Timestamp
+    if (dateValue.toDate) {
+      return dateValue.toDate().toLocaleString('id-ID');
     }
-
-    // Tampilkan loading
-    trackBtn.disabled = true;
-    trackBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Mencari...';
-
-    const orderRef = doc(db, 'orders', orderId);
-    const orderSnap = await getDoc(orderRef);
-
-    if (orderSnap.exists()) {
-      const data = orderSnap.data();
-      
-      // Peta status ke teks dan class
-      const statusMap = {
-        'pending': { text: 'Menunggu pembayaran', class: 'status-pending' },
-        'waiting_payment': { text: 'Menunggu pembayaran', class: 'status-waiting_payment' },
-        'redirecting_payment': { text: 'Mengarahkan ke pembayaran', class: 'status-waiting_payment' },
-        'paid': { text: 'Sudah dibayar - Sedang diproses', class: 'status-paid' },
-        'delivered': { text: 'Robux sudah dikirim!', class: 'status-delivered' },
-        'cancelled': { text: 'Dibatalkan', class: 'status-cancelled' }
-      };
-      
-      const statusInfo = statusMap[data.status] || { text: data.status || 'Unknown', class: 'status-pending' };
-      
-      // Format tanggal
-      let createdAt = '-';
-      if (data.createdAt?.toDate) {
-        createdAt = data.createdAt.toDate().toLocaleString('id-ID');
+    // Jika string ISO
+    if (typeof dateValue === 'string') {
+      const date = new Date(dateValue);
+      if (!isNaN(date.getTime())) {
+        return date.toLocaleString('id-ID');
       }
-      
-      let paidAt = '-';
-      if (data.paidAt?.toDate) {
-        paidAt = data.paidAt.toDate().toLocaleString('id-ID');
-      } else if (data.paidAt) {
-        paidAt = new Date(data.paidAt).toLocaleString('id-ID');
-      }
-      
-      // Tampilkan hasil
-      trackResult.innerHTML = `
-        <div class="result-card">
-          <div class="result-header">
-            <i class="fas fa-receipt"></i>
-            <h3>Detail Pesanan</h3>
-          </div>
-          
-          <div class="order-id-row">
-            <div class="order-id-label">🆔 ORDER ID</div>
-            <div class="order-id-value-wrapper">
-              <span class="order-id-value">${orderId}</span>
-              <button class="copy-btn-track" id="copyOrderIdBtn">
-                <i class="fas fa-copy"></i> Copy
-              </button>
-            </div>
-          </div>
-          
-          <div class="detail-row-track">
-            <div class="detail-label-track">
-              <i class="fas fa-robot"></i> Jumlah Robux
-            </div>
-            <div class="detail-value-track">${(data.robuxAmount || 0).toLocaleString('id-ID')} Robux</div>
-          </div>
-          
-          <div class="detail-row-track">
-            <div class="detail-label-track">
-              <i class="fas fa-money-bill-wave"></i> Total Pembayaran
-            </div>
-            <div class="detail-value-track">Rp ${(data.totalPrice || 0).toLocaleString('id-ID')}</div>
-          </div>
-          
-          <div class="detail-row-track">
-            <div class="detail-label-track">
-              <i class="fas fa-tag"></i> Metode Pembayaran
-            </div>
-            <div class="detail-value-track">${(data.paymentMethod || '-').toUpperCase()}</div>
-          </div>
-          
-          <div class="detail-row-track">
-            <div class="detail-label-track">
-              <i class="fas fa-calendar"></i> Tanggal Pesanan
-            </div>
-            <div class="detail-value-track">${createdAt}</div>
-          </div>
-          
-          ${paidAt !== '-' ? `
-          <div class="detail-row-track">
-            <div class="detail-label-track">
-              <i class="fas fa-check-circle"></i> Tanggal Dibayar
-            </div>
-            <div class="detail-value-track">${paidAt}</div>
-          </div>
-          ` : ''}
-          
-          <div class="detail-row-track">
-            <div class="detail-label-track">
-              <i class="fas fa-info-circle"></i> Status
-            </div>
-            <div class="detail-value-track">
-              <span class="status-badge-track ${statusInfo.class}">${statusInfo.text}</span>
-            </div>
-          </div>
-        </div>
-      `;
-      
-      trackResult.style.display = 'block';
-      
-      // Attach copy event
-      const copyBtn = document.getElementById('copyOrderIdBtn');
-      if (copyBtn) {
-        copyBtn.addEventListener('click', (e) => {
-          copyToClipboard(orderId, e.currentTarget);
-        });
-      }
-      
-    } else {
-      trackResult.innerHTML = `
-        <div class="result-card">
-          <div class="empty-state">
-            <i class="fas fa-search"></i>
-            <p>❌ Order ID tidak ditemukan</p>
-            <small style="color: #a0a0b0;">Pastikan Order ID yang Anda masukkan benar</small>
-          </div>
-        </div>
-      `;
-      trackResult.style.display = 'block';
     }
-    
-    trackBtn.disabled = false;
-    trackBtn.innerHTML = '<i class="fas fa-search"></i> Lacak Pesanan';
+    // Jika number (timestamp)
+    if (typeof dateValue === 'number') {
+      const date = new Date(dateValue);
+      if (!isNaN(date.getTime())) {
+        return date.toLocaleString('id-ID');
+      }
+    }
+    // Jika Date object
+    if (dateValue instanceof Date) {
+      if (!isNaN(dateValue.getTime())) {
+        return dateValue.toLocaleString('id-ID');
+      }
+    }
+    return 'Tanggal tidak tersedia';
+  } catch (e) {
+    console.warn('Error formatting date:', e);
+    return 'Tanggal tidak tersedia';
   }
+}
+
+// Fungsi untuk menampilkan hasil tracking
+async function trackOrder() {
+  const orderId = trackOrderId.value.trim();
+  
+  if (!orderId) {
+    alert('❌ Masukkan Order ID!');
+    return;
+  }
+
+  // Tampilkan loading
+  trackBtn.disabled = true;
+  trackBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Mencari...';
+
+  const orderRef = doc(db, 'orders', orderId);
+  const orderSnap = await getDoc(orderRef);
+
+  if (orderSnap.exists()) {
+    const data = orderSnap.data();
+    
+    // Peta status ke teks dan class
+    const statusMap = {
+      'pending': { text: 'Menunggu pembayaran', class: 'status-pending' },
+      'waiting_payment': { text: 'Menunggu pembayaran', class: 'status-waiting_payment' },
+      'redirecting_payment': { text: 'Mengarahkan ke pembayaran', class: 'status-waiting_payment' },
+      'paid': { text: 'Sudah dibayar - Sedang diproses', class: 'status-paid' },
+      'delivered': { text: 'Robux sudah dikirim!', class: 'status-delivered' },
+      'cancelled': { text: 'Dibatalkan', class: 'status-cancelled' }
+    };
+    
+    const statusInfo = statusMap[data.status] || { text: data.status || 'Unknown', class: 'status-pending' };
+    
+    // Jenis pengiriman saat ini
+    const delivery = getDeliveryType(data.deliveryInfo);
+    
+    // 🔥 Format tanggal dengan fungsi yang aman
+    const createdAt = formatDate(data.createdAt);
+    const paidAt = formatDate(data.paidAt);
+    
+    // Kontak customer
+    const customerEmail = data.customerEmail || '';
+    const customerPhone = data.customerPhone || '';
+    const hasContact = customerEmail || customerPhone;
+    
+    // Riwayat perubahan pengiriman
+    const deliveryHistory = data.deliveryHistory || [];
+    const hasHistory = deliveryHistory.length > 0;
+    const adminNote = data.adminNote || '';
+    
+    // Buat HTML untuk riwayat perubahan
+    let historyHtml = '';
+    if (hasHistory) {
+      let historyItems = '';
+      deliveryHistory.forEach(h => {
+        const fromText = h.from === 'instant' ? '⚡ Instant' : '📦 Pre-Order (15 Hari)';
+        const toText = h.to === 'instant' ? '⚡ Instant' : '📦 Pre-Order (15 Hari)';
+        // 🔥 Gunakan fungsi formatDate untuk setiap tanggal
+        const changedAtFormatted = formatDate(h.changedAt);
+        
+        historyItems += `
+          <div class="history-item-track">
+            <span class="history-change-track">${fromText} → ${toText}</span>
+            <span class="history-reason-track">${h.reason || 'Tidak ada alasan'}</span>
+            <span class="history-time-track">${changedAtFormatted}</span>
+          </div>
+        `;
+      });
+      
+      historyHtml = `
+        <div class="delivery-history-track">
+          <div class="history-title-track">
+            <i class="fas fa-history"></i> Riwayat Perubahan Pengiriman
+          </div>
+          <div class="history-list-track">
+            ${historyItems}
+          </div>
+          <div class="history-note">
+            <i class="fas fa-info-circle"></i>
+            <span>Perubahan status pengiriman dilakukan oleh admin karena kondisi tertentu</span>
+          </div>
+        </div>
+      `;
+    }
+    
+    // Tampilkan hasil
+    trackResult.innerHTML = `
+      <div class="result-card">
+        <div class="result-header">
+          <i class="fas fa-receipt"></i>
+          <h3>Detail Pesanan</h3>
+        </div>
+        
+        <div class="order-id-row">
+          <div class="order-id-label">🆔 ORDER ID</div>
+          <div class="order-id-value-wrapper">
+            <span class="order-id-value">${orderId}</span>
+            <button class="copy-btn-track" id="copyOrderIdBtn">
+              <i class="fas fa-copy"></i> Copy
+            </button>
+          </div>
+        </div>
+        
+        <div class="detail-row-track">
+          <div class="detail-label-track">
+            <i class="fas fa-robot"></i> Jumlah Robux
+          </div>
+          <div class="detail-value-track">${(data.robuxAmount || 0).toLocaleString('id-ID')} Robux</div>
+        </div>
+        
+        <div class="detail-row-track">
+          <div class="detail-label-track">
+            <i class="fas fa-money-bill-wave"></i> Total Pembayaran
+          </div>
+          <div class="detail-value-track">Rp ${(data.totalPrice || 0).toLocaleString('id-ID')}</div>
+        </div>
+        
+        <div class="detail-row-track">
+          <div class="detail-label-track">
+            <i class="fas fa-tag"></i> Metode Pembayaran
+          </div>
+          <div class="detail-value-track">${getMethodDisplayName(data.paymentMethod)}</div>
+        </div>
+        
+        <div class="detail-row-track">
+          <div class="detail-label-track">
+            <i class="fas fa-truck"></i> Status Pengiriman
+          </div>
+          <div class="detail-value-track">
+            <span class="delivery-badge-track ${delivery.class}">${delivery.text}</span>
+          </div>
+        </div>
+        
+        ${historyHtml}
+        
+        ${adminNote ? `
+        <div class="contact-section" style="border-left-color: #ffc107;">
+          <div class="contact-title" style="color: #ffc107;">
+            <i class="fas fa-sticky-note"></i> Catatan Admin
+          </div>
+          <div class="contact-details">
+            <span style="color: #ffc107;">${adminNote}</span>
+          </div>
+        </div>
+        ` : ''}
+        
+        <div class="detail-row-track">
+          <div class="detail-label-track">
+            <i class="fas fa-calendar"></i> Tanggal Pesanan
+          </div>
+          <div class="detail-value-track">${createdAt}</div>
+        </div>
+        
+        ${paidAt !== '-' && paidAt !== 'Tanggal tidak tersedia' ? `
+        <div class="detail-row-track">
+          <div class="detail-label-track">
+            <i class="fas fa-check-circle"></i> Tanggal Dibayar
+          </div>
+          <div class="detail-value-track">${paidAt}</div>
+        </div>
+        ` : ''}
+        
+        <div class="detail-row-track">
+          <div class="detail-label-track">
+            <i class="fas fa-info-circle"></i> Status Pesanan
+          </div>
+          <div class="detail-value-track">
+            <span class="status-badge-track ${statusInfo.class}">${statusInfo.text}</span>
+          </div>
+        </div>
+        
+        ${hasContact ? `
+        <div class="contact-section">
+          <div class="contact-title">
+            <i class="fas fa-address-card"></i> Kontak Customer
+            <span style="font-size: 10px; color: #a0a0b0;">(Untuk keperluan konfirmasi)</span>
+          </div>
+          <div class="contact-details">
+            ${customerEmail ? `<span><i class="fas fa-envelope"></i> ${customerEmail}</span>` : ''}
+            ${customerPhone ? `<span><i class="fab fa-whatsapp"></i> ${customerPhone}</span>` : ''}
+          </div>
+        </div>
+        ` : ''}
+      </div>
+    `;
+    
+    trackResult.style.display = 'block';
+    
+    // Attach copy event
+    const copyBtn = document.getElementById('copyOrderIdBtn');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', (e) => {
+        copyToClipboard(orderId, e.currentTarget);
+      });
+    }
+    
+  } else {
+    trackResult.innerHTML = `
+      <div class="result-card">
+        <div class="empty-state">
+          <i class="fas fa-search"></i>
+          <p>❌ Order ID tidak ditemukan</p>
+          <small style="color: #a0a0b0;">Pastikan Order ID yang Anda masukkan benar</small>
+        </div>
+      </div>
+    `;
+    trackResult.style.display = 'block';
+  }
+  
+  trackBtn.disabled = false;
+  trackBtn.innerHTML = '<i class="fas fa-search"></i> Lacak Pesanan';
+}
 
   trackBtn.addEventListener('click', trackOrder);
   

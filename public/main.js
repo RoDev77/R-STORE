@@ -144,10 +144,72 @@ function generateOrderId() {
   return `RBX-${randomNum}`;
 }
 
-async function submitOrder() {
-  // Cek apakah elemen robuxInput ada
-  if (!robuxInput) {
-    alert('Error: Form tidak ditemukan');
+// Elemen Modal
+const confirmModal = document.getElementById('confirmModal');
+const closeModalBtn = document.getElementById('closeModalBtn');
+const cancelModalBtn = document.getElementById('cancelModalBtn');
+const confirmOrderBtn = document.getElementById('confirmOrderBtn');
+
+// Variabel untuk menyimpan data sementara
+let pendingOrderData = null;
+
+// Fungsi untuk menampilkan modal konfirmasi
+function showConfirmModal() {
+  // Ambil data dari form
+  const robux = Number(robuxInput.value);
+  const total = robux * PRICE_PER_ROBUX;
+  const customerEmail = document.getElementById('customerEmail')?.value?.trim() || '-';
+  const customerPhone = document.getElementById('customerPhone')?.value?.trim() || '-';
+  const deliveryText = deliveryInfo ? deliveryInfo.textContent : 'Pengiriman Instant';
+  
+  // Update modal dengan data
+  document.getElementById('confirmRobux').textContent = `${robux.toLocaleString('id-ID')} Robux`;
+  document.getElementById('confirmTotal').textContent = `Rp ${total.toLocaleString('id-ID')}`;
+  document.getElementById('confirmDelivery').textContent = deliveryText;
+  document.getElementById('confirmEmail').textContent = customerEmail || '-';
+  document.getElementById('confirmPhone').textContent = customerPhone || '-';
+  
+  // Tampilkan modal
+  confirmModal.classList.add('active');
+}
+
+// Fungsi untuk menutup modal
+function closeModal() {
+  confirmModal.classList.remove('active');
+}
+
+// Fungsi untuk melanjutkan ke submit order (dipanggil setelah konfirmasi)
+async function proceedSubmitOrder() {
+  // Validasi checkbox terms
+  const termsCheckbox = document.getElementById('termsCheckbox');
+  const termsError = document.getElementById('termsError');
+  
+  if (!termsCheckbox || !termsCheckbox.checked) {
+    if (termsError) termsError.classList.add('show');
+    alert('❌ Anda harus menyetujui Syarat & Ketentuan dan Kebijakan Privasi untuk melanjutkan.');
+    return;
+  }
+  
+  if (termsError) termsError.classList.remove('show');
+  
+  // Validasi minimal salah satu kontak
+  const customerEmail = document.getElementById('customerEmail')?.value?.trim() || '';
+  const customerPhone = document.getElementById('customerPhone')?.value?.trim() || '';
+  
+  if (!customerEmail && !customerPhone) {
+    alert('❌ Anda wajib mengisi minimal salah satu: Email atau Nomor WhatsApp untuk konfirmasi order.');
+    return;
+  }
+  
+  // Validasi format email
+  if (customerEmail && !isValidEmail(customerEmail)) {
+    alert('❌ Format Email tidak valid. Contoh: nama@domain.com');
+    return;
+  }
+  
+  // Validasi format nomor HP
+  if (customerPhone && !isValidPhone(customerPhone)) {
+    alert('❌ Format Nomor WhatsApp/Telepon tidak valid. Contoh: 081234567890');
     return;
   }
   
@@ -166,23 +228,32 @@ async function submitOrder() {
     return;
   }
   
+  // Tampilkan loading
+  if (btnBuy) {
+    btnBuy.disabled = true;
+    btnBuy.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Memproses...';
+  }
+  
   // Generate custom Order ID
   const orderId = generateOrderId();
   
-  // Cek apakah ID sudah ada (untuk menghindari duplikasi)
+  // Cek apakah ID sudah ada
   const orderRef = doc(db, 'orders', orderId);
   const orderSnap = await getDoc(orderRef);
   
   if (orderSnap.exists()) {
-    // Jika kebetulan duplikat, generate ulang
-    return submitOrder();
+    if (btnBuy) {
+      btnBuy.disabled = false;
+      btnBuy.innerHTML = '<i class="fas fa-arrow-right"></i> Lanjutkan Pembayaran';
+    }
+    return proceedSubmitOrder();
   }
   
   // Hitung waktu kadaluarsa: 2 jam dari sekarang
   const expireAt = new Date();
   expireAt.setHours(expireAt.getHours() + 2);
   
-  // Create order dengan custom ID
+  // Create order
   const orderData = {
     robuxAmount: robux,
     totalPrice: total,
@@ -190,17 +261,78 @@ async function submitOrder() {
     status: 'pending',
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
-    expireAt: expireAt
+    expireAt: expireAt,
+    customerEmail: customerEmail,
+    customerPhone: customerPhone,
+    termsAgreed: true
   };
   
   try {
     await setDoc(orderRef, orderData);
-    // Redirect ke payment page
     window.location.href = `payment.html?orderId=${orderId}`;
   } catch (error) {
     console.error('Error creating order:', error);
     alert('Gagal membuat pesanan. Silakan coba lagi.');
+    if (btnBuy) {
+      btnBuy.disabled = false;
+      btnBuy.innerHTML = '<i class="fas fa-arrow-right"></i> Lanjutkan Pembayaran';
+    }
   }
+}
+
+// Fungsi submit order asli (sekarang hanya menampilkan modal)
+async function submitOrder() {
+  // Validasi dasar sebelum tampilkan modal
+  const termsCheckbox = document.getElementById('termsCheckbox');
+  if (!termsCheckbox || !termsCheckbox.checked) {
+    const termsError = document.getElementById('termsError');
+    if (termsError) termsError.classList.add('show');
+    alert('❌ Anda harus menyetujui Syarat & Ketentuan dan Kebijakan Privasi untuk melanjutkan.');
+    return;
+  }
+  
+  const robux = Number(robuxInput.value);
+  if (robux < 10) {
+    alert('❌ Minimal pembelian 10 Robux');
+    return;
+  }
+  
+  const maxAvailable = CURRENT_STOCK + CURRENT_PO;
+  if (robux > maxAvailable) {
+    alert(`❌ Maksimal pembelian saat ini: ${formatNumber(maxAvailable)} Robux`);
+    return;
+  }
+  
+  // Tampilkan modal konfirmasi
+  showConfirmModal();
+}
+
+// Validasi email
+function isValidEmail(email) {
+  const emailRegex = /^[^\s@]+@([^\s@.,]+\.)+[^\s@.,]{2,}$/;
+  return emailRegex.test(email);
+}
+
+// Validasi nomor HP
+function isValidPhone(phone) {
+  const cleanPhone = phone.replace(/\D/g, '');
+  const phoneRegex = /^(0|62|8)[0-9]{9,12}$/;
+  return phoneRegex.test(cleanPhone) && cleanPhone.length >= 10 && cleanPhone.length <= 13;
+}
+
+// Event listener modal
+if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
+if (cancelModalBtn) cancelModalBtn.addEventListener('click', closeModal);
+if (confirmOrderBtn) confirmOrderBtn.addEventListener('click', () => {
+  closeModal();
+  proceedSubmitOrder();
+});
+
+// Klik di luar modal untuk menutup
+if (confirmModal) {
+  confirmModal.addEventListener('click', (e) => {
+    if (e.target === confirmModal) closeModal();
+  });
 }
 
 // Event listeners - dengan pengecekan
