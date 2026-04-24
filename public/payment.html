@@ -333,6 +333,34 @@
       max-height: 150px;
       overflow-y: auto;
     }
+
+    /* Username Roblox Display */
+    .username-display {
+      background: rgba(102,126,234,0.15);
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin: 10px 0;
+      border-left: 3px solid #667eea;
+    }
+
+    .username-display .username-label {
+      font-size: 11px;
+      color: #667eea;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .username-display .username-value {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      font-family: monospace;
+      word-break: break-all;
+    }
     
     @media (max-width: 480px) {
       .payment-card {
@@ -362,7 +390,7 @@
     <div class="nav-logo">
       <i class="fas fa-gamepad"></i>
       <span>R STORE</span>
-      <small>ROBUX</small>
+      <small>R STUDIO</small>
     </div>
     <a href="index.html" class="btn-track">
       <i class="fas fa-home"></i> Beranda
@@ -402,6 +430,14 @@
             <i class="fas fa-copy"></i> Copy
           </button>
         </div>
+      </div>
+
+      <!-- Username Roblox Display -->
+      <div class="username-display" id="usernameDisplay" style="display: none;">
+        <div class="username-label">
+          <i class="fab fa-roblox"></i> Username Roblox
+        </div>
+        <div class="username-value" id="usernameValue">-</div>
       </div>
       
       <div class="order-details-row">
@@ -565,7 +601,7 @@
     loadingOverlay.classList.add('active');
     
     try {
-      addDebugLog('Calling API /api/doku-checkout', { orderId, currentAmount, bankCode });
+      // addDebugLog('Calling API /api/doku-checkout', { orderId, currentAmount, bankCode });
       
       // 🔥 SIMPAN PAYMENT METHOD TERLEBIH DAHULU
       const orderRef = doc(db, 'orders', orderId);
@@ -574,7 +610,7 @@
         status: 'waiting_payment',
         updatedAt: new Date()
       });
-      addDebugLog('Payment method saved to Firestore', { paymentMethod: bankCode });
+      // addDebugLog('Payment method saved to Firestore', { paymentMethod: bankCode });
       
       // PANGGIL API DOKU
       const response = await fetch('/api/doku-checkout', {
@@ -591,7 +627,7 @@
       });
       
       const result = await response.json();
-      addDebugLog('API Response', result);
+      // addDebugLog('API Response', result);
       
       if (result.success && result.checkout_url) {
         await updateDoc(orderRef, {
@@ -599,13 +635,13 @@
           updatedAt: new Date()
         });
         
-        addDebugLog('Redirecting to DOKU', result.checkout_url);
+        // addDebugLog('Redirecting to DOKU', result.checkout_url);
         window.location.href = result.checkout_url;
       } else {
         throw new Error(result.error || 'Gagal membuat transaksi');
       }
     } catch (error) {
-      addDebugLog('Error in redirectToDoku', error.message);
+      // addDebugLog('Error in redirectToDoku', error.message);
       alert('Gagal memproses pembayaran: ' + error.message);
       loadingOverlay.classList.remove('active');
     } finally {
@@ -648,11 +684,21 @@
       document.getElementById('payRobux').textContent = currentRobux.toLocaleString('id-ID');
       document.getElementById('payTotal').textContent = 'Rp ' + currentAmount.toLocaleString('id-ID');
       
+      // 🔥 TAMPILKAN USERNAME ROBLOX
+      const robloxUsername = data.robloxUsername || '';
+      const usernameDisplay = document.getElementById('usernameDisplay');
+      const usernameValue = document.getElementById('usernameValue');
+      
+      if (robloxUsername && usernameDisplay && usernameValue) {
+        usernameDisplay.style.display = 'block';
+        usernameValue.textContent = robloxUsername;
+      }
+      
       document.getElementById('copyOrderIdBtn').addEventListener('click', () => {
         copyToClipboard(orderId);
       });
       
-      addDebugLog('Order loaded', { currentAmount, currentRobux, orderId });
+      // addDebugLog('Order loaded', { currentAmount, currentRobux, orderId, robloxUsername });
       
     } catch (error) {
       console.error('Error loading order:', error);

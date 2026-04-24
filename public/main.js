@@ -153,13 +153,14 @@ const confirmOrderBtn = document.getElementById('confirmOrderBtn');
 // Variabel untuk menyimpan data sementara
 let pendingOrderData = null;
 
-// Fungsi untuk menampilkan modal konfirmasi
+// Update showConfirmModal untuk menampilkan username
 function showConfirmModal() {
   // Ambil data dari form
   const robux = Number(robuxInput.value);
   const total = robux * PRICE_PER_ROBUX;
   const customerEmail = document.getElementById('customerEmail')?.value?.trim() || '-';
   const customerPhone = document.getElementById('customerPhone')?.value?.trim() || '-';
+  const robloxUsername = document.getElementById('robloxUsername')?.value?.trim() || '-';
   const deliveryText = deliveryInfo ? deliveryInfo.textContent : 'Pengiriman Instant';
   
   // Update modal dengan data
@@ -168,6 +169,7 @@ function showConfirmModal() {
   document.getElementById('confirmDelivery').textContent = deliveryText;
   document.getElementById('confirmEmail').textContent = customerEmail || '-';
   document.getElementById('confirmPhone').textContent = customerPhone || '-';
+  document.getElementById('confirmUsername').textContent = robloxUsername || '-';
   
   // Tampilkan modal
   confirmModal.classList.add('active');
@@ -180,6 +182,23 @@ function closeModal() {
 
 // Fungsi untuk melanjutkan ke submit order (dipanggil setelah konfirmasi)
 async function proceedSubmitOrder() {
+  // Validasi username Roblox
+  const robloxUsername = document.getElementById('robloxUsername')?.value?.trim() || '';
+  const usernameError = document.getElementById('usernameError');
+  
+  if (!robloxUsername) {
+    if (usernameError) usernameError.classList.add('show');
+    alert('❌ Username Roblox wajib diisi!');
+    return;
+  }
+  
+  if (usernameError) usernameError.classList.remove('show');
+  
+  if (!validateUsername(robloxUsername)) {
+    alert('❌ Username Roblox tidak valid!');
+    return;
+  }
+  
   // Validasi checkbox terms
   const termsCheckbox = document.getElementById('termsCheckbox');
   const termsError = document.getElementById('termsError');
@@ -264,6 +283,7 @@ async function proceedSubmitOrder() {
     expireAt: expireAt,
     customerEmail: customerEmail,
     customerPhone: customerPhone,
+    robloxUsername: robloxUsername,  // 🔥 TAMBAHKAN INI
     termsAgreed: true
   };
   
@@ -280,24 +300,69 @@ async function proceedSubmitOrder() {
   }
 }
 
-// Fungsi submit order asli (sekarang hanya menampilkan modal)
+// Update submitOrder untuk validasi username
 async function submitOrder() {
-  // Validasi dasar sebelum tampilkan modal
+  // Validasi username Roblox
+  const robloxUsername = document.getElementById('robloxUsername')?.value?.trim() || '';
+  const usernameError = document.getElementById('usernameError');
+  
+  if (!robloxUsername) {
+    if (usernameError) usernameError.classList.add('show');
+    alert('❌ Username Roblox wajib diisi!');
+    return;
+  }
+  
+  if (usernameError) usernameError.classList.remove('show');
+  
+  // Validasi format username
+  if (!validateUsername(robloxUsername)) {
+    alert('❌ Username Roblox tidak valid! Minimal 3 karakter, maksimal 50 karakter, dan tidak boleh mengandung karakter aneh.');
+    return;
+  }
+  
+  // Validasi checkbox terms
   const termsCheckbox = document.getElementById('termsCheckbox');
+  const termsError = document.getElementById('termsError');
+  
   if (!termsCheckbox || !termsCheckbox.checked) {
-    const termsError = document.getElementById('termsError');
     if (termsError) termsError.classList.add('show');
     alert('❌ Anda harus menyetujui Syarat & Ketentuan dan Kebijakan Privasi untuk melanjutkan.');
     return;
   }
   
+  if (termsError) termsError.classList.remove('show');
+  
+  // Validasi minimal salah satu kontak
+  const customerEmail = document.getElementById('customerEmail')?.value?.trim() || '';
+  const customerPhone = document.getElementById('customerPhone')?.value?.trim() || '';
+  
+  if (!customerEmail && !customerPhone) {
+    alert('❌ Anda wajib mengisi minimal salah satu: Email atau Nomor WhatsApp untuk konfirmasi order.');
+    return;
+  }
+  
+  // Validasi format email
+  if (customerEmail && !isValidEmail(customerEmail)) {
+    alert('❌ Format Email tidak valid. Contoh: nama@domain.com');
+    return;
+  }
+  
+  // Validasi format nomor HP
+  if (customerPhone && !isValidPhone(customerPhone)) {
+    alert('❌ Format Nomor WhatsApp/Telepon tidak valid. Contoh: 081234567890');
+    return;
+  }
+  
   const robux = Number(robuxInput.value);
+  
   if (robux < 10) {
     alert('❌ Minimal pembelian 10 Robux');
     return;
   }
   
+  const total = robux * PRICE_PER_ROBUX;
   const maxAvailable = CURRENT_STOCK + CURRENT_PO;
+  
   if (robux > maxAvailable) {
     alert(`❌ Maksimal pembelian saat ini: ${formatNumber(maxAvailable)} Robux`);
     return;
@@ -305,6 +370,23 @@ async function submitOrder() {
   
   // Tampilkan modal konfirmasi
   showConfirmModal();
+}
+
+// Validasi username Roblox
+function validateUsername(username) {
+  if (!username || username.trim() === '') {
+    return false;
+  }
+  // Minimal 3 karakter, maksimal 50 karakter
+  if (username.length < 3 || username.length > 50) {
+    return false;
+  }
+  // Tidak boleh mengandung karakter spesial berbahaya
+  const invalidChars = /[<>{}[\]\\]/;
+  if (invalidChars.test(username)) {
+    return false;
+  }
+  return true;
 }
 
 // Validasi email

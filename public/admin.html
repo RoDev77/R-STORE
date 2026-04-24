@@ -1370,6 +1370,10 @@
           </div>
           
           <div class="order-details">
+              <div class="order-detail">
+                <div class="order-detail-label"><i class="fas fa-rocket"></i> Username</div>
+                <div class="order-detail-value">${order.robloxUsername || '-'}</div>
+              </div>
             <div class="order-detail">
               <div class="order-detail-label"><i class="fas fa-robot"></i> Robux</div>
               <div class="order-detail-value">${(order.robuxAmount || 0).toLocaleString('id-ID')}</div>
@@ -1394,6 +1398,7 @@
             <div class="contact-details">
               ${customerEmail !== '-' ? `<span><i class="fas fa-envelope"></i> ${customerEmail}</span>` : ''}
               ${customerPhone !== '-' ? `<span><i class="fab fa-whatsapp"></i> ${customerPhone}</span>` : ''}
+              ${order.robloxUsername ? `<span><i class="fas fa-rocket"></i> ${order.robloxUsername}</span>` : ''}
             </div>
           </div>
           ` : ''}
@@ -1503,7 +1508,7 @@
     currentEditOrderId = orderId;
     editOrderIdSpan.textContent = orderId;
     
-    // Set nilai dropdown sesuai delivery type saat ini
+    // 🔥 Set nilai dropdown sesuai delivery type saat ini
     if (currentDeliveryType === 'instant') {
       editDeliveryType.value = 'instant';
     } else if (currentDeliveryType === 'po') {
@@ -1518,6 +1523,30 @@
     const communityLinkGroup = document.getElementById('communityLinkGroup');
     if (communityLinkGroup) {
       communityLinkGroup.style.display = editDeliveryType.value === 'delayed' ? 'block' : 'none';
+    }
+    
+    // 🔥 Tampilkan status saat ini di modal
+    let currentStatusDiv = document.getElementById('currentDeliveryStatus');
+    if (!currentStatusDiv) {
+      // Buat elemen jika belum ada
+      const modalBody = document.querySelector('.modal-edit-body');
+      if (modalBody) {
+        const newDiv = document.createElement('div');
+        newDiv.id = 'currentDeliveryStatus';
+        newDiv.className = 'current-status';
+        newDiv.style.cssText = 'margin-bottom: 15px; padding: 8px 12px; background: rgba(102,126,234,0.1); border-radius: 8px; font-size: 13px;';
+        modalBody.insertBefore(newDiv, modalBody.firstChild);
+        currentStatusDiv = newDiv;
+      }
+    }
+    
+    if (currentStatusDiv) {
+      let statusText = '';
+      if (currentDeliveryType === 'instant') statusText = '⚡ Instant';
+      else if (currentDeliveryType === 'po') statusText = '📦 Pre-Order (15 Hari)';
+      else if (currentDeliveryType === 'delayed') statusText = '⏸️ Ditunda';
+      else statusText = currentDeliveryType;
+      currentStatusDiv.innerHTML = `<strong>Status Saat Ini:</strong> ${statusText}`;
     }
     
     // Kosongkan reason
@@ -1540,6 +1569,26 @@
     const newDeliveryType = editDeliveryType.value;
     const reason = editReason.value.trim();
     
+    // Ambil data order saat ini
+    const orderRef = doc(db, 'orders', currentEditOrderId);
+    const orderSnap = await getDoc(orderRef);
+    const currentData = orderSnap.data();
+    const currentDeliveryType = currentData?.deliveryType || 'instant';
+    
+    // 🔥 VALIDASI: Jika tidak ada perubahan, batalkan
+    if (currentDeliveryType === newDeliveryType) {
+      alert('⚠️ Tidak ada perubahan pada jenis pengiriman. Silakan pilih jenis yang berbeda.');
+      closeEditDeliveryModal();
+      return;
+    }
+    
+    // 🔥 VALIDASI: Jangan izinkan delayed → delayed atau instant → instant
+    if (currentDeliveryType === newDeliveryType) {
+      alert('⚠️ Anda memilih status yang sama dengan sebelumnya. Tidak ada perubahan yang disimpan.');
+      closeEditDeliveryModal();
+      return;
+    }
+    
     // Tentukan text delivery info baru
     let newDeliveryInfo = '';
     let newDeliveryText = '';
@@ -1559,7 +1608,7 @@
     const updateData = {
       deliveryInfo: newDeliveryInfo,
       deliveryType: newDeliveryType,
-      updatedAt: new Date() // 🔥 PASTIKAN MENGGUNAKAN new Date()
+      updatedAt: new Date()
     };
     
     // Jika tidak ada reason dan jenisnya delayed, berikan default reason
@@ -1568,14 +1617,10 @@
       finalReason = 'Akun belum join community Roblox R STORE. Silakan join terlebih dahulu agar dapat diproses.';
     }
     
-    // Jika ada alasan, tambahkan ke riwayat
-    if (finalReason) {
-      const orderRef = doc(db, 'orders', currentEditOrderId);
-      const orderSnap = await getDoc(orderRef);
-      const existingHistory = orderSnap.data()?.deliveryHistory || [];
-      const currentDeliveryType = orderSnap.data()?.deliveryType || 'instant';
+    // 🔥 HANYA tambahkan ke riwayat jika ada alasan DAN from/to berbeda
+    if (finalReason && currentDeliveryType !== newDeliveryType) {
+      const existingHistory = currentData?.deliveryHistory || [];
       
-      // 🔥 PASTIKAN changedAt DISIMPAN SEBAGAI Date OBJECT (bukan string)
       updateData.deliveryHistory = [
         ...existingHistory,
         {
@@ -1583,14 +1628,14 @@
           to: newDeliveryType,
           reason: finalReason,
           changedBy: 'Admin',
-          changedAt: new Date()  // 🔥 PASTIKAN new Date() BUKAN STRING
+          changedAt: new Date()
         }
       ];
     }
     
     try {
-      await updateDoc(doc(db, 'orders', currentEditOrderId), updateData);
-      alert('✅ Status pengiriman berhasil diubah!');
+      await updateDoc(orderRef, updateData);
+      alert(`✅ Status pengiriman berhasil diubah menjadi ${newDeliveryText}!`);
       closeEditDeliveryModal();
       applyFilterAndSearch();
     } catch (error) {

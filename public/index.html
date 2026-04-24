@@ -54,7 +54,7 @@
     <div class="nav-logo">
       <i class="fas fa-gamepad"></i>
       <span>R STORE</span>
-      <small>ROBUX</small>
+      <small>R STUDIO</small>
     </div>
     <div class="nav-menu">
       <a href="index.html" class="nav-link active">Home</a>
@@ -275,17 +275,28 @@
           </div>
         </div>
 
-        <div class="input-group">
-          <label>Jumlah Robux</label>
+        <!-- Username Roblox Field (WAJIB) -->
+        <div class="username-field">
+          <label><i class="fas fa-rocket"></i> Username Roblox </label>
           <div class="input-wrapper">
-            <i class="fas fa-robot"></i>
+            <i class="fas fa-rocket"></i>
+            <input type="text" id="robloxUsername" placeholder="Contoh: rstudiolab" />
+          </div>
+          <small class="username-hint">Pastikan username Roblox Anda benar! Kesalahan username bukan tanggung jawab kami.</small>
+          <div id="usernameError" class="username-error">Username Roblox wajib diisi!</div>
+        </div>
+
+        <div class="input-group">
+          <label><i class="fas fa-gem"></i> Jumlah Robux </label>
+          <div class="input-wrapper">
+            <i class="fas fa-gem"></i> 
             <input type="number" id="robuxInput" min="10" step="10" placeholder="Minimal 10" />
           </div>
           <div id="robuxError" class="error">Minimal pembelian 10 Robux</div>
         </div>
 
         <div class="input-group">
-          <label>Harga / Robux</label>
+          <label><i class="fas fa-tag"></i> Harga / Robux </label>
           <div class="input-wrapper">
             <i class="fas fa-tag"></i>
             <input type="text" id="pricePerRobux" disabled />
@@ -378,6 +389,10 @@
     </div>
     <div class="modal-body">
       <div class="confirm-summary">
+        <div class="confirm-item">
+          <span class="confirm-label">🎮 Username Roblox</span>
+          <span class="confirm-value" id="confirmUsername">-</span>
+        </div>
         <div class="confirm-item">
           <span class="confirm-label">🎮 Jumlah Robux</span>
           <span class="confirm-value" id="confirmRobux">0</span>

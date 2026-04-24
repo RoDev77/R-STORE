@@ -10,7 +10,82 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <link rel="stylesheet" href="style.css" />
   <style>
-    /* Done Page Specific Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0f0f1a;
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(15, 15, 26, 0.95);
+      backdrop-filter: blur(10px);
+      z-index: 100;
+      padding: 15px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .nav-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    .nav-logo i {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-logo span {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-logo small {
+      font-size: 10px;
+      background: rgba(102,126,234,0.2);
+      padding: 2px 8px;
+      border-radius: 20px;
+      color: #667eea;
+    }
+
+    .btn-track {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 30px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: transform 0.3s;
+    }
+
+    .btn-track:hover {
+      transform: translateY(-2px);
+    }
+
     .done-container {
       max-width: 550px;
       margin: 0 auto;
@@ -26,7 +101,6 @@
       text-align: center;
     }
     
-    /* Icon Animation */
     .status-icon {
       width: 100px;
       height: 100px;
@@ -45,12 +119,8 @@
     }
     
     @keyframes pulse {
-      0%, 100% {
-        box-shadow: 0 0 0 0 rgba(102,126,234,0.4);
-      }
-      50% {
-        box-shadow: 0 0 0 20px rgba(102,126,234,0);
-      }
+      0%, 100% { box-shadow: 0 0 0 0 rgba(102,126,234,0.4); }
+      50% { box-shadow: 0 0 0 20px rgba(102,126,234,0); }
     }
     
     .status-icon.pulse {
@@ -71,7 +141,6 @@
       margin-bottom: 25px;
     }
     
-    /* Order Summary */
     .order-summary-done {
       background: rgba(102,126,234,0.08);
       border-radius: 20px;
@@ -100,7 +169,6 @@
       color: #a0a0b0;
     }
     
-    /* Order ID Row */
     .order-id-row-done {
       background: rgba(0,0,0,0.3);
       border-radius: 14px;
@@ -158,7 +226,6 @@
       color: white;
     }
     
-    /* Detail Rows */
     .detail-row-done {
       display: flex;
       justify-content: space-between;
@@ -188,7 +255,6 @@
       font-size: 15px;
     }
     
-    /* Delivery Badge */
     .delivery-badge-done {
       display: inline-block;
       padding: 4px 12px;
@@ -197,19 +263,10 @@
       font-weight: 600;
     }
     
-    .delivery-instant {
-      background: rgba(40, 167, 69, 0.2);
-      color: #28a745;
-      border: 1px solid rgba(40, 167, 69, 0.3);
-    }
+    .delivery-instant { background: rgba(40,167,69,0.2); color: #28a745; border: 1px solid rgba(40,167,69,0.3); }
+    .delivery-po { background: rgba(255,193,7,0.2); color: #ffc107; border: 1px solid rgba(255,193,7,0.3); }
+    .delivery-delayed { background: rgba(255,193,7,0.2); color: #856404; border: 1px solid rgba(255,193,7,0.3); }
     
-    .delivery-po {
-      background: rgba(255, 193, 7, 0.2);
-      color: #ffc107;
-      border: 1px solid rgba(255, 193, 7, 0.3);
-    }
-    
-    /* Status Badge */
     .status-badge-done {
       display: inline-block;
       padding: 6px 16px;
@@ -224,7 +281,39 @@
     .status-delivered-done { background: #17a2b8; color: #fff; }
     .status-cancelled-done { background: #dc3545; color: #fff; }
     
-    /* Contact Section */
+    .timer-container {
+      background: linear-gradient(135deg, rgba(102,126,234,0.2), rgba(118,75,162,0.2));
+      border-radius: 16px;
+      padding: 15px;
+      margin: 15px 0;
+      text-align: center;
+      border: 1px solid rgba(102,126,234,0.3);
+    }
+
+    .timer-label {
+      font-size: 12px;
+      color: #a0a0b0;
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .timer-value {
+      font-size: 28px;
+      font-weight: 800;
+      font-family: monospace;
+      letter-spacing: 2px;
+      color: #ffc107;
+    }
+
+    .timer-warning {
+      font-size: 11px;
+      color: #ffc107;
+      margin-top: 5px;
+    }
+
     .contact-section-done {
       background: rgba(102,126,234,0.08);
       border-radius: 12px;
@@ -258,14 +347,8 @@
       color: #c0c0d0;
     }
     
-    .contact-details-done i {
-      color: #667eea;
-      width: 16px;
-    }
-    
-    /* Delivery History - Sama seperti di track.html */
     .delivery-history-done {
-      background: rgba(23, 162, 184, 0.08);
+      background: rgba(23,162,184,0.08);
       border-radius: 12px;
       padding: 12px 16px;
       margin: 15px 0;
@@ -299,10 +382,6 @@
       border-bottom: 1px solid rgba(255,255,255,0.05);
     }
 
-    .history-item-done:last-child {
-      border-bottom: none;
-    }
-
     .history-change-done {
       background: rgba(102,126,234,0.2);
       padding: 2px 8px;
@@ -310,84 +389,28 @@
       font-weight: 600;
       color: #667eea;
       font-size: 11px;
-      white-space: nowrap;
     }
 
     .history-reason-done {
       color: #ffc107;
       flex: 1;
-      font-size: 10px;
+      font-size: 11px;
+      background: rgba(255,193,7,0.1);
       padding: 4px 8px;
       border-radius: 20px;
-      display: inline-block;
-      max-width: 200px;
-      white-space: normal;
-      word-break: break-word;
     }
 
     .history-time-done {
       color: #a0a0b0;
       font-size: 10px;
-      white-space: nowrap;
     }
 
-    .history-note-done {
-      margin-top: 8px;
-      padding-top: 6px;
-      font-size: 11px;
-      color: #a0a0b0;
-      border-top: 1px solid rgba(255,255,255,0.05);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .history-note-done i {
-      color: #ffc107;
-      font-size: 10px;
-    }
-
-    .delivery-delayed {
-      background: rgba(255, 193, 7, 0.2);
-      color: #856404;
-      border: 1px solid rgba(255, 193, 7, 0.3);
-    }
-
-    .delivery-delayed i {
-      color: #ffc107;
-    }
-
-    .history-reason-done {
-      color: #ffc107;
-      flex: 1;
-      font-size: 11px;
-      background: rgba(255, 193, 7, 0.1);
-      padding: 4px 8px;
-      border-radius: 20px;
-      display: inline-block;
-      max-width: 250px;
-      white-space: normal;
-      word-break: break-word;
-    }
-
-    /* Community Link Box untuk status Ditunda */
     .community-link-box-done {
       background: rgba(102,126,234,0.15);
       border-radius: 12px;
       padding: 12px 16px;
       margin: 15px 0;
       border-left: 3px solid #667eea;
-    }
-
-    .community-link-title-done {
-      font-size: 11px;
-      color: #667eea;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
     }
 
     .community-link-button-done {
@@ -401,25 +424,10 @@
       text-decoration: none;
       font-size: 13px;
       font-weight: 600;
-      transition: all 0.3s;
-      margin-top: 8px;
-      word-break: break-all;
     }
 
-    .community-link-button-done:hover {
-      background: rgba(102,126,234,0.4);
-      transform: translateY(-2px);
-    }
-
-    .community-note-done {
-      font-size: 11px;
-      color: #a0a0b0;
-      margin-top: 8px;
-    }
-    
-    /* Instruction Box */
     .instruction-box-done {
-      background: rgba(255, 193, 7, 0.1);
+      background: rgba(255,193,7,0.1);
       border-left: 4px solid #ffc107;
       border-radius: 12px;
       padding: 18px;
@@ -427,28 +435,8 @@
       text-align: left;
     }
     
-    .instruction-box-done strong {
-      color: #ffc107;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-    
-    .instruction-box-done ul {
-      margin: 0;
-      padding-left: 20px;
-    }
-    
-    .instruction-box-done li {
-      color: #e0e0e0;
-      font-size: 13px;
-      margin-bottom: 8px;
-    }
-    
-    /* Success Box */
     .success-box-done {
-      background: rgba(40, 167, 69, 0.15);
+      background: rgba(40,167,69,0.15);
       border-left: 4px solid #28a745;
       border-radius: 12px;
       padding: 18px;
@@ -456,15 +444,6 @@
       text-align: left;
     }
     
-    .success-box-done strong {
-      color: #28a745;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-    
-    /* Button Group */
     .btn-group-done {
       display: flex;
       gap: 15px;
@@ -480,15 +459,9 @@
       border-radius: 40px;
       text-decoration: none;
       font-weight: 600;
-      transition: all 0.3s;
       display: inline-flex;
       align-items: center;
       gap: 8px;
-    }
-    
-    .btn-primary-done:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 20px rgba(102,126,234,0.3);
     }
     
     .btn-secondary-done {
@@ -498,19 +471,9 @@
       border-radius: 40px;
       text-decoration: none;
       font-weight: 600;
-      transition: all 0.3s;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
       border: 1px solid rgba(255,255,255,0.1);
     }
     
-    .btn-secondary-done:hover {
-      background: rgba(255,255,255,0.2);
-      transform: translateY(-2px);
-    }
-    
-    /* Auto Refresh Indicator */
     .auto-refresh-indicator {
       margin-top: 15px;
       padding: 8px 16px;
@@ -523,16 +486,6 @@
       color: #667eea;
     }
     
-    .auto-refresh-indicator i {
-      animation: spin 1s linear infinite;
-    }
-    
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    
-    /* Notification Toast */
     .notification-toast {
       position: fixed;
       bottom: 30px;
@@ -545,71 +498,34 @@
       font-size: 14px;
       font-weight: 600;
       z-index: 1000;
-      animation: slideUp 0.3s ease;
       display: none;
       align-items: center;
       gap: 10px;
     }
     
-    .notification-toast.error {
-      background: #dc3545;
+    .footer {
+      text-align: center;
+      padding: 30px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      color: #a0a0b0;
+      font-size: 14px;
+      margin-top: 40px;
     }
     
-    .notification-toast.warning {
-      background: #ffc107;
-      color: #000;
-    }
-    
-    @keyframes slideUp {
-      from {
-        opacity: 0;
-        transform: translateX(-50%) translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(-50%) translateY(0);
-      }
-    }
-    
-    /* Responsive */
     @media (max-width: 480px) {
-      .done-card {
-        padding: 25px;
-      }
-      .status-icon {
-        width: 70px;
-        height: 70px;
-      }
-      .status-icon i {
-        font-size: 35px;
-      }
-      .done-header h2 {
-        font-size: 22px;
-      }
-      .order-id-value {
-        font-size: 11px;
-      }
-      .detail-row-done {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 5px;
-      }
-      .contact-details-done {
-        flex-direction: column;
-        gap: 8px;
-      }
+      .done-card { padding: 25px; }
+      .timer-value { font-size: 22px; }
     }
   </style>
 </head>
 <body>
 
-<!-- Navbar -->
 <nav class="navbar">
   <div class="nav-container">
     <div class="nav-logo">
       <i class="fas fa-gamepad"></i>
       <span>R STORE</span>
-      <small>ROBUX</small>
+      <small>R STUDIO</small>
     </div>
     <a href="track.html" class="btn-track">
       <i class="fas fa-search"></i> Lacak Pesanan
@@ -620,18 +536,21 @@
 <div class="done-container">
   <div class="done-card">
     
-    <!-- Animated Icon -->
     <div class="status-icon pulse" id="statusIcon">
       <i class="fas fa-clock"></i>
     </div>
     
-    <!-- Header -->
     <div class="done-header">
       <h2 id="statusTitle">Menunggu Pembayaran</h2>
       <p id="statusDesc">Pesanan Anda telah dibuat. Silakan selesaikan pembayaran.</p>
     </div>
     
-    <!-- Order Summary -->
+    <div id="timerContainer" class="timer-container" style="display: none;">
+      <div class="timer-label"><i class="fas fa-hourglass-half"></i> Sisa Waktu Pembayaran</div>
+      <div class="timer-value" id="timerValue">02:00:00</div>
+      <div class="timer-warning" id="timerWarning">⚠️ Pesanan akan otomatis dibatalkan jika tidak dibayar tepat waktu</div>
+    </div>
+
     <div class="order-summary-done">
       <div class="order-summary-title">
         <i class="fas fa-receipt"></i>
@@ -644,114 +563,77 @@
       </div>
       
       <div class="detail-row-done">
-        <div class="detail-label-done">
-          <i class="fas fa-credit-card"></i> Metode Pembayaran
-        </div>
+        <div class="detail-label-done"><i class="fab fa-roblox"></i> Username Roblox</div>
+        <div class="detail-value-done" id="robloxUsername">-</div>
+      </div>
+
+      <div class="detail-row-done">
+        <div class="detail-label-done"><i class="fas fa-credit-card"></i> Metode Pembayaran</div>
         <div class="detail-value-done" id="payMethod">-</div>
       </div>
       
       <div class="detail-row-done">
-        <div class="detail-label-done">
-          <i class="fas fa-money-bill-wave"></i> Total Pembayaran
-        </div>
+        <div class="detail-label-done"><i class="fas fa-money-bill-wave"></i> Total Pembayaran</div>
         <div class="detail-value-done" id="totalAmount">-</div>
       </div>
     </div>
     
-    <!-- Status Pengiriman Row -->
     <div id="deliveryRow" style="display: none;" class="order-summary-done">
-      <div class="order-summary-title">
-        <i class="fas fa-truck"></i>
-        <span>Status Pengiriman</span>
-      </div>
+      <div class="order-summary-title"><i class="fas fa-truck"></i> <span>Status Pengiriman</span></div>
       <div class="detail-row-done">
-        <div class="detail-label-done">
-          <i class="fas fa-box"></i> Jenis Pengiriman
-        </div>
-        <div class="detail-value-done">
-          <span id="deliveryBadge" class="delivery-badge-done delivery-instant">⚡ Instant</span>
-        </div>
+        <div class="detail-label-done"><i class="fas fa-box"></i> Jenis Pengiriman</div>
+        <div class="detail-value-done"><span id="deliveryBadge" class="delivery-badge-done delivery-instant">⚡ Instant</span></div>
       </div>
     </div>
     
-    <!-- Dynamic Box (Instruction / Success) -->
     <div id="dynamicBox"></div>
     
-    <!-- Status Row (hidden initially) -->
     <div id="statusRow" style="display: none;" class="order-summary-done">
       <div class="detail-row-done">
-        <div class="detail-label-done">
-          <i class="fas fa-info-circle"></i> Status Pesanan
-        </div>
-        <div class="detail-value-done">
-          <span id="orderStatus" class="status-badge-done status-pending-done">pending</span>
-        </div>
+        <div class="detail-label-done"><i class="fas fa-info-circle"></i> Status Pesanan</div>
+        <div class="detail-value-done"><span id="orderStatus" class="status-badge-done status-pending-done">pending</span></div>
       </div>
     </div>
     
-    <!-- Contact Section (hidden initially) -->
     <div id="contactSection" style="display: none;" class="contact-section-done"></div>
-    
-    <!-- Delivery History Section (hidden initially) -->
     <div id="historySection" style="display: none;" class="delivery-history-done"></div>
+    <div id="communityLinkBox" style="display: none;"></div>
     
-    <!-- Auto Refresh Indicator -->
     <div class="auto-refresh-indicator" id="autoRefreshIndicator">
-      <i class="fas fa-sync-alt"></i>
-      <span>Memantau status pesanan...</span>
+      <i class="fas fa-sync-alt"></i> <span>Memantau status pesanan...</span>
     </div>
     
-    <!-- Button Group -->
     <div class="btn-group-done">
-      
-      <a href="index.html" class="btn-secondary-done">
-        <i class="fas fa-shopping-cart"></i> Beli Lagi
-      </a>
+      <a href="index.html" class="btn-secondary-done"><i class="fas fa-shopping-cart"></i> Beli Lagi</a>
     </div>
     
   </div>
 </div>
 
-<!-- Notification Toast -->
 <div id="notificationToast" class="notification-toast">
   <i class="fas fa-check-circle"></i> <span id="toastMessage"></span>
 </div>
 
-<!-- Footer -->
 <footer class="footer">
   <div class="footer-container">
     <div class="footer-brand">
-      <div class="footer-logo">
-        <i class="fas fa-gamepad"></i>
-        <span>R STORE</span>
-      </div>
+      <div class="footer-logo"><i class="fas fa-gamepad"></i><span>R STORE</span></div>
       <p>Top Up Robux termurah dan tercepat di Indonesia. Layanan 24/7 dengan harga terbaik.</p>
     </div>
     <div class="footer-links">
       <h4>Menu</h4>
-      <ul>
-        <li><a href="index.html">Home</a></li>
-        <li><a href="track.html">Lacak Pesanan</a></li>
-      </ul>
+      <ul><li><a href="index.html">Home</a></li><li><a href="track.html">Lacak Pesanan</a></li></ul>
     </div>
     <div class="footer-links">
       <h4>Informasi</h4>
-      <ul>
-        <li><a href="terms.html">Syarat & Ketentuan</a></li>
-        <li><a href="privacy.html">Kebijakan Privasi</a></li>
-      </ul>
+      <ul><li><a href="terms.html">Syarat & Ketentuan</a></li><li><a href="privacy.html">Kebijakan Privasi</a></li></ul>
     </div>
     <div class="footer-contact">
       <h4>Kontak</h4>
-      <ul>
-        <li><i class="fab fa-discord"></i> R STORE#1234</li>
-        <li><i class="fab fa-whatsapp"></i> +62 812-3456-7890</li>
-      </ul>
+      <ul><li><i class="fab fa-discord"></i> ahmadrodiii</li><li><i class="fab fa-whatsapp"></i> +62 812 123 123</li></ul>
     </div>
   </div>
-  <div class="footer-bottom">
-    <p>&copy; 2025 R STORE — Unofficial Roblox Store. All rights reserved.</p>
-  </div>
+  <div class="footer-bottom"><p>&copy; 2025 R STORE — Unofficial Roblox Store. All rights reserved.</p></div>
 </footer>
 
 <script type="module">
@@ -761,7 +643,44 @@
   const orderId = urlParams.get('orderId');
   const method = urlParams.get('method');
 
-  // Fungsi untuk menentukan jenis pengiriman
+  let timerInterval = null;
+  let unsubscribe = null;
+
+  function formatTime(seconds) {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  }
+
+  function startTimer(expireAtDate) {
+    const timerContainer = document.getElementById('timerContainer');
+    const timerValue = document.getElementById('timerValue');
+    const timerWarning = document.getElementById('timerWarning');
+    if (!timerContainer) return;
+    timerContainer.style.display = 'block';
+    if (timerInterval) clearInterval(timerInterval);
+    
+    function updateTimer() {
+      const remaining = Math.max(0, Math.floor((expireAtDate.getTime() - new Date().getTime()) / 1000));
+      if (remaining <= 0) {
+        timerValue.textContent = '00:00:00';
+        timerWarning.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Waktu pembayaran telah habis! Pesanan akan kadaluarsa.';
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = null;
+      } else {
+        timerValue.textContent = formatTime(remaining);
+        if (remaining <= 600) {
+          timerWarning.innerHTML = '<i class="fas fa-exclamation-triangle"></i> ⚠️ Waktu tersisa kurang dari 10 menit! Segera selesaikan pembayaran.';
+        } else if (remaining <= 1800) {
+          timerWarning.innerHTML = '<i class="fas fa-hourglass-end"></i> Sisa waktu kurang dari 30 menit.';
+        }
+      }
+    }
+    updateTimer();
+    timerInterval = setInterval(updateTimer, 1000);
+  }
+
   function getDeliveryType(deliveryInfo) {
     if (!deliveryInfo) return { type: 'instant', text: '⚡ Instant', class: 'delivery-instant' };
     if (deliveryInfo.includes('PO') || deliveryInfo.includes('Pre-Order') || deliveryInfo.includes('📦')) {
@@ -773,71 +692,43 @@
     return { type: 'instant', text: '⚡ Instant', class: 'delivery-instant' };
   }
 
-  // Fungsi copy ke clipboard
   async function copyToClipboard(text, buttonElement) {
     try {
       await navigator.clipboard.writeText(text);
       const originalText = buttonElement.innerHTML;
       buttonElement.innerHTML = '<i class="fas fa-check"></i> Tersalin!';
       buttonElement.classList.add('copied');
-      
-      setTimeout(() => {
-        buttonElement.innerHTML = originalText;
-        buttonElement.classList.remove('copied');
-      }, 2000);
-    } catch (err) {
-      alert('Gagal menyalin. Silakan copy manual.');
-    }
+      setTimeout(() => { buttonElement.innerHTML = originalText; buttonElement.classList.remove('copied'); }, 2000);
+    } catch (err) { alert('Gagal menyalin.'); }
   }
 
-  // Show notification
   function showNotification(message, type = 'success') {
     const toast = document.getElementById('notificationToast');
     const toastMessage = document.getElementById('toastMessage');
     toastMessage.textContent = message;
     toast.className = 'notification-toast ' + type;
     toast.style.display = 'flex';
-    
-    setTimeout(() => {
-      toast.style.display = 'none';
-    }, 5000);
+    setTimeout(() => { toast.style.display = 'none'; }, 4000);
   }
 
-  // Update UI berdasarkan status
   function updateUIByStatus(status, orderData = {}) {
     const statusIcon = document.getElementById('statusIcon');
     const statusTitle = document.getElementById('statusTitle');
     const statusDesc = document.getElementById('statusDesc');
     const dynamicBox = document.getElementById('dynamicBox');
-    const autoRefreshIndicator = document.getElementById('autoRefreshIndicator');
+    const autoRefresh = document.getElementById('autoRefreshIndicator');
     const statusRow = document.getElementById('statusRow');
-    const orderStatusSpan = document.getElementById('orderStatus');
+    const orderStatus = document.getElementById('orderStatus');
     
-    // Update status badge
-    if (statusRow && orderStatusSpan) {
+    if (statusRow && orderStatus) {
       statusRow.style.display = 'block';
-      let statusClass = 'status-pending-done';
-      let statusText = status;
-      
-      if (status === 'paid') {
-        statusClass = 'status-paid-done';
-        statusText = '✅ Dibayar - Sedang diproses';
-      } else if (status === 'delivered') {
-        statusClass = 'status-delivered-done';
-        statusText = '🎉 Robux sudah dikirim!';
-      } else if (status === 'cancelled') {
-        statusClass = 'status-cancelled-done';
-        statusText = '❌ Dibatalkan';
-      } else if (status === 'waiting_payment') {
-        statusClass = 'status-waiting_payment-done';
-        statusText = '💳 Menunggu pembayaran';
-      } else if (status === 'pending') {
-        statusClass = 'status-pending-done';
-        statusText = '⏳ Menunggu pembayaran';
-      }
-      
-      orderStatusSpan.className = `status-badge-done ${statusClass}`;
-      orderStatusSpan.textContent = statusText;
+      let statusClass = 'status-pending-done', statusText = status;
+      if (status === 'paid') { statusClass = 'status-paid-done'; statusText = '✅ Dibayar - Sedang diproses'; }
+      else if (status === 'delivered') { statusClass = 'status-delivered-done'; statusText = '🎉 Robux sudah dikirim!'; }
+      else if (status === 'cancelled') { statusClass = 'status-cancelled-done'; statusText = '❌ Dibatalkan'; }
+      else if (status === 'waiting_payment') { statusClass = 'status-waiting_payment-done'; statusText = '💳 Menunggu pembayaran'; }
+      orderStatus.className = `status-badge-done ${statusClass}`;
+      orderStatus.textContent = statusText;
     }
     
     if (status === 'paid') {
@@ -846,20 +737,8 @@
       statusIcon.classList.remove('pulse');
       statusTitle.textContent = '✅ Pembayaran Diterima!';
       statusDesc.textContent = 'Pembayaran Anda telah kami terima. Pesanan sedang diproses.';
-      
-      dynamicBox.innerHTML = `
-        <div class="success-box-done">
-          <strong><i class="fas fa-check-circle"></i> Pembayaran Berhasil!</strong>
-          <p style="color: #a0a0a0; font-size: 14px; margin-top: 8px;">
-            Pembayaran Anda sebesar <strong>${document.getElementById('totalAmount')?.textContent || '-'}</strong> 
-            telah kami terima. Pesanan sedang kami proses.
-          </p>
-          <p style="color: #a0a0a0; font-size: 13px; margin-top: 10px;">
-            ⏱️ Robux akan segera dikirim ke akun Roblox Anda.
-          </p>
-        </div>
-      `;
-      autoRefreshIndicator.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> <span>Menunggu pengiriman Robux...</span>';
+      dynamicBox.innerHTML = `<div class="success-box-done"><strong><i class="fas fa-check-circle"></i> Pembayaran Berhasil!</strong><p>Pembayaran Anda telah kami terima. Pesanan sedang kami proses.</p><p>⏱️ Robux akan segera dikirim ke akun Roblox Anda.</p></div>`;
+      autoRefresh.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> <span>Menunggu pengiriman Robux...</span>';
       showNotification('✅ Pembayaran berhasil! Pesanan Anda akan segera diproses.', 'success');
     } 
     else if (status === 'delivered') {
@@ -868,20 +747,8 @@
       statusIcon.classList.remove('pulse');
       statusTitle.textContent = '🎉 Robux Telah Dikirim!';
       statusDesc.textContent = 'Robux sudah masuk ke akun Roblox Anda. Terima kasih telah berbelanja di R STORE!';
-      
-      dynamicBox.innerHTML = `
-        <div class="success-box-done">
-          <strong><i class="fas fa-rocket"></i> Pesanan Selesai!</strong>
-          <p style="color: #a0a0a0; font-size: 14px; margin-top: 8px;">
-            Robux sebanyak <strong>${orderData.robuxAmount?.toLocaleString('id-ID') || '-'} Robux</strong> 
-            telah berhasil dikirim ke akun Roblox Anda.
-          </p>
-          <p style="color: #a0a0a0; font-size: 13px; margin-top: 10px;">
-            ⭐ Terima kasih telah berbelanja di R STORE! ⭐
-          </p>
-        </div>
-      `;
-      autoRefreshIndicator.innerHTML = '<i class="fas fa-check-circle"></i> <span>Pesanan selesai! Terima kasih.</span>';
+      dynamicBox.innerHTML = `<div class="success-box-done"><strong><i class="fas fa-rocket"></i> Pesanan Selesai!</strong><p>Robux sebanyak <strong>${orderData.robuxAmount?.toLocaleString('id-ID') || '-'} Robux</strong> telah berhasil dikirim.</p><p>⭐ Terima kasih telah berbelanja di R STORE! ⭐</p></div>`;
+      autoRefresh.innerHTML = '<i class="fas fa-check-circle"></i> <span>Pesanan selesai! Terima kasih.</span>';
       showNotification('🎉 Robux sudah dikirim ke akun Anda!', 'success');
     }
     else if (status === 'cancelled') {
@@ -890,306 +757,128 @@
       statusIcon.classList.remove('pulse');
       statusTitle.textContent = '❌ Pesanan Dibatalkan';
       statusDesc.textContent = 'Pesanan Anda telah dibatalkan. Silakan hubungi admin jika ada pertanyaan.';
-      
-      dynamicBox.innerHTML = `
-        <div class="instruction-box-done" style="background: rgba(220,53,69,0.15); border-left-color: #dc3545;">
-          <strong style="color: #dc3545;"><i class="fas fa-exclamation-triangle"></i> Pesanan Dibatalkan</strong>
-          <p style="color: #a0a0a0; font-size: 14px; margin-top: 8px;">
-            Pesanan Anda telah dibatalkan. Jika ini kesalahan, silakan hubungi admin kami.
-          </p>
-        </div>
-      `;
-      autoRefreshIndicator.style.display = 'none';
+      dynamicBox.innerHTML = `<div class="instruction-box-done" style="background:rgba(220,53,69,0.15);border-left-color:#dc3545;"><strong style="color:#dc3545;"><i class="fas fa-exclamation-triangle"></i> Pesanan Dibatalkan</strong><p>Pesanan Anda telah dibatalkan. Jika ini kesalahan, silakan hubungi admin kami.</p></div>`;
+      autoRefresh.style.display = 'none';
       showNotification('❌ Pesanan dibatalkan.', 'error');
     }
     else {
-      // Default waiting for payment
-      dynamicBox.innerHTML = `
-        <div class="instruction-box-done">
-          <strong><i class="fas fa-info-circle"></i> Instruksi Pembayaran</strong>
-          <ul>
-            <li>✅ Simpan Order ID Anda untuk lacak pesanan</li>
-            <li>✅ Lakukan pembayaran sesuai metode yang dipilih</li>
-            <li>✅ Robux akan dikirim otomatis setelah pembayaran dikonfirmasi</li>
-            <li>⏱️ Anda memiliki waktu 2 jam untuk menyelesaikan pembayaran</li>
-          </ul>
-        </div>
-      `;
-      autoRefreshIndicator.style.display = 'inline-flex';
+      dynamicBox.innerHTML = `<div class="instruction-box-done"><strong><i class="fas fa-info-circle"></i> Instruksi Pembayaran</strong><ul><li>✅ Simpan Order ID Anda untuk lacak pesanan</li><li>✅ Lakukan pembayaran sesuai metode yang dipilih</li><li>✅ Robux akan dikirim otomatis setelah pembayaran dikonfirmasi</li><li>⏱️ Anda memiliki waktu 2 jam untuk menyelesaikan pembayaran</li></ul></div>`;
     }
   }
 
-  // Update tampilan pengiriman dan kontak
   function updateDeliveryAndContact(orderData) {
-    // Update status pengiriman
     const delivery = getDeliveryType(orderData.deliveryInfo);
     const deliveryRow = document.getElementById('deliveryRow');
     const deliveryBadge = document.getElementById('deliveryBadge');
-    
     if (deliveryRow && deliveryBadge) {
       deliveryRow.style.display = 'block';
       deliveryBadge.textContent = delivery.text;
       deliveryBadge.className = `delivery-badge-done ${delivery.class}`;
     }
     
-    // Update kontak customer
     const customerEmail = orderData.customerEmail || '';
     const customerPhone = orderData.customerPhone || '';
-    const hasContact = customerEmail || customerPhone;
     const contactSection = document.getElementById('contactSection');
-    
-    if (contactSection && hasContact) {
+    if (contactSection && (customerEmail || customerPhone)) {
       contactSection.style.display = 'block';
-      contactSection.innerHTML = `
-        <div class="contact-title-done">
-          <i class="fas fa-address-card"></i> Kontak Customer
-          <span style="font-size: 10px; color: #a0a0b0;">(Untuk keperluan konfirmasi)</span>
-        </div>
-        <div class="contact-details-done">
-          ${customerEmail ? `<span><i class="fas fa-envelope"></i> ${customerEmail}</span>` : ''}
-          ${customerPhone ? `<span><i class="fab fa-whatsapp"></i> ${customerPhone}</span>` : ''}
-        </div>
-      `;
+      contactSection.innerHTML = `<div class="contact-title-done"><i class="fas fa-address-card"></i> Kontak Customer</div><div class="contact-details-done">${customerEmail ? `<span><i class="fas fa-envelope"></i> ${customerEmail}</span>` : ''}${customerPhone ? `<span><i class="fab fa-whatsapp"></i> ${customerPhone}</span>` : ''}</div>`;
     }
     
-    // 🔥 TAMBAHKAN LINK COMMUNITY JIKA STATUS DITUNDA
-    const deliveryHistory = orderData.deliveryHistory || [];
-    const currentDeliveryType = delivery.type;
-    
-    // Cek apakah status saat ini adalah Ditunda
-    if (currentDeliveryType === 'delayed') {
-      const communityBox = document.getElementById('communityLinkBox');
-      if (!communityBox) {
-        // Buat elemen community box jika belum ada
-        const deliveryRowParent = document.getElementById('deliveryRow');
-        if (deliveryRowParent && deliveryRowParent.parentNode) {
-          const newCommunityBox = document.createElement('div');
-          newCommunityBox.id = 'communityLinkBox';
-          newCommunityBox.className = 'community-link-box-done';
-          newCommunityBox.innerHTML = `
-            <div class="community-link-title-done">
-              <i class="fab fa-roblox"></i> Perlu Join Community
-            </div>
-            <p style="font-size: 13px; color: #c0c0d0; margin-bottom: 8px;">
-              Pesanan Anda ditunda karena akun belum join community Roblox R STORE.
-              Silakan join community terlebih dahulu:
-            </p>
-            <a href="https://www.roblox.com/communities/13174452" target="_blank" class="community-link-button-done">
-              <i class="fab fa-roblox"></i> Join Community R STORE
-            </a>
-            <div class="community-note-done">
-              <i class="fas fa-info-circle"></i> Setelah join, hubungi admin untuk memproses pesanan.
-            </div>
-          `;
-          deliveryRowParent.parentNode.insertBefore(newCommunityBox, deliveryRowParent.nextSibling);
-        }
-      }
-    } else {
-      // Sembunyikan community box jika status bukan Ditunda
+    if (delivery.type === 'delayed') {
       const communityBox = document.getElementById('communityLinkBox');
       if (communityBox) {
-        communityBox.style.display = 'none';
+        communityBox.style.display = 'block';
+        communityBox.innerHTML = `<div class="community-link-box-done"><div class="community-link-title-done"><i class="fab fa-roblox"></i> Perlu Join Community</div><p>Pesanan Anda ditunda karena akun belum join community Roblox R STORE. Silakan join community terlebih dahulu:</p><a href="https://www.roblox.com/communities/13174452" target="_blank" class="community-link-button-done"><i class="fab fa-roblox"></i> Join Community R STORE</a><div class="community-note-done"><i class="fas fa-info-circle"></i> Setelah join, hubungi admin untuk memproses pesanan.</div></div>`;
       }
     }
     
-    // Update riwayat perubahan pengiriman
     const historySection = document.getElementById('historySection');
-    
-    if (historySection) {
-      if (deliveryHistory.length > 0) {
-        historySection.style.display = 'block';
-        let historyHtml = `
-          <div class="history-title-done">
-            <i class="fas fa-history"></i> Riwayat Perubahan Pengiriman
-          </div>
-          <div class="history-list-done">
-        `;
-        
-        deliveryHistory.forEach(h => {
-          // Format from dan to ke teks yang lebih bagus
-          let fromText = '';
-          let toText = '';
-          
-          if (h.from === 'instant') fromText = '⚡ Instant';
-          else if (h.from === 'po') fromText = '📦 Pre-Order';
-          else if (h.from === 'delayed') fromText = '⏸️ Ditunda';
-          else fromText = h.from || '⚡ Instant';
-          
-          if (h.to === 'instant') toText = '⚡ Instant';
-          else if (h.to === 'po') toText = '📦 Pre-Order';
-          else if (h.to === 'delayed') toText = '⏸️ Ditunda';
-          else toText = h.to || '⚡ Instant';
-          
-          // Format tanggal dengan aman
-          let changedAtFormatted = '-';
-          if (h.changedAt) {
-            try {
-              if (h.changedAt.toDate) {
-                changedAtFormatted = h.changedAt.toDate().toLocaleString('id-ID');
-              } else if (typeof h.changedAt === 'string') {
-                const date = new Date(h.changedAt);
-                if (!isNaN(date.getTime())) changedAtFormatted = date.toLocaleString('id-ID');
-              } else if (typeof h.changedAt === 'number') {
-                const date = new Date(h.changedAt);
-                if (!isNaN(date.getTime())) changedAtFormatted = date.toLocaleString('id-ID');
-              } else if (h.changedAt instanceof Date) {
-                if (!isNaN(h.changedAt.getTime())) changedAtFormatted = h.changedAt.toLocaleString('id-ID');
-              }
-            } catch (e) {
-              changedAtFormatted = 'Tanggal tidak tersedia';
-            }
-          }
-          
-          historyHtml += `
-            <div class="history-item-done">
-              <span class="history-change-done">${fromText} → ${toText}</span>
-              <span class="history-reason-done">${h.reason || 'Tidak ada alasan'}</span>
-              <span class="history-time-done">${changedAtFormatted}</span>
-            </div>
-          `;
-        });
-        
-        historyHtml += `
-          </div>
-          <div class="history-note-done">
-            <i class="fas fa-info-circle"></i>
-            <span>Perubahan status pengiriman dilakukan oleh admin karena kondisi tertentu</span>
-          </div>
-        `;
-        historySection.innerHTML = historyHtml;
-      } else {
-        historySection.style.display = 'none';
-      }
+    const deliveryHistory = orderData.deliveryHistory || [];
+    if (historySection && deliveryHistory.length > 0) {
+      historySection.style.display = 'block';
+      let historyHtml = `<div class="history-title-done"><i class="fas fa-history"></i> Riwayat Perubahan Pengiriman</div><div class="history-list-done">`;
+      deliveryHistory.forEach(h => {
+        if (h.from === h.to) return;
+        const fromText = h.from === 'instant' ? '⚡ Instant' : (h.from === 'po' ? '📦 Pre-Order' : '⏸️ Ditunda');
+        const toText = h.to === 'instant' ? '⚡ Instant' : (h.to === 'po' ? '📦 Pre-Order' : '⏸️ Ditunda');
+        let changedAt = '-';
+        if (h.changedAt) {
+          try {
+            if (h.changedAt.toDate) changedAt = h.changedAt.toDate().toLocaleString('id-ID');
+            else if (typeof h.changedAt === 'string') changedAt = new Date(h.changedAt).toLocaleString('id-ID');
+            else if (typeof h.changedAt === 'number') changedAt = new Date(h.changedAt).toLocaleString('id-ID');
+          } catch(e) { changedAt = 'Tanggal tidak tersedia'; }
+        }
+        historyHtml += `<div class="history-item-done"><span class="history-change-done">${fromText} → ${toText}</span><span class="history-reason-done">${h.reason || 'Tidak ada alasan'}</span><span class="history-time-done">${changedAt}</span></div>`;
+      });
+      historyHtml += `</div><div class="history-note-done"><i class="fas fa-info-circle"></i> Perubahan status pengiriman dilakukan oleh admin karena kondisi tertentu</div>`;
+      historySection.innerHTML = historyHtml;
     }
   }
 
-  // Handle status perubahan dari DOKU callback
   async function handleDokuCallback() {
     const dokuStatus = urlParams.get('status');
     const dokuInvoice = urlParams.get('invoice');
-    
     if (dokuStatus && dokuInvoice && dokuInvoice === orderId) {
       const orderRef = doc(db, 'orders', orderId);
-      
-      if (dokuStatus === 'success') {
-        await updateDoc(orderRef, {
-          status: 'paid',
-          paidAt: new Date(),
-          updatedAt: new Date()
-        });
-      } else if (dokuStatus === 'cancel') {
-        await updateDoc(orderRef, {
-          status: 'cancelled',
-          updatedAt: new Date()
-        });
-      }
-      
+      if (dokuStatus === 'success') await updateDoc(orderRef, { status: 'paid', paidAt: new Date(), updatedAt: new Date() });
+      else if (dokuStatus === 'cancel') await updateDoc(orderRef, { status: 'cancelled', updatedAt: new Date() });
       const newUrl = window.location.pathname + `?orderId=${orderId}&method=${method}`;
       window.history.replaceState({}, document.title, newUrl);
     }
   }
 
-  // Real-time listener untuk perubahan status
-  let unsubscribe = null;
-  
   function listenToOrderStatus() {
     if (!orderId) return;
-    
     const orderRef = doc(db, 'orders', orderId);
-    
     unsubscribe = onSnapshot(orderRef, (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
-        const currentStatus = data.status;
-        
-        console.log('📡 Status updated:', currentStatus);
-        
-        // Update UI berdasarkan status
-        updateUIByStatus(currentStatus, data);
-        // Update pengiriman dan kontak
+        updateUIByStatus(data.status, data);
         updateDeliveryAndContact(data);
       }
-    }, (error) => {
-      console.error('Error listening to order:', error);
-    });
+    }, (error) => console.error('Error listening:', error));
   }
 
   async function loadOrder() {
     if (!orderId) {
-      const orderIdWrapper = document.getElementById('orderIdWrapper');
-      if (orderIdWrapper) {
-        orderIdWrapper.innerHTML = '<span style="color: #dc3545;">Order ID tidak ditemukan</span>';
-      }
+      const wrapper = document.getElementById('orderIdWrapper');
+      if (wrapper) wrapper.innerHTML = '<span style="color:#dc3545;">Order ID tidak ditemukan</span>';
       return;
     }
-
     await handleDokuCallback();
-
     const orderRef = doc(db, 'orders', orderId);
     const orderSnap = await getDoc(orderRef);
-    
     if (!orderSnap.exists()) {
-      const orderIdWrapper = document.getElementById('orderIdWrapper');
-      if (orderIdWrapper) {
-        orderIdWrapper.innerHTML = '<span style="color: #dc3545;">❌ Pesanan tidak ditemukan atau sudah kadaluarsa</span>';
-      }
+      const wrapper = document.getElementById('orderIdWrapper');
+      if (wrapper) wrapper.innerHTML = '<span style="color:#dc3545;">❌ Pesanan tidak ditemukan atau sudah kadaluarsa</span>';
       return;
     }
-    
     const data = orderSnap.data();
     
-    // Tampilkan Order ID dengan tombol copy
-    const orderIdWrapper = document.getElementById('orderIdWrapper');
-    orderIdWrapper.innerHTML = `
-      <span class="order-id-value">${orderId}</span>
-      <button class="copy-btn-done" id="copyOrderIdBtn">
-        <i class="fas fa-copy"></i> Copy
-      </button>
-    `;
+    const wrapper = document.getElementById('orderIdWrapper');
+    wrapper.innerHTML = `<span class="order-id-value">${orderId}</span><button class="copy-btn-done" id="copyOrderIdBtn"><i class="fas fa-copy"></i> Copy</button>`;
+    document.getElementById('copyOrderIdBtn')?.addEventListener('click', (e) => copyToClipboard(orderId, e.currentTarget));
     
-    const copyBtn = document.getElementById('copyOrderIdBtn');
-    if (copyBtn) {
-      copyBtn.addEventListener('click', (e) => {
-        copyToClipboard(orderId, e.currentTarget);
-      });
-    }
+    document.getElementById('robloxUsername').textContent = data.robloxUsername || '-';
     
-    // Metode pembayaran
-    const payMethod = document.getElementById('payMethod');
-    const totalAmount = document.getElementById('totalAmount');
+    const methodNames = { 'bca': 'BCA VA', 'mandiri': 'Mandiri VA', 'bni': 'BNI VA', 'bri': 'BRI VA', 'qris': 'QRIS', 'gopay': 'GoPay', 'dana': 'DANA' };
+    document.getElementById('payMethod').textContent = methodNames[data.paymentMethod] || data.paymentMethod?.toUpperCase() || '-';
+    document.getElementById('totalAmount').textContent = 'Rp ' + (data.totalPrice || 0).toLocaleString('id-ID');
     
-    const methodNames = {
-      'bca': 'BCA Virtual Account',
-      'mandiri': 'Mandiri Virtual Account',
-      'bni': 'BNI Virtual Account',
-      'bri': 'BRI Virtual Account',
-      'qris': 'QRIS',
-      'gopay': 'GoPay',
-      'dana': 'DANA'
-    };
-    
-    let paymentMethod = data.paymentMethod || method;
-    let displayMethod = methodNames[paymentMethod] || paymentMethod?.toUpperCase() || '-';
-    
-    if (payMethod) payMethod.textContent = displayMethod;
-    if (totalAmount) totalAmount.textContent = 'Rp ' + (data.totalPrice || 0).toLocaleString('id-ID');
-    
-    // Update pengiriman dan kontak
     updateDeliveryAndContact(data);
-    
-    // Update UI berdasarkan status awal
     updateUIByStatus(data.status, data);
     
-    // Start real-time listener
+    const expireAt = data.expireAt?.toDate();
+    if ((data.status === 'waiting_payment' || data.status === 'pending') && expireAt && expireAt > new Date()) {
+      startTimer(expireAt);
+    }
+    
     listenToOrderStatus();
   }
 
   loadOrder();
-  
-  window.addEventListener('beforeunload', () => {
-    if (unsubscribe) unsubscribe();
-  });
+  window.addEventListener('beforeunload', () => { if (unsubscribe) unsubscribe(); if (timerInterval) clearInterval(timerInterval); });
 </script>
-
 </body>
 </html>

@@ -1375,6 +1375,58 @@ body {
   box-shadow: 0 10px 20px rgba(40,167,69,0.3);
 }
 
+/* Username Field */
+.username-field {
+  margin-bottom: 20px;
+}
+
+.username-field label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.username-field .input-wrapper {
+  display: flex;
+  align-items: center;
+  background: #1a1a30;
+  border-radius: 12px;
+  padding: 0 15px;
+  border: 1px solid #2a2a40;
+}
+
+.username-field .input-wrapper i {
+  color: #667eea;
+}
+
+.username-field .input-wrapper input {
+  background: transparent;
+  border: none;
+  padding: 14px;
+  width: 100%;
+  color: white;
+  font-size: 16px;
+  outline: none;
+}
+
+.username-hint {
+  display: block;
+  font-size: 11px;
+  color: #6c6c8a;
+  margin-top: 5px;
+}
+
+.username-error {
+  color: #dc3545;
+  font-size: 12px;
+  margin-top: 5px;
+  display: none;
+}
+
+.username-error.show {
+  display: block;
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
   .hero-title { font-size: 48px; }

@@ -405,6 +405,59 @@
       color: #ffc107;
       font-size: 10px;
     }
+
+    .delivery-delayed {
+      background: rgba(255, 193, 7, 0.2);
+      color: #856404;
+      border: 1px solid rgba(255, 193, 7, 0.3);
+    }
+
+    /* Community Link Box untuk status Ditunda */
+    .community-link-box-track {
+      background: rgba(102,126,234,0.15);
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin: 15px 0;
+      border-left: 3px solid #667eea;
+    }
+
+    .community-link-title-track {
+      font-size: 11px;
+      color: #667eea;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .community-link-button-track {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(102,126,234,0.2);
+      color: #667eea;
+      padding: 10px 16px;
+      border-radius: 30px;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.3s;
+      margin-top: 8px;
+      word-break: break-all;
+    }
+
+    .community-link-button-track:hover {
+      background: rgba(102,126,234,0.4);
+      transform: translateY(-2px);
+    }
+
+    .community-note-track {
+      font-size: 11px;
+      color: #a0a0b0;
+      margin-top: 8px;
+    }
     
     @media (max-width: 480px) {
       .track-card {
@@ -436,7 +489,7 @@
     <div class="nav-logo">
       <i class="fas fa-gamepad"></i>
       <span>R STORE</span>
-      <small>ROBUX</small>
+      <small>R STUDIO</small>
     </div>
     <a href="index.html" class="btn-track">
       <i class="fas fa-home"></i> Beranda
@@ -536,6 +589,9 @@
     if (deliveryInfo.includes('PO') || deliveryInfo.includes('Pre-Order') || deliveryInfo.includes('📦')) {
       return { type: 'po', text: '📦 Pre-Order (15 Hari Kerja)', class: 'delivery-po' };
     }
+    if (deliveryInfo.includes('Ditunda') || deliveryInfo.includes('⏸️') || deliveryInfo.includes('delayed')) {
+      return { type: 'delayed', text: '⏸️ Ditunda', class: 'delivery-delayed' };
+    }
     return { type: 'instant', text: '⚡ Instant', class: 'delivery-instant' };
   }
 
@@ -627,6 +683,28 @@ async function trackOrder() {
     // Jenis pengiriman saat ini
     const delivery = getDeliveryType(data.deliveryInfo);
     
+    // 🔥 TAMBAHKAN LINK COMMUNITY JIKA STATUS DITUNDA
+    let communityLinkHtml = '';
+    if (delivery.type === 'delayed') {
+      communityLinkHtml = `
+        <div class="community-link-box-track">
+          <div class="community-link-title-track">
+            <i class="fab fa-roblox"></i> Perlu Join Community
+          </div>
+          <p style="font-size: 13px; color: #c0c0d0; margin-bottom: 8px;">
+            Pesanan Anda ditunda karena akun belum join community Roblox R STORE.
+            Silakan join community terlebih dahulu:
+          </p>
+          <a href="https://www.roblox.com/communities/13174452" target="_blank" class="community-link-button-track">
+            <i class="fab fa-roblox"></i> Join Community R STORE
+          </a>
+          <div class="community-note-track">
+            <i class="fas fa-info-circle"></i> Setelah join, hubungi admin untuk memproses pesanan.
+          </div>
+        </div>
+      `;
+    }
+
     // 🔥 Format tanggal dengan fungsi yang aman
     const createdAt = formatDate(data.createdAt);
     const paidAt = formatDate(data.paidAt);
@@ -636,19 +714,24 @@ async function trackOrder() {
     const customerPhone = data.customerPhone || '';
     const hasContact = customerEmail || customerPhone;
     
+    // 🔥 TAMBAHKAN INI - Username Roblox
+    const robloxUsername = data.robloxUsername || '-';
+
     // Riwayat perubahan pengiriman
     const deliveryHistory = data.deliveryHistory || [];
     const hasHistory = deliveryHistory.length > 0;
     const adminNote = data.adminNote || '';
     
-    // Buat HTML untuk riwayat perubahan
+    // Buat HTML untuk riwayat perubahan (HANYA yang from !== to)
     let historyHtml = '';
     if (hasHistory) {
       let historyItems = '';
       deliveryHistory.forEach(h => {
-        const fromText = h.from === 'instant' ? '⚡ Instant' : '📦 Pre-Order (15 Hari)';
-        const toText = h.to === 'instant' ? '⚡ Instant' : '📦 Pre-Order (15 Hari)';
-        // 🔥 Gunakan fungsi formatDate untuk setiap tanggal
+        // 🔥 SKIP jika from dan to sama (tidak valid)
+        if (h.from === h.to) return;
+        
+        const fromText = h.from === 'instant' ? '⚡ Instant' : (h.from === 'po' ? '📦 Pre-Order (15 Hari)' : '⏸️ Ditunda');
+        const toText = h.to === 'instant' ? '⚡ Instant' : (h.to === 'po' ? '📦 Pre-Order (15 Hari)' : '⏸️ Ditunda');
         const changedAtFormatted = formatDate(h.changedAt);
         
         historyItems += `
@@ -660,20 +743,23 @@ async function trackOrder() {
         `;
       });
       
-      historyHtml = `
-        <div class="delivery-history-track">
-          <div class="history-title-track">
-            <i class="fas fa-history"></i> Riwayat Perubahan Pengiriman
+      // 🔥 Hanya tampilkan jika ada item yang valid
+      if (historyItems) {
+        historyHtml = `
+          <div class="delivery-history-track">
+            <div class="history-title-track">
+              <i class="fas fa-history"></i> Riwayat Perubahan Pengiriman
+            </div>
+            <div class="history-list-track">
+              ${historyItems}
+            </div>
+            <div class="history-note">
+              <i class="fas fa-info-circle"></i>
+              <span>Perubahan status pengiriman dilakukan oleh admin karena kondisi tertentu</span>
+            </div>
           </div>
-          <div class="history-list-track">
-            ${historyItems}
-          </div>
-          <div class="history-note">
-            <i class="fas fa-info-circle"></i>
-            <span>Perubahan status pengiriman dilakukan oleh admin karena kondisi tertentu</span>
-          </div>
-        </div>
-      `;
+        `;
+      }
     }
     
     // Tampilkan hasil
@@ -694,6 +780,14 @@ async function trackOrder() {
           </div>
         </div>
         
+        <!-- 🔥 TAMBAHKAN DI SINI -->
+        <div class="detail-row-track">
+          <div class="detail-label-track">
+            <i class="fas fa-rocket"></i> Username Roblox
+          </div>
+          <div class="detail-value-track">${robloxUsername}</div>
+        </div>
+
         <div class="detail-row-track">
           <div class="detail-label-track">
             <i class="fas fa-robot"></i> Jumlah Robux
@@ -725,6 +819,8 @@ async function trackOrder() {
         </div>
         
         ${historyHtml}
+        
+        ${communityLinkHtml}
         
         ${adminNote ? `
         <div class="contact-section" style="border-left-color: #ffc107;">
