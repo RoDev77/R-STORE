@@ -1,4 +1,5 @@
 import { db, doc, getDoc, setDoc, addDoc, collection, serverTimestamp } from './firebase-config.js';
+import { getDiscordUser, updateUserAfterOrder, isDiscordLoggedIn, fetchUserDataFromFirestore } from './js/discord-auth.js';
 
 // DOM Elements - dengan pengecekan
 const getElement = (id) => {
@@ -180,6 +181,30 @@ function closeModal() {
   confirmModal.classList.remove('active');
 }
 
+// 🔥 FUNGSI UPDATE BALANCE SETELAH ORDER
+async function updateUserBalanceAfterOrder(totalAmount, robuxAmount) {
+  // Cek apakah user sudah login
+  if (!isDiscordLoggedIn()) {
+    console.log('User belum login, balance tidak diupdate');
+    return;
+  }
+  
+  const user = getDiscordUser();
+  if (!user) return;
+  
+  console.log(`💳 Update balance untuk ${user.globalName || user.username}: +Rp ${totalAmount.toLocaleString()}`);
+  
+  const success = await updateUserAfterOrder(totalAmount, robuxAmount);
+  
+  if (success) {
+    console.log('✅ Balance berhasil diupdate');
+    // Refresh data user untuk memastikan balance terbaru
+    await fetchUserDataFromFirestore();
+  } else {
+    console.log('❌ Gagal update balance');
+  }
+}
+
 // Fungsi untuk melanjutkan ke submit order (dipanggil setelah konfirmasi)
 async function proceedSubmitOrder() {
   // Validasi username Roblox
@@ -272,6 +297,10 @@ async function proceedSubmitOrder() {
   const expireAt = new Date();
   expireAt.setHours(expireAt.getHours() + 2);
   
+  // 🔥 Tambahkan user Discord ID jika login
+  const discordUser = getDiscordUser();
+  const discordId = discordUser ? discordUser.id : null;
+  
   // Create order
   const orderData = {
     robuxAmount: robux,
@@ -283,12 +312,17 @@ async function proceedSubmitOrder() {
     expireAt: expireAt,
     customerEmail: customerEmail,
     customerPhone: customerPhone,
-    robloxUsername: robloxUsername,  // 🔥 TAMBAHKAN INI
-    termsAgreed: true
+    robloxUsername: robloxUsername,
+    termsAgreed: true,
+    discordId: discordId  // 🔥 TAMBAHKAN DISCORD ID
   };
   
   try {
     await setDoc(orderRef, orderData);
+    
+    // 🔥 UPDATE BALANCE USER SETELAH ORDER BERHASIL
+    await updateUserBalanceAfterOrder(total, robux);
+    
     window.location.href = `payment.html?orderId=${orderId}`;
   } catch (error) {
     console.error('Error creating order:', error);
@@ -431,6 +465,13 @@ setInterval(() => {
   loadConfig();
 }, 30000);
 
+// 🔥 Refresh balance user setiap 60 detik (jika login)
+setInterval(() => {
+  if (isDiscordLoggedIn()) {
+    fetchUserDataFromFirestore();
+  }
+}, 60000);
+
 // Tunggu DOM siap sebelum load config
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
@@ -439,3 +480,6 @@ if (document.readyState === 'loading') {
 } else {
   loadConfig();
 }
+
+// Export functions untuk digunakan di file lain
+export { updateUserBalanceAfterOrder };

@@ -1,5 +1,5 @@
 // File: public/js/discord-auth.js
-// Login dengan Discord - Lengkap dengan data user dari Firestore
+// Login dengan Discord - Lengkap dengan balance dari Firestore
 
 const DISCORD_LOGIN_URL = '/api/discord-login';
 const JWT_TOKEN_KEY = 'discord_session_token';
@@ -41,7 +41,7 @@ function isAdmin() {
   return getUserRole() === 'admin';
 }
 
-// Ambil saldo user
+// Ambil saldo user dari localStorage (cache)
 function getUserBalance() {
   const user = getDiscordUser();
   return user?.balance || 0;
@@ -53,28 +53,48 @@ function getUserTotalSpent() {
   return user?.totalSpent || 0;
 }
 
-// Update data user setelah transaksi
-async function updateUserAfterOrder(amount) {
+// Fetch data user terbaru dari Firestore
+async function fetchUserDataFromFirestore() {
   const user = getDiscordUser();
-  if (!user) return;
+  if (!user || !user.id) return null;
+  
+  try {
+    const response = await fetch(`/api/user/get-user?discordId=${user.id}`);
+    const data = await response.json();
+    
+    if (data.success && data.user) {
+      // Update localStorage dengan data terbaru
+      const updatedUser = {
+        ...user,
+        balance: data.user.balance || 0,
+        totalSpent: data.user.totalSpent || 0,
+        totalOrders: data.user.totalOrders || 0,
+        role: data.user.role || 'member'
+      };
+      localStorage.setItem(DISCORD_USER_KEY, JSON.stringify(updatedUser));
+      
+      // Update UI balance
+      if (userBalance) {
+        userBalance.textContent = `Rp ${(updatedUser.balance || 0).toLocaleString('id-ID')}`;
+      }
+      
+      return updatedUser;
+    }
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+  }
+  return null;
+}
+
+// Update data user setelah transaksi
+async function updateUserAfterOrder(amount, robuxAmount) {
+  const user = getDiscordUser();
+  if (!user) return false;
   
   const newBalance = (user.balance || 0) + amount;
   const newTotalSpent = (user.totalSpent || 0) + amount;
+  const newTotalOrders = (user.totalOrders || 0) + 1;
   
-  // Update localStorage
-  const updatedUser = {
-    ...user,
-    balance: newBalance,
-    totalSpent: newTotalSpent
-  };
-  localStorage.setItem(DISCORD_USER_KEY, JSON.stringify(updatedUser));
-  
-  // Update UI
-  if (userBalance) {
-    userBalance.textContent = `Rp ${newBalance.toLocaleString('id-ID')}`;
-  }
-  
-  // Update di Firestore via API
   try {
     const response = await fetch('/api/user/update-balance', {
       method: 'POST',
@@ -82,16 +102,36 @@ async function updateUserAfterOrder(amount) {
       body: JSON.stringify({
         discordId: user.id,
         balance: newBalance,
-        totalSpent: newTotalSpent
+        totalSpent: newTotalSpent,
+        totalOrders: newTotalOrders,
+        lastOrderAmount: amount,
+        lastOrderRobux: robuxAmount
       })
     });
+    
     const data = await response.json();
-    if (!data.success) {
-      console.error('Failed to update balance in Firestore');
+    
+    if (data.success) {
+      // Update localStorage
+      const updatedUser = {
+        ...user,
+        balance: newBalance,
+        totalSpent: newTotalSpent,
+        totalOrders: newTotalOrders
+      };
+      localStorage.setItem(DISCORD_USER_KEY, JSON.stringify(updatedUser));
+      
+      // Update UI
+      if (userBalance) {
+        userBalance.textContent = `Rp ${newBalance.toLocaleString('id-ID')}`;
+      }
+      
+      return true;
     }
   } catch (error) {
     console.error('Error updating balance:', error);
   }
+  return false;
 }
 
 // Mulai login Discord
@@ -130,7 +170,7 @@ function showNotification(message, type = 'success') {
 }
 
 // Update UI berdasarkan status login
-function updateUIBasedOnLogin() {
+async function updateUIBasedOnLogin() {
   const isLoggedIn = isDiscordLoggedIn();
   const user = getDiscordUser();
   
@@ -154,19 +194,18 @@ function updateUIBasedOnLogin() {
       userName.textContent = displayName;
     }
     
-    // Set saldo
+    // Set saldo dari data user
     if (userBalance) {
       userBalance.textContent = `Rp ${(user.balance || 0).toLocaleString('id-ID')}`;
     }
     
-    // Sembunyikan tombol Discord login
-    if (discordLoginBtn) discordLoginBtn.style.display = 'none';
+    // Fetch data terbaru dari Firestore untuk memastikan balance up to date
+    await fetchUserDataFromFirestore();
     
   } else {
     // Tampilkan "belum login", sembunyikan "sudah login"
     if (authNotLoggedIn) authNotLoggedIn.style.display = 'flex';
     if (authLoggedIn) authLoggedIn.style.display = 'none';
-    if (discordLoginBtn) discordLoginBtn.style.display = 'inline-flex';
   }
 }
 
@@ -198,11 +237,6 @@ function checkDiscordCallback() {
       
       // Update UI
       updateUIBasedOnLogin();
-      
-      // Refresh untuk update UI
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
       
     } catch (e) {
       console.error('Error parsing user data:', e);
@@ -259,5 +293,6 @@ export {
   getUserTotalSpent, 
   getUserRole, 
   isAdmin,
-  updateUserAfterOrder 
+  updateUserAfterOrder,
+  fetchUserDataFromFirestore
 };

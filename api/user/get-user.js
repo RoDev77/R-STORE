@@ -1,4 +1,4 @@
-// File: api/user/update-balance.js
+// File: api/user/get-user.js
 
 const admin = require('firebase-admin');
 
@@ -22,19 +22,20 @@ if (!admin.apps.length) {
 const db = admin.firestore();
 
 module.exports = async (req, res) => {
+  // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Content-Type', 'application/json');
   
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
   
-  if (req.method !== 'POST') {
+  if (req.method !== 'GET') {
     return res.status(405).json({ success: false, error: 'Method not allowed' });
   }
   
-  const { discordId, balance, totalSpent, totalOrders, lastOrderAmount, lastOrderRobux } = req.body;
+  const { discordId } = req.query;
   
   if (!discordId) {
     return res.status(400).json({ success: false, error: 'Missing discordId' });
@@ -49,38 +50,27 @@ module.exports = async (req, res) => {
       return res.status(404).json({ success: false, error: 'User not found' });
     }
     
-    const currentData = userDoc.data();
+    const userData = userDoc.data();
     
-    const updateData = {
-      updatedAt: admin.firestore.Timestamp.now()
-    };
-    
-    // Update balance
-    if (balance !== undefined) updateData.balance = balance;
-    
-    // Update totalSpent (akumulasi)
-    if (totalSpent !== undefined) {
-      updateData.totalSpent = totalSpent;
-    } else if (lastOrderAmount !== undefined) {
-      updateData.totalSpent = (currentData.totalSpent || 0) + lastOrderAmount;
-    }
-    
-    // Update totalOrders
-    if (totalOrders !== undefined) {
-      updateData.totalOrders = totalOrders;
-    } else if (lastOrderAmount !== undefined) {
-      updateData.totalOrders = (currentData.totalOrders || 0) + 1;
-    }
-    
-    if (lastOrderAmount !== undefined) updateData.lastOrderAmount = lastOrderAmount;
-    if (lastOrderRobux !== undefined) updateData.lastOrderRobux = lastOrderRobux;
-    
-    await userRef.update(updateData);
-    
-    res.status(200).json({ success: true });
+    res.status(200).json({
+      success: true,
+      user: {
+        discordId: userData.discordId,
+        username: userData.username,
+        globalName: userData.globalName,
+        avatar: userData.avatar,
+        email: userData.email,
+        role: userData.role,
+        balance: userData.balance || 0,
+        totalSpent: userData.totalSpent || 0,
+        totalOrders: userData.totalOrders || 0,
+        createdAt: userData.createdAt,
+        lastLogin: userData.lastLogin
+      }
+    });
     
   } catch (error) {
-    console.error('Error updating user balance:', error);
+    console.error('Error fetching user:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 };
