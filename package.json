@@ -1,0 +1,7 @@
+{
+  "name": "r-store",
+  "version": "1.0.0",
+  "dependencies": {
+    "my-qris": "^1.0.3"
+  }
+}
