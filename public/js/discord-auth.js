@@ -1,5 +1,5 @@
 // File: public/js/discord-auth.js
-// Login dengan Discord
+// Login dengan Discord - Style seperti OxRodi™
 
 const DISCORD_LOGIN_URL = '/api/discord-login';
 const JWT_TOKEN_KEY = 'discord_session_token';
@@ -9,11 +9,13 @@ const DISCORD_USER_KEY = 'discord_user';
 const authNotLoggedIn = document.getElementById('authNotLoggedIn');
 const authLoggedIn = document.getElementById('authLoggedIn');
 const discordLoginBtn = document.getElementById('discordLoginBtn');
-const discordAvatar = document.getElementById('discordAvatar');
-const discordUsername = document.getElementById('discordUsername');
-const discordLogoutBtn = document.getElementById('discordLogoutBtn');
-const discordUserInfo = document.getElementById('discordUserInfo');
-const discordDropdown = document.getElementById('discordDropdown');
+const userAvatar = document.getElementById('userAvatar');
+const userName = document.getElementById('userName');
+const userBalance = document.getElementById('userBalance');
+const logoutBtn = document.getElementById('logoutBtn');
+const userInfo = document.getElementById('userInfo');
+const userDropdown = document.getElementById('userDropdown');
+const userMenu = document.querySelector('.user-menu');
 
 // Cek apakah user sudah login
 function isDiscordLoggedIn() {
@@ -28,6 +30,13 @@ function getDiscordUser() {
   return user ? JSON.parse(user) : null;
 }
 
+// Ambil saldo user (dari Firestore atau localStorage)
+function getUserBalance() {
+  // TODO: Ambil dari Firestore nanti
+  const savedBalance = localStorage.getItem('user_balance');
+  return savedBalance ? parseInt(savedBalance) : 0;
+}
+
 // Mulai login Discord
 function loginWithDiscord() {
   window.location.href = DISCORD_LOGIN_URL;
@@ -37,8 +46,12 @@ function loginWithDiscord() {
 function logoutDiscord() {
   localStorage.removeItem(JWT_TOKEN_KEY);
   localStorage.removeItem(DISCORD_USER_KEY);
+  localStorage.removeItem('user_balance');
   updateUIBasedOnLogin();
-  window.location.reload();
+  showNotification('Anda telah logout', 'info');
+  setTimeout(() => {
+    window.location.reload();
+  }, 500);
 }
 
 // Tampilkan notifikasi
@@ -64,6 +77,7 @@ function showNotification(message, type = 'success') {
 function updateUIBasedOnLogin() {
   const isLoggedIn = isDiscordLoggedIn();
   const user = getDiscordUser();
+  const balance = getUserBalance();
   
   if (isLoggedIn && user) {
     // Sembunyikan "belum login", tampilkan "sudah login"
@@ -71,22 +85,37 @@ function updateUIBasedOnLogin() {
     if (authLoggedIn) authLoggedIn.style.display = 'block';
     
     // Set avatar
-    if (discordAvatar && user.avatar) {
-      const avatarUrl = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=32`;
-      discordAvatar.src = avatarUrl;
-      discordAvatar.style.display = 'inline-block';
-    } else if (discordAvatar) {
-      discordAvatar.style.display = 'none';
+    if (userAvatar && user.avatar) {
+      const avatarUrl = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=64`;
+      userAvatar.src = avatarUrl;
+    } else if (userAvatar && user.id) {
+      // Default avatar jika tidak ada custom avatar
+      const defaultAvatar = `https://cdn.discordapp.com/embed/avatars/${parseInt(user.id) % 5}.png`;
+      userAvatar.src = defaultAvatar;
     }
     
-    // Set username
-    if (discordUsername) {
-      discordUsername.textContent = user.globalName || user.username;
+    // Set username dengan format "Username™"
+    if (userName) {
+      const displayName = user.globalName || user.username;
+      userName.textContent = displayName;
+    }
+    
+    // Set saldo
+    if (userBalance) {
+      userBalance.textContent = `Rp ${balance.toLocaleString('id-ID')}`;
     }
   } else {
     // Tampilkan "belum login", sembunyikan "sudah login"
     if (authNotLoggedIn) authNotLoggedIn.style.display = 'flex';
     if (authLoggedIn) authLoggedIn.style.display = 'none';
+  }
+}
+
+// Update saldo (dipanggil setelah transaksi)
+function updateBalance(newBalance) {
+  localStorage.setItem('user_balance', newBalance);
+  if (userBalance) {
+    userBalance.textContent = `Rp ${newBalance.toLocaleString('id-ID')}`;
   }
 }
 
@@ -111,6 +140,11 @@ function checkDiscordCallback() {
       localStorage.setItem(JWT_TOKEN_KEY, sessionToken);
       localStorage.setItem(DISCORD_USER_KEY, JSON.stringify(user));
       
+      // Set saldo awal 0
+      if (!localStorage.getItem('user_balance')) {
+        localStorage.setItem('user_balance', '0');
+      }
+      
       showNotification(`Selamat datang, ${user.globalName || user.username}!`, 'success');
       
       // Bersihkan URL
@@ -118,11 +152,6 @@ function checkDiscordCallback() {
       
       // Update UI
       updateUIBasedOnLogin();
-      
-      // Refresh halaman untuk update UI
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
       
     } catch (e) {
       console.error('Error parsing user data:', e);
@@ -133,17 +162,21 @@ function checkDiscordCallback() {
 
 // Setup dropdown menu
 function setupDropdown() {
-  if (!discordUserInfo || !discordDropdown) return;
+  if (!userInfo || !userDropdown || !userMenu) return;
   
-  // Toggle dropdown saat klik avatar/username
-  discordUserInfo.addEventListener('click', (e) => {
+  // Toggle dropdown saat klik user info
+  userInfo.addEventListener('click', (e) => {
     e.stopPropagation();
-    discordDropdown.classList.toggle('show');
+    userDropdown.classList.toggle('show');
+    userMenu.classList.toggle('active');
   });
   
   // Tutup dropdown jika klik di luar
-  document.addEventListener('click', () => {
-    discordDropdown.classList.remove('show');
+  document.addEventListener('click', (e) => {
+    if (!userMenu.contains(e.target)) {
+      userDropdown.classList.remove('show');
+      userMenu.classList.remove('active');
+    }
   });
 }
 
@@ -155,8 +188,8 @@ if (discordLoginBtn) {
   });
 }
 
-if (discordLogoutBtn) {
-  discordLogoutBtn.addEventListener('click', (e) => {
+if (logoutBtn) {
+  logoutBtn.addEventListener('click', (e) => {
     e.preventDefault();
     logoutDiscord();
   });
@@ -168,3 +201,6 @@ document.addEventListener('DOMContentLoaded', () => {
   updateUIBasedOnLogin();
   setupDropdown();
 });
+
+// Export functions untuk digunakan di file lain
+export { updateBalance, getUserBalance, isDiscordLoggedIn, getDiscordUser };
