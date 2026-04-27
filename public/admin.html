@@ -53,28 +53,26 @@
       margin-bottom: 25px;
     }
 
-    .login-box input {
+    .discord-login-btn {
+      background: #5865F2;
       width: 100%;
-      padding: 14px 18px;
-      background: #1a1a30;
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 16px;
-      font-size: 16px;
-      color: white;
-      margin-bottom: 20px;
-      outline: none;
-    }
-
-    .login-box button {
-      width: 100%;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: white;
-      border: none;
       padding: 14px;
       border-radius: 40px;
       font-size: 16px;
       font-weight: 700;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      border: none;
+      color: white;
+      transition: all 0.3s;
+    }
+
+    .discord-login-btn:hover {
+      background: #4752C4;
+      transform: translateY(-2px);
     }
 
     .error-msg { color: #dc3545; margin-top: 15px; display: none; font-size: 14px; }
@@ -114,7 +112,7 @@
       -webkit-text-fill-color: transparent;
     }
 
-    .nav-buttons { display: flex; gap: 15px; }
+    .nav-buttons { display: flex; gap: 15px; align-items: center; }
     .btn-nav {
       background: rgba(102,126,234,0.2);
       color: #667eea;
@@ -274,35 +272,48 @@
 
     .timer-display { font-size: 11px; color: #ffc107; margin-top: 4px; }
     .empty-state { text-align: center; padding: 60px; color: #a0a0b0; }
+    .admin-user-info { margin-left: 15px; font-size: 14px; color: #667eea; }
 
     .footer { text-align: center; padding: 30px; border-top: 1px solid rgba(255,255,255,0.1); color: #a0a0b0; }
-    @media (max-width: 768px) { .nav-container { flex-direction: column; gap: 15px; } .container { padding: 15px; } .card { padding: 20px; } }
+    
+    @media (max-width: 768px) { 
+      .nav-container { flex-direction: column; gap: 15px; } 
+      .container { padding: 15px; } 
+      .card { padding: 20px; } 
+      .login-box { margin: 20px; padding: 30px; width: auto; }
+    }
   </style>
 </head>
 <body>
 
+<!-- Login Screen -->
 <div class="login-screen" id="loginScreen">
   <div class="login-box">
     <h2>🔐 Admin Login</h2>
-    <input type="password" id="adminPassword" placeholder="Masukkan password admin" />
-    <button id="loginBtn">Login</button>
+    
+    <button id="discordAdminLogin" class="discord-login-btn">
+      <i class="fab fa-discord"></i> Login dengan Discord
+    </button>
+    
     <div class="loading-msg" id="loadingMsg">⏳ Memeriksa...</div>
-    <div class="error-msg" id="loginError">❌ Password salah!</div>
+    <div class="error-msg" id="loginError">❌ Anda tidak memiliki akses admin!</div>
   </div>
 </div>
 
+<!-- Admin Content -->
 <div class="admin-content" id="adminContent">
   <nav class="navbar">
     <div class="nav-container">
       <div class="nav-logo"><i class="fas fa-shield-alt"></i><span>R STORE</span></div>
       <div class="nav-buttons">
-        <a href="index.html" class="btn-nav"><i class="fas fa-store"></i> Buka Toko</a>
-        <button id="logoutBtn" class="btn-nav btn-logout"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        <span id="adminUserInfo" class="admin-user-info"></span>
+        <button id="adminLogoutBtn" class="btn-nav btn-logout"><i class="fas fa-sign-out-alt"></i> Logout</button>
       </div>
     </div>
   </nav>
 
   <div class="container">
+    <!-- Stats Grid -->
     <div class="stats-grid">
       <div class="stat-card"><div class="stat-number" id="statWaiting">0</div><div class="stat-label">💳 Menunggu Bayar</div></div>
       <div class="stat-card"><div class="stat-number" id="statPending">0</div><div class="stat-label">⏰ Verifikasi</div></div>
@@ -311,6 +322,7 @@
       <div class="stat-card"><div class="stat-number" id="statTotal">0</div><div class="stat-label">📦 Total Order</div></div>
     </div>
 
+    <!-- Settings Card -->
     <div class="card">
       <h2><i class="fas fa-sliders-h"></i> Pengaturan Toko</h2>
       <div class="settings-grid">
@@ -323,6 +335,7 @@
       <span id="saveFeedback" class="save-feedback"></span>
     </div>
 
+    <!-- Orders Card -->
     <div class="card">
       <div class="filter-bar">
         <div class="filter-group"><i class="fas fa-filter"></i><select id="statusFilter">
@@ -344,42 +357,151 @@
 
   const CONFIG_ID = 'storeSettings';
   let allOrders = [], unsubscribe = null;
+  
+  // Discord login URL
+  const DISCORD_LOGIN_URL = '/api/discord-login';
+  const JWT_TOKEN_KEY = 'admin_session_token';
+  const ADMIN_USER_KEY = 'admin_user';
 
-  async function verifyPassword(pwd) {
-    try {
-      const snap = await getDoc(doc(db, 'pconfig', 'admins'));
-      return snap.exists() && snap.data().password === pwd;
-    } catch { return false; }
+  // ========== FUNGSI DISCORD LOGIN ==========
+  function isDiscordLoggedIn() {
+    const token = localStorage.getItem(JWT_TOKEN_KEY);
+    const user = localStorage.getItem(ADMIN_USER_KEY);
+    return token && user;
   }
 
-  const loginScreen = document.getElementById('loginScreen'), adminContent = document.getElementById('adminContent');
-  const loginBtn = document.getElementById('loginBtn'), logoutBtn = document.getElementById('logoutBtn');
-  const loginError = document.getElementById('loginError'), loadingMsg = document.getElementById('loadingMsg');
+  function getDiscordUser() {
+    const user = localStorage.getItem(ADMIN_USER_KEY);
+    return user ? JSON.parse(user) : null;
+  }
 
+  function isUserAdmin(user) {
+    return user && user.role === 'admin';
+  }
+
+  function loginWithDiscord() {
+    window.location.href = DISCORD_LOGIN_URL;
+  }
+
+  function logoutDiscord() {
+    localStorage.removeItem(JWT_TOKEN_KEY);
+    localStorage.removeItem(ADMIN_USER_KEY);
+    window.location.reload();
+  }
+
+  function checkDiscordCallback() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionToken = urlParams.get('discord_token');
+    const userData = urlParams.get('user');
+    const error = urlParams.get('error');
+    
+    if (error) {
+      console.error('Discord login error:', error);
+      showError('Login Discord gagal!');
+      return false;
+    }
+    
+    if (sessionToken && userData) {
+      try {
+        const user = JSON.parse(decodeURIComponent(userData));
+        
+        // Cek apakah user memiliki role admin
+        if (user.role === 'admin') {
+          localStorage.setItem(JWT_TOKEN_KEY, sessionToken);
+          localStorage.setItem(ADMIN_USER_KEY, JSON.stringify(user));
+          window.history.replaceState({}, document.title, window.location.pathname);
+          return true;
+        } else {
+          console.error('User is not admin');
+          showError('Anda tidak memiliki akses admin!');
+          return false;
+        }
+      } catch (e) {
+        console.error('Error parsing user data:', e);
+        showError('Gagal memproses login');
+        return false;
+      }
+    }
+    return false;
+  }
+
+  function showError(message) {
+    const errorDiv = document.getElementById('loginError');
+    if (errorDiv) {
+      errorDiv.textContent = message;
+      errorDiv.style.display = 'block';
+      setTimeout(() => {
+        errorDiv.style.display = 'none';
+      }, 3000);
+    }
+  }
+
+  function showLoading(show) {
+    const loadingDiv = document.getElementById('loadingMsg');
+    if (loadingDiv) {
+      loadingDiv.style.display = show ? 'block' : 'none';
+    }
+  }
+
+  // ========== DOM Elements ==========
+  const loginScreen = document.getElementById('loginScreen');
+  const adminContent = document.getElementById('adminContent');
+  const discordAdminLogin = document.getElementById('discordAdminLogin');
+  const adminLogoutBtn = document.getElementById('adminLogoutBtn');
+  const adminUserInfo = document.getElementById('adminUserInfo');
+
+  // ========== CHECK AUTH ==========
   function checkAuth() {
-    if (sessionStorage.getItem('adminLoggedIn') === 'true') {
-      loginScreen.style.display = 'none';
-      adminContent.style.display = 'block';
-      loadSettings();
-      listenOrders();
-    } else { loginScreen.style.display = 'flex'; adminContent.style.display = 'none'; }
+    // Cek callback Discord terlebih dahulu
+    if (checkDiscordCallback()) {
+      const user = getDiscordUser();
+      if (user && isUserAdmin(user)) {
+        loginScreen.style.display = 'none';
+        adminContent.style.display = 'block';
+        if (adminUserInfo) {
+          adminUserInfo.innerHTML = `<i class="fab fa-discord"></i> ${user.globalName || user.username} (Admin)`;
+        }
+        loadSettings();
+        listenOrders();
+        return;
+      }
+    }
+    
+    // Cek session yang sudah ada
+    if (isDiscordLoggedIn()) {
+      const user = getDiscordUser();
+      if (user && isUserAdmin(user)) {
+        loginScreen.style.display = 'none';
+        adminContent.style.display = 'block';
+        if (adminUserInfo) {
+          adminUserInfo.innerHTML = `<i class="fab fa-discord"></i> ${user.globalName || user.username} (Admin)`;
+        }
+        loadSettings();
+        listenOrders();
+        return;
+      }
+    }
+    
+    loginScreen.style.display = 'flex';
+    adminContent.style.display = 'none';
   }
 
-  loginBtn.onclick = async () => {
-    const pwd = document.getElementById('adminPassword').value;
-    if (!pwd) { loginError.textContent = '❌ Masukkan password!'; loginError.style.display = 'block'; return; }
-    loadingMsg.style.display = 'block'; loginError.style.display = 'none'; loginBtn.disabled = true;
-    const valid = await verifyPassword(pwd);
-    loadingMsg.style.display = 'none'; loginBtn.disabled = false;
-    if (valid) {
-      sessionStorage.setItem('adminLoggedIn', 'true');
-      loginScreen.style.display = 'none'; adminContent.style.display = 'block';
-      loadSettings(); listenOrders();
-    } else { loginError.textContent = '❌ Password salah!'; loginError.style.display = 'block'; }
-  };
+  // ========== DISCORD LOGIN EVENT ==========
+  if (discordAdminLogin) {
+    discordAdminLogin.onclick = () => {
+      showLoading(true);
+      loginWithDiscord();
+    };
+  }
 
-  logoutBtn.onclick = () => { sessionStorage.removeItem('adminLoggedIn'); if (unsubscribe) unsubscribe(); loginScreen.style.display = 'flex'; adminContent.style.display = 'none'; };
+  // ========== LOGOUT ==========
+  if (adminLogoutBtn) {
+    adminLogoutBtn.onclick = () => {
+      logoutDiscord();
+    };
+  }
 
+  // ========== LOAD SETTINGS ==========
   async function loadSettings() {
     const snap = await getDoc(doc(db, 'config', CONFIG_ID));
     if (snap.exists()) {
@@ -391,6 +513,7 @@
     }
   }
 
+  // ========== SAVE SETTINGS ==========
   document.getElementById('saveSettingsBtn').onclick = async () => {
     await setDoc(doc(db, 'config', CONFIG_ID), {
       pricePerRobux: parseInt(document.getElementById('adminPrice').value),
@@ -400,9 +523,11 @@
       updatedAt: new Date()
     });
     const fb = document.getElementById('saveFeedback');
-    fb.textContent = '✅ Tersimpan!'; setTimeout(() => fb.textContent = '', 2000);
+    fb.textContent = '✅ Tersimpan!';
+    setTimeout(() => fb.textContent = '', 2000);
   };
 
+  // ========== STATS ==========
   function updateStats(orders) {
     document.getElementById('statWaiting').textContent = orders.filter(o => o.status === 'waiting_payment').length;
     document.getElementById('statPending').textContent = orders.filter(o => o.status === 'pending_verification').length;
@@ -411,6 +536,7 @@
     document.getElementById('statTotal').textContent = orders.length;
   }
 
+  // ========== LISTEN ORDERS ==========
   function listenOrders() {
     const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
     if (unsubscribe) unsubscribe();
@@ -422,6 +548,7 @@
     });
   }
 
+  // ========== FORMAT DATE ==========
   function formatDate(dateValue) {
     if (!dateValue) return '-';
     try { if (dateValue?.toDate) return dateValue.toDate().toLocaleString('id-ID'); }
@@ -429,11 +556,9 @@
     return '-';
   }
 
-  // 🔥 FUNGSI GET SISA WAKTU - HANYA UNTUK STATUS waiting_payment
+  // ========== GET EXPIRE TIME ==========
   function getExpireTimeLeft(expireAt, status) {
-    // ❌ JIKA BUKAN waiting_payment, TIDAK TAMPILKAN TIMER
     if (status !== 'waiting_payment') return '';
-    
     if (!expireAt) return '';
     try {
       const expDate = expireAt.toDate ? expireAt.toDate() : new Date(expireAt);
@@ -447,15 +572,18 @@
     } catch { return ''; }
   }
 
+  // ========== GET METHOD NAME ==========
   function getMethodName(method) {
     const names = { bca: 'BCA VA', mandiri: 'Mandiri VA', bni: 'BNI VA', bri: 'BRI VA', qris: 'QRIS' };
     return names[method] || method?.toUpperCase() || '-';
   }
 
+  // ========== UPDATE ORDER STATUS ==========
   async function updateOrderStatus(orderId, newStatus) {
     await updateDoc(doc(db, 'orders', orderId), { status: newStatus, updatedAt: new Date() });
   }
 
+  // ========== FILTER & SEARCH ==========
   function applyFilterAndSearch() {
     const status = document.getElementById('statusFilter')?.value || 'all';
     const search = document.getElementById('searchOrder')?.value?.toLowerCase() || '';
@@ -465,10 +593,14 @@
     renderOrders(filtered);
   }
 
+  // ========== RENDER ORDERS ==========
   function renderOrders(orders) {
     const container = document.getElementById('ordersList');
     if (!container) return;
-    if (orders.length === 0) { container.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>✨ Tidak ada pesanan</p></div>'; return; }
+    if (orders.length === 0) { 
+      container.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>✨ Tidak ada pesanan</p></div>'; 
+      return; 
+    }
     
     container.innerHTML = orders.map(order => {
       let statusClass = 'status-waiting_payment', statusText = '💳 Menunggu Bayar';
@@ -481,7 +613,6 @@
       if (order.deliveryInfo?.includes('PO') || order.deliveryInfo?.includes('📦')) { deliveryClass = 'delivery-po'; deliveryText = '📦 Pre-Order'; }
       else if (order.deliveryInfo?.includes('Ditunda') || order.deliveryInfo?.includes('⏸️')) { deliveryClass = 'delivery-delayed'; deliveryText = '⏸️ Ditunda'; }
       
-      // 🔥 TIMER HANYA UNTUK STATUS waiting_payment
       const timerHtml = getExpireTimeLeft(order.expireAt, order.status);
       
       return `
@@ -523,11 +654,12 @@
     document.querySelectorAll('.btn-status').forEach(b => b.onclick = () => updateOrderStatus(b.dataset.id, b.dataset.status));
   }
 
+  // ========== EVENT LISTENERS ==========
   document.getElementById('statusFilter')?.addEventListener('change', () => applyFilterAndSearch());
   document.getElementById('searchOrder')?.addEventListener('input', () => applyFilterAndSearch());
   document.getElementById('refreshOrders')?.addEventListener('click', () => applyFilterAndSearch());
-  document.getElementById('adminPassword')?.addEventListener('keypress', (e) => e.key === 'Enter' && loginBtn.click());
 
+  // ========== INIT ==========
   checkAuth();
 </script>
 </body>
