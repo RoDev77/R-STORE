@@ -108,6 +108,51 @@
     .error-msg { color: #dc3545; margin-top: 15px; display: none; font-size: 14px; }
     .loading-msg { color: #667eea; margin-top: 15px; display: none; font-size: 14px; }
 
+    /* Not Admin Message */
+    .not-admin-message {
+      display: none;
+      text-align: center;
+      padding: 40px;
+      background: rgba(220, 53, 69, 0.1);
+      border-radius: 20px;
+      border: 1px solid rgba(220, 53, 69, 0.3);
+      margin: 80px auto;
+      max-width: 500px;
+    }
+
+    .not-admin-message i {
+      font-size: 48px;
+      color: #dc3545;
+      margin-bottom: 20px;
+    }
+
+    .not-admin-message h3 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    .not-admin-message p {
+      color: #a0a0b0;
+      margin-bottom: 20px;
+    }
+
+    .not-admin-message .btn-back {
+      background: rgba(102,126,234,0.2);
+      color: #667eea;
+      padding: 10px 24px;
+      border-radius: 30px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s;
+    }
+
+    .not-admin-message .btn-back:hover {
+      background: rgba(102,126,234,0.4);
+      transform: translateY(-2px);
+    }
+
     /* Navbar */
     .navbar {
       position: fixed;
@@ -207,7 +252,7 @@
       padding: 24px 30px;
     }
 
-    /* Stats Grid - Modern */
+    /* Stats Grid */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -252,7 +297,6 @@
       padding: 28px;
       margin-bottom: 30px;
       border: 1px solid rgba(255,255,255,0.08);
-      transition: all 0.3s;
     }
 
     .card-header {
@@ -267,7 +311,6 @@
     .card-header h2 {
       font-size: 18px;
       font-weight: 700;
-      color: #fff;
     }
 
     .card-header i {
@@ -360,7 +403,6 @@
       border-radius: 40px;
       padding: 0 16px;
       border: 1px solid rgba(255,255,255,0.08);
-      transition: all 0.2s;
     }
 
     .filter-group:focus-within {
@@ -372,8 +414,7 @@
       font-size: 14px;
     }
 
-    .filter-group select, 
-    .filter-group input {
+    .filter-group select, .filter-group input {
       background: transparent;
       border: none;
       padding: 10px 12px;
@@ -402,14 +443,13 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      transition: all 0.2s;
     }
 
     .btn-refresh:hover {
       background: rgba(102,126,234,0.3);
     }
 
-    /* Order Item - Modern */
+    /* Order Item */
     .order-item {
       background: #1a1a2e;
       border-radius: 20px;
@@ -559,7 +599,6 @@
       opacity: 0.5;
     }
 
-    /* Delivery History */
     .delivery-history {
       background: rgba(23,162,184,0.06);
       border-radius: 12px;
@@ -747,8 +786,17 @@
       <i class="fab fa-discord"></i> Login dengan Discord
     </button>
     <div class="loading-msg" id="loadingMsg">⏳ Memeriksa...</div>
-    <div class="error-msg" id="loginError">❌ Anda tidak memiliki akses admin!</div>
+    <div class="error-msg" id="loginError">❌ Login gagal!</div>
   </div>
+</div>
+
+<!-- Not Admin Message -->
+<div class="not-admin-message" id="notAdminMessage">
+  <i class="fas fa-shield-alt"></i>
+  <h3>⛔ Akses Ditolak</h3>
+  <p>Akun Discord Anda tidak memiliki akses sebagai Admin.</p>
+  <p style="font-size: 13px;">Hanya akun dengan role <strong style="color:#667eea;">"admin"</strong> yang dapat mengakses halaman ini.</p>
+  <a href="/" class="btn-back"><i class="fas fa-arrow-left"></i> Kembali ke Beranda</a>
 </div>
 
 <!-- Admin Content -->
@@ -902,6 +950,7 @@
   const discordAdminLogin = document.getElementById('discordAdminLogin');
   const adminLogoutBtn = document.getElementById('adminLogoutBtn');
   const adminUserInfo = document.getElementById('adminUserInfo');
+  const notAdminMessage = document.getElementById('notAdminMessage');
 
   function isDiscordLoggedIn() {
     const token = localStorage.getItem(JWT_TOKEN_KEY);
@@ -956,19 +1005,67 @@
   }
 
   function hideInitialLoading() { if (initialLoading) initialLoading.style.display = 'none'; }
-  function showAdminContent() { loginScreen.style.display = 'none'; adminContent.style.display = 'block'; initialLoading.style.display = 'none'; }
-  function showLoginScreen() { loginScreen.style.display = 'flex'; adminContent.style.display = 'none'; initialLoading.style.display = 'none'; if (unsubscribe) unsubscribe(); if (sessionCheckInterval) clearInterval(sessionCheckInterval); }
+  
+  function showAdminContent() { 
+    loginScreen.style.display = 'none'; 
+    adminContent.style.display = 'block'; 
+    notAdminMessage.style.display = 'none';
+    initialLoading.style.display = 'none'; 
+  }
+  
+  function showNotAdminMessage() {
+    loginScreen.style.display = 'none';
+    adminContent.style.display = 'none';
+    notAdminMessage.style.display = 'block';
+    initialLoading.style.display = 'none';
+    if (unsubscribe) unsubscribe();
+    if (sessionCheckInterval) clearInterval(sessionCheckInterval);
+  }
+  
+  function showLoginScreen() { 
+    loginScreen.style.display = 'flex'; 
+    adminContent.style.display = 'none'; 
+    notAdminMessage.style.display = 'none';
+    initialLoading.style.display = 'none'; 
+    if (unsubscribe) unsubscribe(); 
+    if (sessionCheckInterval) clearInterval(sessionCheckInterval); 
+  }
 
   async function checkAuth() {
+    // Cek callback dari Discord
     if (checkDiscordCallback()) {
       const user = getDiscordUser();
-      if (user && isUserAdmin(user)) { showAdminContent(); updateAdminUserInfo(user); await loadSettings(); listenOrders(); startSessionCheck(); return; }
+      if (user && isUserAdmin(user)) { 
+        showAdminContent(); 
+        updateAdminUserInfo(user); 
+        await loadSettings(); 
+        listenOrders(); 
+        startSessionCheck(); 
+        return;
+      } else {
+        showNotAdminMessage();
+        return;
+      }
     }
+    
+    // Cek session yang sudah ada
     if (isDiscordLoggedIn()) {
       const user = getDiscordUser();
-      if (user && isUserAdmin(user)) { showAdminContent(); updateAdminUserInfo(user); await loadSettings(); listenOrders(); startSessionCheck(); return; }
+      if (user && isUserAdmin(user)) { 
+        showAdminContent(); 
+        updateAdminUserInfo(user); 
+        await loadSettings(); 
+        listenOrders(); 
+        startSessionCheck(); 
+        return;
+      } else {
+        showNotAdminMessage();
+        return;
+      }
     }
-    showLoginScreen(); hideInitialLoading();
+    
+    showLoginScreen();
+    hideInitialLoading();
   }
 
   function updateAdminUserInfo(user) {
@@ -977,7 +1074,18 @@
 
   function startSessionCheck() {
     if (sessionCheckInterval) clearInterval(sessionCheckInterval);
-    sessionCheckInterval = setInterval(() => { if (!isDiscordLoggedIn()) { showLoginScreen(); if (unsubscribe) unsubscribe(); } }, 30 * 60 * 1000);
+    sessionCheckInterval = setInterval(() => { 
+      if (!isDiscordLoggedIn()) { 
+        showLoginScreen(); 
+        if (unsubscribe) unsubscribe(); 
+      } else {
+        const user = getDiscordUser();
+        if (!user || !isUserAdmin(user)) {
+          showNotAdminMessage();
+          if (unsubscribe) unsubscribe();
+        }
+      }
+    }, 30 * 60 * 1000);
   }
 
   if (discordAdminLogin) discordAdminLogin.onclick = () => loginWithDiscord();
