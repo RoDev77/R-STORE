@@ -1,6 +1,7 @@
 // File: api/discord-callback.js
+// Menggunakan fetch bawaan Node.js 18+ (tanpa node-fetch)
+
 const jwt = require('jsonwebtoken');
-const fetch = require('node-fetch');
 
 const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID;
 const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
@@ -15,7 +16,7 @@ module.exports = async (req, res) => {
   }
   
   try {
-    // 1. Tukar code dengan access token
+    // 1. Tukar code dengan access token (pakai fetch bawaan)
     const tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },

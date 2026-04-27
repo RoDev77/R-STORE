@@ -1,5 +1,6 @@
 // File: api/discord-login.js
-const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID || '1032176001150636052';
+
+const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID;
 const REDIRECT_URI = 'https://store.rstudiolab.online/api/discord-callback';
 
 module.exports = (req, res) => {

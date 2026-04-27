@@ -4,7 +4,6 @@
   "dependencies": {
     "firebase-admin": "^13.8.0",
     "jsonwebtoken": "^9.0.3",
-    "my-qris": "^1.0.3",
-    "node-fetch": "^3.3.2"
+    "my-qris": "^1.0.3"
   }
 }
