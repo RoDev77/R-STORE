@@ -4,8 +4,8 @@ const fetch = require('node-fetch');
 
 const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID;
 const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
-const REDIRECT_URI = 'https://r-store.vercel.app/api/discord-callback';
-const JWT_SECRET = process.env.JWT_SECRET || 'rahasia-default-ganti-dengan-string-unik';
+const REDIRECT_URI = 'https://store.rstudiolab.online/api/discord-callback';
+const JWT_SECRET = process.env.JWT_SECRET || 'DHAmxoe9MDpmze29mmfoi2kdPODMDmxk92247jDkXNi2Jdi922JDndX218rndDN';
 
 module.exports = async (req, res) => {
   const { code } = req.query;
@@ -55,7 +55,7 @@ module.exports = async (req, res) => {
     );
     
     // 4. Redirect ke halaman utama dengan token
-    const frontendUrl = process.env.FRONTEND_URL || 'https://r-store.vercel.app';
+    const frontendUrl = process.env.FRONTEND_URL || 'https://store.rstudiolab.online';
     res.redirect(`${frontendUrl}/?discord_token=${sessionToken}&user=${encodeURIComponent(JSON.stringify({
       id: discordUser.id,
       username: discordUser.username,

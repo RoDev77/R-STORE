@@ -1,6 +1,6 @@
 // File: api/discord-login.js
 const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID || '1032176001150636052';
-const REDIRECT_URI = 'https://r-store.vercel.app/api/discord-callback';
+const REDIRECT_URI = 'https://store.rstudiolab.online/api/discord-callback';
 
 module.exports = (req, res) => {
   const DISCORD_AUTH_URL = 'https://discord.com/api/oauth2/authorize';
