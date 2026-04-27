@@ -22,6 +22,35 @@
       overflow-x: hidden;
     }
 
+    /* Loading Screen */
+    .loading-screen-init {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #0f0f1a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+
+    .loading-spinner-init {
+      width: 50px;
+      height: 50px;
+      border: 3px solid rgba(102,126,234,0.3);
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 15px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
     .login-screen {
       position: fixed;
       top: 0;
@@ -286,8 +315,16 @@
 </head>
 <body>
 
+<!-- Initial Loading Screen -->
+<div class="loading-screen-init" id="initialLoading">
+  <div style="text-align: center;">
+    <div class="loading-spinner-init"></div>
+    <p>Memeriksa sesi admin...</p>
+  </div>
+</div>
+
 <!-- Login Screen -->
-<div class="login-screen" id="loginScreen">
+<div class="login-screen" id="loginScreen" style="display: none;">
   <div class="login-box">
     <h2>🔐 Admin Login</h2>
     
@@ -301,7 +338,7 @@
 </div>
 
 <!-- Admin Content -->
-<div class="admin-content" id="adminContent">
+<div class="admin-content" id="adminContent" style="display: none;">
   <nav class="navbar">
     <div class="nav-container">
       <div class="nav-logo"><i class="fas fa-shield-alt"></i><span>R STORE</span></div>
@@ -313,7 +350,6 @@
   </nav>
 
   <div class="container">
-    <!-- Stats Grid -->
     <div class="stats-grid">
       <div class="stat-card"><div class="stat-number" id="statWaiting">0</div><div class="stat-label">💳 Menunggu Bayar</div></div>
       <div class="stat-card"><div class="stat-number" id="statPending">0</div><div class="stat-label">⏰ Verifikasi</div></div>
@@ -322,7 +358,6 @@
       <div class="stat-card"><div class="stat-number" id="statTotal">0</div><div class="stat-label">📦 Total Order</div></div>
     </div>
 
-    <!-- Settings Card -->
     <div class="card">
       <h2><i class="fas fa-sliders-h"></i> Pengaturan Toko</h2>
       <div class="settings-grid">
@@ -335,7 +370,6 @@
       <span id="saveFeedback" class="save-feedback"></span>
     </div>
 
-    <!-- Orders Card -->
     <div class="card">
       <div class="filter-bar">
         <div class="filter-group"><i class="fas fa-filter"></i><select id="statusFilter">
@@ -357,11 +391,20 @@
 
   const CONFIG_ID = 'storeSettings';
   let allOrders = [], unsubscribe = null;
+  let sessionCheckInterval = null;
   
   // Discord login URL
   const DISCORD_LOGIN_URL = '/api/discord-login';
   const JWT_TOKEN_KEY = 'admin_session_token';
   const ADMIN_USER_KEY = 'admin_user';
+
+  // DOM Elements
+  const initialLoading = document.getElementById('initialLoading');
+  const loginScreen = document.getElementById('loginScreen');
+  const adminContent = document.getElementById('adminContent');
+  const discordAdminLogin = document.getElementById('discordAdminLogin');
+  const adminLogoutBtn = document.getElementById('adminLogoutBtn');
+  const adminUserInfo = document.getElementById('adminUserInfo');
 
   // ========== FUNGSI DISCORD LOGIN ==========
   function isDiscordLoggedIn() {
@@ -386,7 +429,7 @@
   function logoutDiscord() {
     localStorage.removeItem(JWT_TOKEN_KEY);
     localStorage.removeItem(ADMIN_USER_KEY);
-    window.location.reload();
+    showLoginScreen();
   }
 
   function checkDiscordCallback() {
@@ -405,7 +448,6 @@
       try {
         const user = JSON.parse(decodeURIComponent(userData));
         
-        // Cek apakah user memiliki role admin
         if (user.role === 'admin') {
           localStorage.setItem(JWT_TOKEN_KEY, sessionToken);
           localStorage.setItem(ADMIN_USER_KEY, JSON.stringify(user));
@@ -436,65 +478,96 @@
     }
   }
 
-  function showLoading(show) {
-    const loadingDiv = document.getElementById('loadingMsg');
-    if (loadingDiv) {
-      loadingDiv.style.display = show ? 'block' : 'none';
+  // ========== SHOW/HIDE SCREENS ==========
+  function hideInitialLoading() {
+    if (initialLoading) {
+      initialLoading.style.display = 'none';
     }
   }
 
-  // ========== DOM Elements ==========
-  const loginScreen = document.getElementById('loginScreen');
-  const adminContent = document.getElementById('adminContent');
-  const discordAdminLogin = document.getElementById('discordAdminLogin');
-  const adminLogoutBtn = document.getElementById('adminLogoutBtn');
-  const adminUserInfo = document.getElementById('adminUserInfo');
+  function showAdminContent() {
+    if (loginScreen) loginScreen.style.display = 'none';
+    if (adminContent) adminContent.style.display = 'block';
+    if (initialLoading) initialLoading.style.display = 'none';
+  }
+
+  function showLoginScreen() {
+    if (loginScreen) loginScreen.style.display = 'flex';
+    if (adminContent) adminContent.style.display = 'none';
+    if (initialLoading) initialLoading.style.display = 'none';
+    
+    // Hentikan listener jika ada
+    if (unsubscribe) unsubscribe();
+    if (sessionCheckInterval) clearInterval(sessionCheckInterval);
+  }
 
   // ========== CHECK AUTH ==========
-  function checkAuth() {
-    // Cek callback Discord terlebih dahulu
+  async function checkAuth() {
+    // 1. Cek callback dari Discord
     if (checkDiscordCallback()) {
       const user = getDiscordUser();
       if (user && isUserAdmin(user)) {
-        loginScreen.style.display = 'none';
-        adminContent.style.display = 'block';
-        if (adminUserInfo) {
-          adminUserInfo.innerHTML = `<i class="fab fa-discord"></i> ${user.globalName || user.username} (Admin)`;
-        }
-        loadSettings();
+        showAdminContent();
+        await loadSettings();
         listenOrders();
+        startSessionCheck();
+        updateAdminUserInfo(user);
         return;
       }
     }
     
-    // Cek session yang sudah ada
+    // 2. Cek session yang sudah ada
     if (isDiscordLoggedIn()) {
       const user = getDiscordUser();
       if (user && isUserAdmin(user)) {
-        loginScreen.style.display = 'none';
-        adminContent.style.display = 'block';
-        if (adminUserInfo) {
-          adminUserInfo.innerHTML = `<i class="fab fa-discord"></i> ${user.globalName || user.username} (Admin)`;
-        }
-        loadSettings();
+        showAdminContent();
+        await loadSettings();
         listenOrders();
+        startSessionCheck();
+        updateAdminUserInfo(user);
         return;
       }
     }
     
-    loginScreen.style.display = 'flex';
-    adminContent.style.display = 'none';
+    // 3. Tidak ada session, tampilkan login
+    showLoginScreen();
+    hideInitialLoading();
   }
 
-  // ========== DISCORD LOGIN EVENT ==========
+  function updateAdminUserInfo(user) {
+    if (adminUserInfo && user) {
+      adminUserInfo.innerHTML = `<i class="fab fa-discord"></i> ${user.globalName || user.username} (Admin)`;
+    }
+  }
+
+  // Cek session secara berkala (setiap 30 menit)
+  function startSessionCheck() {
+    if (sessionCheckInterval) clearInterval(sessionCheckInterval);
+    
+    sessionCheckInterval = setInterval(() => {
+      if (!isDiscordLoggedIn()) {
+        console.log('Session expired, redirecting to login...');
+        showLoginScreen();
+        if (unsubscribe) unsubscribe();
+      } else {
+        // Refresh user data
+        const user = getDiscordUser();
+        if (user && adminUserInfo) {
+          adminUserInfo.innerHTML = `<i class="fab fa-discord"></i> ${user.globalName || user.username} (Admin)`;
+        }
+      }
+    }, 30 * 60 * 1000); // 30 menit
+  }
+
+  // ========== EVENT LISTENERS ==========
   if (discordAdminLogin) {
     discordAdminLogin.onclick = () => {
-      showLoading(true);
+      const loadingMsg = document.getElementById('loadingMsg');
+      if (loadingMsg) loadingMsg.style.display = 'block';
       loginWithDiscord();
     };
   }
 
-  // ========== LOGOUT ==========
   if (adminLogoutBtn) {
     adminLogoutBtn.onclick = () => {
       logoutDiscord();
@@ -660,6 +733,7 @@
   document.getElementById('refreshOrders')?.addEventListener('click', () => applyFilterAndSearch());
 
   // ========== INIT ==========
+  // Jalankan pengecekan auth saat halaman dimuat
   checkAuth();
 </script>
 </body>
