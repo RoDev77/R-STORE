@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Top Up Robux - R STORE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: #0a0a14;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background: rgba(20,20,40,0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 28px;
+            padding: 30px;
+        }
+        h1 {
+            font-family: 'Oxanium', sans-serif;
+            font-size: 24px;
+            text-align: center;
+        }
+        .subtitle {
+            text-align: center;
+            color: #8a8aa0;
+            font-size: 13px;
+            margin-bottom: 25px;
+        }
+        .quick-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .quick-btn {
+            background: rgba(99,102,241,0.15);
+            border: 1px solid rgba(99,102,241,0.3);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .quick-btn:hover, .quick-btn.active {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-color: transparent;
+        }
+        .custom-input {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin: 20px 0;
+        }
+        .custom-input input {
+            flex: 1;
+            padding: 14px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            text-align: center;
+        }
+        .price-box {
+            background: rgba(0,212,255,0.1);
+            border-radius: 16px;
+            padding: 16px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .price-box .label {
+            font-size: 12px;
+            color: #00d4ff;
+        }
+        .price-box .amount {
+            font-size: 28px;
+            font-weight: 800;
+            font-family: 'Oxanium', monospace;
+            color: #00d4ff;
+        }
+        .btn-pay {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border: none;
+            border-radius: 16px;
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-pay:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(99,102,241,0.3);
+        }
+        .btn-pay:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .qr-section {
+            text-align: center;
+            margin-top: 25px;
+            display: none;
+        }
+        .qr-section img {
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            max-width: 250px;
+            width: 100%;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            display: none;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(99,102,241,0.3);
+            border-top-color: #6366f1;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .error-msg {
+            color: #f87171;
+            text-align: center;
+            margin-top: 15px;
+            display: none;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>💰 Top Up Robux</h1>
+    <p class="subtitle">Instant Delivery • 100% Aman</p>
+
+    <div class="quick-buttons">
+        <div class="quick-btn" data-robux="100">100 RB</div>
+        <div class="quick-btn" data-robux="200">200 RB</div>
+        <div class="quick-btn" data-robux="500">500 RB</div>
+        <div class="quick-btn" data-robux="1000">1000 RB</div>
+    </div>
+
+    <div class="custom-input">
+        <input type="number" id="customRobux" placeholder="Jumlah Robux custom" value="">
+        <span>RB</span>
+    </div>
+
+    <div class="price-box">
+        <div class="label">Total yang harus dibayar</div>
+        <div class="amount" id="totalPrice">Rp0</div>
+    </div>
+
+    <button class="btn-pay" id="payBtn">💳 Bayar dengan QRIS</button>
+
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p style="margin-top: 10px;">Membuat QR Code...</p>
+    </div>
+
+    <div class="qr-section" id="qrSection">
+        <img id="qrImage" src="">
+        <p>📱 Scan QRIS di atas menggunakan DANA, GoPay, atau aplikasi bank apapun</p>
+        <p style="font-size: 12px; margin-top: 8px;">Setelah scan, transfer sesuai nominal yang sudah terisi otomatis</p>
+    </div>
+
+    <div class="error-msg" id="errorMsg"></div>
+</div>
+
+<script>
+    const RATE = 150; // 1 Robux = Rp150 (sesuaikan)
+    let selectedRobux = 100;
+
+    const quickBtns = document.querySelectorAll('.quick-btn');
+    const customInput = document.getElementById('customRobux');
+    const totalPriceEl = document.getElementById('totalPrice');
+    const payBtn = document.getElementById('payBtn');
+    const loadingDiv = document.getElementById('loading');
+    const qrSection = document.getElementById('qrSection');
+    const qrImage = document.getElementById('qrImage');
+    const errorDiv = document.getElementById('errorMsg');
+
+    function updatePrice() {
+        let robux = selectedRobux;
+        if (customInput.value) {
+            robux = parseInt(customInput.value) || 0;
+        }
+        const total = robux * RATE;
+        totalPriceEl.textContent = 'Rp' + total.toLocaleString('id-ID');
+        return total;
+    }
+
+    // Quick button click
+    quickBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            quickBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedRobux = parseInt(btn.dataset.robux);
+            customInput.value = '';
+            updatePrice();
+        });
+    });
+
+    // Custom input
+    customInput.addEventListener('input', () => {
+        quickBtns.forEach(b => b.classList.remove('active'));
+        selectedRobux = parseInt(customInput.value) || 0;
+        updatePrice();
+    });
+
+    // Pay button
+    payBtn.addEventListener('click', async () => {
+        let robux = selectedRobux;
+        if (customInput.value) {
+            robux = parseInt(customInput.value) || 0;
+        }
+        
+        if (robux < 10) {
+            errorDiv.textContent = 'Minimal pembelian 10 Robux';
+            errorDiv.style.display = 'block';
+            return;
+        }
+
+        const totalPrice = robux * RATE;
+        
+        // Sembunyikan QR sebelumnya
+        qrSection.style.display = 'none';
+        errorDiv.style.display = 'none';
+        loadingDiv.style.display = 'block';
+        payBtn.disabled = true;
+
+        try {
+            // Panggil API generate QRIS dinamis
+            const response = await fetch(`/api/qris-dynamic.php?amount=${totalPrice}`);
+            const data = await response.json();
+
+            if (data.success) {
+                qrImage.src = data.qr_base64;
+                qrSection.style.display = 'block';
+                
+                // Simpan transaksi ke localStorage (opsional)
+                const transaction = {
+                    id: Date.now(),
+                    robux: robux,
+                    amount: totalPrice,
+                    qr_string: data.qr_string,
+                    status: 'pending',
+                    time: new Date().toISOString()
+                };
+                
+                let transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+                transactions.push(transaction);
+                localStorage.setItem('transactions', JSON.stringify(transactions));
+                
+                // Scroll ke QR
+                qrSection.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                errorDiv.textContent = data.error || 'Gagal membuat QRIS';
+                errorDiv.style.display = 'block';
+            }
+        } catch (err) {
+            errorDiv.textContent = 'Terjadi kesalahan: ' + err.message;
+            errorDiv.style.display = 'block';
+        } finally {
+            loadingDiv.style.display = 'none';
+            payBtn.disabled = false;
+        }
+    });
+
+    // Initial update
+    document.querySelector('.quick-btn').classList.add('active');
+    updatePrice();
+</script>
+</body>
+</html>
