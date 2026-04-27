@@ -253,7 +253,7 @@
 
         try {
             // Panggil API generate QRIS dinamis
-            const response = await fetch(`/api/qris-dynamic.php?amount=${totalPrice}`);
+            const response = await fetch(`/api/qris-dynamic?amount=${totalPrice}`);
             const data = await response.json();
 
             if (data.success) {
