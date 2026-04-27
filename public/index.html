@@ -64,16 +64,21 @@
         </a>
       </div>
       
-      <!-- Tampilan saat sudah login -->
+      <!-- Tampilan saat sudah login (seperti contoh: OxRodi™ | Rp 0 | Logout) -->
       <div id="authLoggedIn" style="display: none;">
-        <div class="discord-user-menu">
-          <div class="discord-user-info" id="discordUserInfo">
-            <img id="discordAvatar" src="" alt="Avatar" class="discord-avatar">
-            <span id="discordUsername" class="discord-username"></span>
+        <div class="user-menu">
+          <div class="user-info" id="userInfo">
+            <img id="userAvatar" src="" alt="Avatar" class="user-avatar">
+            <span class="user-name" id="userName">OxRodi™</span>
+            <span class="user-balance" id="userBalance">Rp 0</span>
             <i class="fas fa-chevron-down"></i>
           </div>
-          <div class="discord-dropdown" id="discordDropdown">
-            <a href="#" id="discordLogoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+          <div class="user-dropdown" id="userDropdown">
+            <a href="#" id="logoutBtn">
+              <i class="fas fa-sign-out-alt"></i> 
+              <span>Logout</span>
+              <span class="logout-sub">Keluar dari akun</span>
+            </a>
           </div>
         </div>
       </div>
