@@ -2,28 +2,20 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- Title yang menarik (60 karakter maksimal) -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
   <title>R STORE - Top Up Robux Murah & Instant</title>
-  <!-- Meta Description (160 karakter maksimal, muncul di bawah judul) -->
   <meta name="description" content="Beli Robux dengan harga terbaik, proses cepat, aman, dan terpercaya. Top up Roblox instant 24 jam." />
-  <!-- Meta Keywords (opsional) -->
   <meta name="keywords" content="top up robux, beli robux, robux murah, roblox, topup roblox" />
-  <!-- Author -->
   <meta name="author" content="R STORE" />
-  <!-- Google agar mengindex halaman -->
   <meta name="robots" content="index, follow" />
-  <!-- Open Graph (untuk tampilan di sosial media & Google) -->
   <meta property="og:title" content="R STORE - Top Up Robux Murah & Instant" />
   <meta property="og:description" content="Dapatkan Robux dengan harga terbaik, proses cepat, dan aman" />
   <meta property="og:image" content="https://store.rstudiolab.online/images/RSLogo.png" />
   <meta property="og:url" content="https://store.rstudiolab.online" />
   <meta property="og:type" content="website" />
-  <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="R STORE - Top Up Robux Murah & Instant" />
   <meta name="twitter:description" content="Dapatkan Robux dengan harga terbaik, proses cepat, dan aman" />
-  <!-- Canonical URL (biar tidak dianggap duplicate content) -->
   <link rel="canonical" href="https://store.rstudiolab.online/" />
   <link rel="icon" type="image/png" href="/images/favicon.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
@@ -56,28 +48,37 @@
       <span>R STORE</span>
       <small>R STUDIO</small>
     </div>
-    <div class="nav-menu">
+    
+    <div class="nav-menu" id="navMenu">
       <a href="index.html" class="nav-link active">Home</a>
       <a href="#pricing" class="nav-link">Harga</a>
       <a href="#testimonials" class="nav-link">Testimoni</a>
-      <a href="#" id="discordLoginBtn" class="nav-link discord-login-link">
-        <i class="fab fa-discord"></i> Discord
-      </a>
+      <a href="track.html" class="nav-link">Track Order</a>
     </div>
-    <a href="track.html" class="btn-track">
-      <i class="fas fa-search"></i> Lacak Pesanan
-    </a>
-    <!-- Di dalam <div class="nav-container">, setelah btn-track, tambahkan: -->
-    <div id="discordUserMenu" class="discord-user-menu" style="display: none;">
-      <div class="discord-user-info">
-        <img id="discordAvatar" src="" alt="Avatar" class="discord-avatar" style="display: none;">
-        <span id="discordUsername" class="discord-username"></span>
-        <i class="fas fa-chevron-down"></i>
+    
+    <div class="nav-auth">
+      <!-- Tampilan saat belum login -->
+      <div id="authNotLoggedIn" style="display: flex; gap: 12px;">
+        <a href="#" id="discordLoginBtn" class="discord-login-link">
+          <i class="fab fa-discord"></i> <span>Login dengan Discord</span>
+        </a>
       </div>
-      <div class="discord-dropdown">
-        <a href="#" id="discordLogoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      
+      <!-- Tampilan saat sudah login -->
+      <div id="authLoggedIn" style="display: none;">
+        <div class="discord-user-menu">
+          <div class="discord-user-info" id="discordUserInfo">
+            <img id="discordAvatar" src="" alt="Avatar" class="discord-avatar">
+            <span id="discordUsername" class="discord-username"></span>
+            <i class="fas fa-chevron-down"></i>
+          </div>
+          <div class="discord-dropdown" id="discordDropdown">
+            <a href="#" id="discordLogoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+          </div>
+        </div>
       </div>
     </div>
+    
     <div class="menu-toggle" id="menuToggle">
       <i class="fas fa-bars"></i>
     </div>
@@ -94,7 +95,7 @@
       <div class="community-text">
         <h3>⚠️ SYARAT PENTING SEBELUM MEMBELI!</h3>
         <p>Untuk mendapatkan pengiriman <strong>INSTANT</strong>, Anda WAJIB join <strong>Community Roblox R STORE</strong> minimal <strong>15 hari</strong> sebelum melakukan pembelian.</p>
-        <p>Belum join? <a href="https://www.roblox.com/communities/13174452" class="community-link" id="communityLink">Klik di sini untuk join community →</a></p>
+        <p>Belum join? <a href="https://www.roblox.com/communities/13174452" class="community-link" id="communityLink" target="_blank">Klik di sini untuk join community →</a></p>
       </div>
       <div class="community-badge">
         <span class="badge-important">WAJIB</span>
@@ -289,9 +290,8 @@
           </div>
         </div>
 
-        <!-- Username Roblox Field (WAJIB) -->
         <div class="username-field">
-          <label><i class="fas fa-rocket"></i> Username Roblox </label>
+          <label><i class="fas fa-rocket"></i> Username Roblox <span class="required">*</span></label>
           <div class="input-wrapper">
             <i class="fas fa-rocket"></i>
             <input type="text" id="robloxUsername" placeholder="Contoh: rstudiolab" />
@@ -301,7 +301,7 @@
         </div>
 
         <div class="input-group">
-          <label><i class="fas fa-gem"></i> Jumlah Robux </label>
+          <label><i class="fas fa-gem"></i> Jumlah Robux <span class="required">*</span></label>
           <div class="input-wrapper">
             <i class="fas fa-gem"></i> 
             <input type="number" id="robuxInput" min="10" step="10" placeholder="Minimal 10" />
@@ -310,10 +310,10 @@
         </div>
 
         <div class="input-group">
-          <label><i class="fas fa-tag"></i> Harga / Robux </label>
+          <label><i class="fas fa-tag"></i> Harga / Robux</label>
           <div class="input-wrapper">
             <i class="fas fa-tag"></i>
-            <input type="text" id="pricePerRobux" disabled />
+            <input type="text" id="pricePerRobux" disabled value="Rp 150" />
           </div>
         </div>
 
@@ -334,7 +334,6 @@
           </div>
         </div>
 
-        <!-- Tambahan Form: Email & No HP -->
         <div class="customer-info">
           <div class="info-title">
             <i class="fas fa-user-check"></i>
@@ -361,7 +360,6 @@
           </div>
         </div>
 
-        <!-- Checkbox Konfirmasi Syarat & Ketentuan -->
         <div class="terms-checkbox">
           <label class="checkbox-container">
             <input type="checkbox" id="termsCheckbox" />
@@ -436,7 +434,7 @@
     </div>
     <div class="modal-footer">
       <button class="btn-cancel" id="cancelModalBtn">Batal</button>
-      <button class="btn-confirm" id="confirmOrderBtn">Ya, Lanjutkan Pembayaran</button>
+      <button class="btn-confirm" id="confirmOrderBtn">Ya, Lanjutkan</button>
     </div>
   </div>
 </div>
@@ -543,7 +541,7 @@
 </section>
 
 <!-- WhatsApp Float -->
-<a href="https://wa.me/621233?text=Halo%20R%20STORE%2C%20saya%20mau%20tanya%20tentang%20Robux" 
+<a href="https://wa.me/6281234567890?text=Halo%20R%20STORE%2C%20saya%20mau%20tanya%20tentang%20Robux" 
    class="whatsapp-float" target="_blank" rel="noopener noreferrer">
   <i class="fab fa-whatsapp"></i>
   <span class="whatsapp-tooltip">Chat Admin</span>
@@ -617,18 +615,18 @@
 
   // Mobile menu toggle
   const menuToggle = document.getElementById('menuToggle');
-  const navMenu = document.querySelector('.nav-menu');
+  const navMenu = document.getElementById('navMenu');
   
-  if (menuToggle) {
+  if (menuToggle && navMenu) {
     menuToggle.addEventListener('click', () => {
       navMenu.classList.toggle('active');
     });
   }
   
   // Close mobile menu when clicking a link
-  document.querySelectorAll('.nav-link').forEach(link => {
+  document.querySelectorAll('.nav-link, .discord-login-link').forEach(link => {
     link.addEventListener('click', () => {
-      navMenu.classList.remove('active');
+      if (navMenu) navMenu.classList.remove('active');
     });
   });
   
@@ -645,16 +643,6 @@
     customOrderLink.addEventListener('click', (e) => {
       e.preventDefault();
       document.getElementById('order-section').scrollIntoView({ behavior: 'smooth' });
-    });
-  }
-  
-  // Community link
-  const communityLink = document.getElementById('communityLink');
-  if (communityLink) {
-    communityLink.addEventListener('click', (e) => {
-      e.preventDefault();
-      // Ganti dengan link community Roblox asli Anda
-      window.open('https://www.roblox.com/communities/13174452', '_blank');
     });
   }
   
@@ -698,7 +686,6 @@
     });
   };
   
-  // Trigger animation when element is visible
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
