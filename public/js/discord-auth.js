@@ -1,18 +1,20 @@
 // File: public/js/discord-auth.js
-// Handle login Discord di frontend
+// Login dengan Discord - Manual tanpa Firebase Auth
 
 const DISCORD_LOGIN_URL = '/api/discord-login';
+const JWT_TOKEN_KEY = 'discord_session_token';
+const DISCORD_USER_KEY = 'discord_user';
 
 // Cek apakah user sudah login
 function isDiscordLoggedIn() {
-  const token = localStorage.getItem('discord_session_token');
-  const user = localStorage.getItem('discord_user');
+  const token = localStorage.getItem(JWT_TOKEN_KEY);
+  const user = localStorage.getItem(DISCORD_USER_KEY);
   return token && user;
 }
 
 // Ambil data user yang login
 function getDiscordUser() {
-  const user = localStorage.getItem('discord_user');
+  const user = localStorage.getItem(DISCORD_USER_KEY);
   return user ? JSON.parse(user) : null;
 }
 
@@ -23,9 +25,29 @@ function loginWithDiscord() {
 
 // Logout
 function logoutDiscord() {
-  localStorage.removeItem('discord_session_token');
-  localStorage.removeItem('discord_user');
+  localStorage.removeItem(JWT_TOKEN_KEY);
+  localStorage.removeItem(DISCORD_USER_KEY);
   window.location.reload();
+}
+
+// Tampilkan notifikasi
+function showNotification(message, type = 'success') {
+  // Hapus notifikasi lama
+  const oldToast = document.querySelector('.notification-toast');
+  if (oldToast) oldToast.remove();
+  
+  const toast = document.createElement('div');
+  toast.className = `notification-toast ${type}`;
+  toast.innerHTML = `
+    <i class="fas ${type === 'success' ? 'fa-check-circle' : (type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle')}"></i>
+    <span>${message}</span>
+  `;
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.style.animation = 'fadeOut 0.3s ease forwards';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
 }
 
 // Cek parameter dari redirect Discord
@@ -36,7 +58,6 @@ function checkDiscordCallback() {
   const error = urlParams.get('error');
   
   if (error) {
-    console.error('Discord login error:', error);
     showNotification('Login Discord gagal: ' + error, 'error');
     window.history.replaceState({}, document.title, window.location.pathname);
     return;
@@ -47,244 +68,101 @@ function checkDiscordCallback() {
       const user = JSON.parse(decodeURIComponent(userData));
       
       // Simpan ke localStorage
-      localStorage.setItem('discord_session_token', sessionToken);
-      localStorage.setItem('discord_user', JSON.stringify(user));
+      localStorage.setItem(JWT_TOKEN_KEY, sessionToken);
+      localStorage.setItem(DISCORD_USER_KEY, JSON.stringify(user));
       
       showNotification(`Selamat datang, ${user.globalName || user.username}!`, 'success');
       
       // Bersihkan URL
       window.history.replaceState({}, document.title, window.location.pathname);
       
-      // Refresh halaman
+      // Refresh halaman untuk update UI
       setTimeout(() => {
         window.location.reload();
       }, 1000);
       
     } catch (e) {
       console.error('Error parsing user data:', e);
+      showNotification('Gagal memproses login', 'error');
     }
   }
 }
 
-// Verifikasi token ke server (opsional, untuk validasi)
-async function verifyDiscordToken() {
-  const token = localStorage.getItem('discord_session_token');
-  if (!token) return false;
-  
-  try {
-    const response = await fetch('/api/discord-verify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token })
-    });
-    
-    const data = await response.json();
-    return data.valid;
-  } catch (error) {
-    return false;
-  }
-}
-
-// Tampilkan notifikasi
-function showNotification(message, type = 'info') {
-  // Cek apakah sudah ada container notifikasi
-  let container = document.querySelector('.notification-container');
-  if (!container) {
-    container = document.createElement('div');
-    container.className = 'notification-container';
-    document.body.appendChild(container);
-  }
-  
-  const notification = document.createElement('div');
-  notification.className = `notification ${type}`;
-  notification.innerHTML = `
-    <i class="fas ${type === 'success' ? 'fa-check-circle' : (type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle')}"></i>
-    <span>${message}</span>
-  `;
-  
-  container.appendChild(notification);
-  
-  setTimeout(() => {
-    notification.classList.add('fade-out');
-    setTimeout(() => notification.remove(), 300);
-  }, 3000);
-}
-
-// Tambahkan tombol login Discord ke navbar
-function addDiscordButton() {
+// Update UI berdasarkan status login
+function updateDiscordUI() {
   const isLoggedIn = isDiscordLoggedIn();
   const user = getDiscordUser();
   
-  // Cari tempat untuk menempatkan tombol
-  const navLinks = document.querySelector('.nav-links');
-  if (!navLinks) return;
-  
-  // Hapus tombol lama jika ada
-  const oldBtn = document.querySelector('.discord-auth-btn');
-  if (oldBtn) oldBtn.remove();
+  const discordLoginBtn = document.getElementById('discordLoginBtn');
+  const discordUserMenu = document.getElementById('discordUserMenu');
+  const discordAvatar = document.getElementById('discordAvatar');
+  const discordUsername = document.getElementById('discordUsername');
   
   if (isLoggedIn && user) {
-    // Tampilkan profil user jika sudah login
-    const avatarUrl = user.avatar 
-      ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=32`
-      : 'https://cdn.discordapp.com/embed/avatars/0.png';
+    // Sembunyikan tombol login
+    if (discordLoginBtn) discordLoginBtn.style.display = 'none';
     
-    const userMenu = document.createElement('div');
-    userMenu.className = 'discord-user-menu';
-    userMenu.innerHTML = `
-      <div class="discord-user-info">
-        <img src="${avatarUrl}" alt="Avatar" class="discord-avatar">
-        <span class="discord-username">${user.globalName || user.username}</span>
-        <i class="fas fa-chevron-down"></i>
-      </div>
-      <div class="discord-dropdown">
-        <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
-      </div>
-    `;
+    // Tampilkan user menu
+    if (discordUserMenu) {
+      discordUserMenu.style.display = 'block';
+    }
     
-    navLinks.appendChild(userMenu);
+    // Set avatar
+    if (discordAvatar && user.avatar) {
+      const avatarUrl = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=32`;
+      discordAvatar.src = avatarUrl;
+      discordAvatar.style.display = 'inline-block';
+    }
     
-    // Event dropdown
-    const userInfo = userMenu.querySelector('.discord-user-info');
-    const dropdown = userMenu.querySelector('.discord-dropdown');
-    userInfo.addEventListener('click', () => {
-      dropdown.classList.toggle('show');
-    });
+    // Set username
+    if (discordUsername) {
+      discordUsername.textContent = user.globalName || user.username;
+    }
     
-    // Logout
-    document.getElementById('logoutBtn')?.addEventListener('click', (e) => {
-      e.preventDefault();
-      logoutDiscord();
-    });
+    // Setup dropdown
+    const userInfo = discordUserMenu?.querySelector('.discord-user-info');
+    const dropdown = discordUserMenu?.querySelector('.discord-dropdown');
     
-    // Tutup dropdown jika klik di luar
-    document.addEventListener('click', (e) => {
-      if (!userMenu.contains(e.target)) {
+    if (userInfo && dropdown) {
+      // Toggle dropdown
+      userInfo.onclick = (e) => {
+        e.stopPropagation();
+        dropdown.classList.toggle('show');
+      };
+      
+      // Tutup dropdown jika klik di luar
+      document.addEventListener('click', () => {
         dropdown.classList.remove('show');
-      }
-    });
+      });
+    }
+    
+    // Logout button
+    const logoutBtn = document.getElementById('discordLogoutBtn');
+    if (logoutBtn) {
+      logoutBtn.onclick = (e) => {
+        e.preventDefault();
+        logoutDiscord();
+      };
+    }
     
   } else {
     // Tampilkan tombol login
-    const discordBtn = document.createElement('a');
-    discordBtn.href = '#';
-    discordBtn.className = 'discord-auth-btn';
-    discordBtn.innerHTML = '<i class="fab fa-discord"></i> Login dengan Discord';
-    discordBtn.onclick = (e) => {
-      e.preventDefault();
-      loginWithDiscord();
-    };
-    
-    navLinks.appendChild(discordBtn);
+    if (discordLoginBtn) discordLoginBtn.style.display = 'inline-flex';
+    if (discordUserMenu) discordUserMenu.style.display = 'none';
   }
-}
-
-// Style untuk Discord button
-function addDiscordStyles() {
-  const style = document.createElement('style');
-  style.textContent = `
-    .discord-auth-btn {
-      background: #5865F2;
-      color: white !important;
-      padding: 8px 20px !important;
-      border-radius: 30px !important;
-      display: inline-flex !important;
-      align-items: center !important;
-      gap: 8px !important;
-      transition: all 0.3s !important;
-    }
-    .discord-auth-btn:hover {
-      background: #4752C4 !important;
-      transform: translateY(-2px) !important;
-    }
-    
-    .discord-user-menu {
-      position: relative;
-      cursor: pointer;
-    }
-    .discord-user-info {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 12px;
-      background: rgba(102,126,234,0.2);
-      border-radius: 30px;
-      transition: all 0.3s;
-    }
-    .discord-user-info:hover {
-      background: rgba(102,126,234,0.4);
-    }
-    .discord-avatar {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-    }
-    .discord-username {
-      font-size: 13px;
-      font-weight: 600;
-    }
-    .discord-dropdown {
-      position: absolute;
-      top: 100%;
-      right: 0;
-      background: #1a1a30;
-      border-radius: 12px;
-      padding: 8px 0;
-      min-width: 150px;
-      border: 1px solid rgba(255,255,255,0.1);
-      display: none;
-      z-index: 1000;
-    }
-    .discord-dropdown.show {
-      display: block;
-    }
-    .discord-dropdown a {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 16px;
-      color: #fff;
-      text-decoration: none;
-      font-size: 13px;
-    }
-    .discord-dropdown a:hover {
-      background: rgba(255,255,255,0.1);
-    }
-    
-    .notification-container {
-      position: fixed;
-      top: 80px;
-      right: 20px;
-      z-index: 9999;
-    }
-    .notification {
-      background: #1a1a30;
-      border-radius: 12px;
-      padding: 12px 20px;
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      border-left: 4px solid #667eea;
-      animation: slideIn 0.3s ease;
-    }
-    .notification.success { border-left-color: #28a745; }
-    .notification.error { border-left-color: #dc3545; }
-    .notification.fade-out { animation: fadeOut 0.3s ease forwards; }
-    @keyframes slideIn {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-    @keyframes fadeOut {
-      to { transform: translateX(100%); opacity: 0; }
-    }
-  `;
-  document.head.appendChild(style);
 }
 
 // Inisialisasi
 document.addEventListener('DOMContentLoaded', () => {
-  addDiscordStyles();
   checkDiscordCallback();
-  addDiscordButton();
+  updateDiscordUI();
+  
+  // Pasang event listener untuk tombol login
+  const discordLoginBtn = document.getElementById('discordLoginBtn');
+  if (discordLoginBtn) {
+    discordLoginBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      loginWithDiscord();
+    });
+  }
 });

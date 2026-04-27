@@ -1305,6 +1305,122 @@ body {
   animation: fadeIn 0.3s ease;
 }
 
+/* Discord Login Styles */
+.discord-login-link {
+  background: #5865F2 !important;
+  color: white !important;
+  padding: 8px 20px !important;
+  border-radius: 30px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  transition: all 0.3s !important;
+}
+
+.discord-login-link:hover {
+  background: #4752C4 !important;
+  transform: translateY(-2px) !important;
+  color: white !important;
+}
+
+.discord-user-menu {
+  position: relative;
+  cursor: pointer;
+  margin-left: 15px;
+}
+
+.discord-user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: rgba(102,126,234,0.2);
+  border-radius: 30px;
+  transition: all 0.3s;
+}
+
+.discord-user-info:hover {
+  background: rgba(102,126,234,0.4);
+}
+
+.discord-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+}
+
+.discord-username {
+  font-size: 13px;
+  font-weight: 600;
+  color: white;
+}
+
+.discord-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: #1a1a30;
+  border-radius: 12px;
+  padding: 8px 0;
+  min-width: 150px;
+  border: 1px solid rgba(255,255,255,0.1);
+  display: none;
+  z-index: 1000;
+}
+
+.discord-dropdown.show {
+  display: block;
+}
+
+.discord-dropdown a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  color: #fff;
+  text-decoration: none;
+  font-size: 13px;
+}
+
+.discord-dropdown a:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+/* Notification Toast */
+.notification-toast {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  background: #1a1a30;
+  border-radius: 12px;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 9999;
+  animation: slideInRight 0.3s ease;
+  border-left: 4px solid #28a745;
+}
+
+.notification-toast.error {
+  border-left-color: #dc3545;
+}
+
+.notification-toast.info {
+  border-left-color: #667eea;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }

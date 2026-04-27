@@ -60,10 +60,24 @@
       <a href="index.html" class="nav-link active">Home</a>
       <a href="#pricing" class="nav-link">Harga</a>
       <a href="#testimonials" class="nav-link">Testimoni</a>
+      <a href="#" id="discordLoginBtn" class="nav-link discord-login-link">
+        <i class="fab fa-discord"></i> Discord
+      </a>
     </div>
     <a href="track.html" class="btn-track">
       <i class="fas fa-search"></i> Lacak Pesanan
     </a>
+    <!-- Di dalam <div class="nav-container">, setelah btn-track, tambahkan: -->
+    <div id="discordUserMenu" class="discord-user-menu" style="display: none;">
+      <div class="discord-user-info">
+        <img id="discordAvatar" src="" alt="Avatar" class="discord-avatar" style="display: none;">
+        <span id="discordUsername" class="discord-username"></span>
+        <i class="fas fa-chevron-down"></i>
+      </div>
+      <div class="discord-dropdown">
+        <a href="#" id="discordLogoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </div>
+    </div>
     <div class="menu-toggle" id="menuToggle">
       <i class="fas fa-bars"></i>
     </div>
@@ -584,6 +598,8 @@
   </div>
 </footer>
 
+<!-- Discord Auth Script -->
+<script type="module" src="js/discord-auth.js"></script>
 <script type="module" src="main.js"></script>
 <script>
   // Hide loading screen after page load

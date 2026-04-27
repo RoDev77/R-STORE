@@ -1,21 +1,11 @@
 // File: api/discord-callback.js
-// Endpoint callback setelah user login di Discord
-
 const jwt = require('jsonwebtoken');
-const admin = require('firebase-admin');
-
-// Initialize Firebase Admin (cukup sekali)
-if (!admin.apps.length) {
-  const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT || '{}');
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount)
-  });
-}
+const fetch = require('node-fetch');
 
 const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID;
 const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
 const REDIRECT_URI = 'https://r-store.vercel.app/api/discord-callback';
-const JWT_SECRET = process.env.JWT_SECRET || 'rahasia-default-ganti-ini';
+const JWT_SECRET = process.env.JWT_SECRET || 'rahasia-default-ganti-dengan-string-unik';
 
 module.exports = async (req, res) => {
   const { code } = req.query;
@@ -51,28 +41,7 @@ module.exports = async (req, res) => {
     
     const discordUser = await userResponse.json();
     
-    // 3. Simpan atau update user ke Firestore
-    const db = admin.firestore();
-    const userRef = db.collection('discord_users').doc(discordUser.id);
-    const userDoc = await userRef.get();
-    
-    const userData = {
-      discordId: discordUser.id,
-      username: discordUser.username,
-      globalName: discordUser.global_name || discordUser.username,
-      avatar: discordUser.avatar,
-      email: discordUser.email || null,
-      lastLogin: admin.firestore.Timestamp.now(),
-      loginCount: userDoc.exists ? (userDoc.data().loginCount || 0) + 1 : 1,
-    };
-    
-    if (!userDoc.exists) {
-      userData.createdAt = admin.firestore.Timestamp.now();
-    }
-    
-    await userRef.set(userData, { merge: true });
-    
-    // 4. Buat JWT token untuk session
+    // 3. Buat JWT token untuk session
     const sessionToken = jwt.sign(
       {
         userId: discordUser.id,
@@ -85,7 +54,7 @@ module.exports = async (req, res) => {
       { expiresIn: '7d' }
     );
     
-    // 5. Redirect ke halaman utama dengan token
+    // 4. Redirect ke halaman utama dengan token
     const frontendUrl = process.env.FRONTEND_URL || 'https://r-store.vercel.app';
     res.redirect(`${frontendUrl}/?discord_token=${sessionToken}&user=${encodeURIComponent(JSON.stringify({
       id: discordUser.id,

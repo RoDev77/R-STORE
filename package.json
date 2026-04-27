@@ -2,6 +2,9 @@
   "name": "r-store",
   "version": "1.0.0",
   "dependencies": {
-    "my-qris": "^1.0.3"
+    "firebase-admin": "^13.8.0",
+    "jsonwebtoken": "^9.0.3",
+    "my-qris": "^1.0.3",
+    "node-fetch": "^3.3.2"
   }
 }

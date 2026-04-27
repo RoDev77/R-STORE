@@ -1,7 +1,5 @@
 // File: api/discord-login.js
-// Endpoint untuk memulai login Discord
-
-const DISCORD_CLIENT_ID = 'YOUR_DISCORD_CLIENT_ID'; // Ganti dengan Client ID kamu
+const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID || '1032176001150636052';
 const REDIRECT_URI = 'https://r-store.vercel.app/api/discord-callback';
 
 module.exports = (req, res) => {
