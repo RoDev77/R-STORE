@@ -235,36 +235,49 @@
       padding: 20px;
       margin-bottom: 15px;
       border: 1px solid rgba(255,255,255,0.08);
+      transition: all 0.3s;
     }
+
+    .order-item:hover {
+      border-color: rgba(102,126,234,0.3);
+      transform: translateX(5px);
+    }
+
     .order-header {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       flex-wrap: wrap;
+      gap: 10px;
       margin-bottom: 15px;
       padding-bottom: 15px;
       border-bottom: 1px solid rgba(255,255,255,0.1);
     }
+
     .order-id {
       font-family: monospace;
       background: rgba(102,126,234,0.15);
       padding: 4px 12px;
       border-radius: 20px;
       color: #667eea;
+      font-size: 12px;
     }
+
     .order-details {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
       gap: 15px;
       margin-bottom: 15px;
     }
-    .order-detail-label { font-size: 11px; color: #a0a0b0; text-transform: uppercase; }
-    .order-detail-value { font-size: 15px; font-weight: 600; }
+
+    .order-detail-label { font-size: 11px; color: #a0a0b0; text-transform: uppercase; letter-spacing: 0.5px; }
+    .order-detail-value { font-size: 14px; font-weight: 600; }
 
     .status-badge {
       display: inline-block;
       padding: 4px 12px;
       border-radius: 20px;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 700;
     }
     .status-waiting_payment { background: #ffc107; color: #000; }
@@ -273,19 +286,50 @@
     .status-delivered { background: #17a2b8; color: #fff; }
     .status-cancelled { background: #dc3545; color: #fff; }
 
+    /* 🔥 JENIS PENGIRIMAN - TAMPIL LEBIH MENONJOL */
     .delivery-badge {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 30px;
       font-size: 11px;
-      font-weight: 600;
+      font-weight: 700;
     }
-    .delivery-instant { background: rgba(40,167,69,0.2); color: #28a745; }
-    .delivery-po { background: rgba(255,193,7,0.2); color: #ffc107; }
-    .delivery-delayed { background: rgba(255,193,7,0.2); color: #ffc107; }
+    .delivery-instant { 
+      background: rgba(40, 167, 69, 0.2); 
+      color: #28a745; 
+      border: 1px solid rgba(40, 167, 69, 0.3);
+    }
+    .delivery-po { 
+      background: rgba(255, 193, 7, 0.2); 
+      color: #ffc107; 
+      border: 1px solid rgba(255, 193, 7, 0.3);
+    }
+    .delivery-delayed { 
+      background: rgba(255, 193, 7, 0.2); 
+      color: #ffc107; 
+      border: 1px solid rgba(255, 193, 7, 0.3);
+    }
 
-    .order-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); }
-    .btn-status { padding: 8px 16px; border-radius: 30px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; }
+    .order-actions { 
+      display: flex; 
+      gap: 10px; 
+      flex-wrap: wrap; 
+      margin-top: 15px; 
+      padding-top: 15px; 
+      border-top: 1px solid rgba(255,255,255,0.1); 
+    }
+    .btn-status { 
+      padding: 6px 14px; 
+      border-radius: 30px; 
+      font-size: 12px; 
+      font-weight: 600; 
+      cursor: pointer; 
+      border: none; 
+      transition: all 0.2s;
+    }
+    .btn-status:hover { transform: translateY(-2px); }
     .btn-paid { background: #28a745; color: white; }
     .btn-delivered { background: #17a2b8; color: white; }
     .btn-cancel { background: #dc3545; color: white; }
@@ -295,21 +339,25 @@
       background: #1a1a30;
       border: 1px solid rgba(255,255,255,0.1);
       border-radius: 30px;
-      padding: 8px 16px;
+      padding: 6px 14px;
       color: white;
+      font-size: 12px;
+      cursor: pointer;
     }
 
-    .timer-display { font-size: 11px; color: #ffc107; margin-top: 4px; }
+    .timer-display { font-size: 11px; color: #ffc107; margin-top: 8px; padding: 5px 10px; background: rgba(255,193,7,0.1); border-radius: 20px; display: inline-block; }
     .empty-state { text-align: center; padding: 60px; color: #a0a0b0; }
-    .admin-user-info { margin-left: 15px; font-size: 14px; color: #667eea; }
+    .admin-user-info { margin-left: 15px; font-size: 14px; color: #667eea; display: flex; align-items: center; gap: 8px; }
 
-    .footer { text-align: center; padding: 30px; border-top: 1px solid rgba(255,255,255,0.1); color: #a0a0b0; }
+    .footer { text-align: center; padding: 30px; border-top: 1px solid rgba(255,255,255,0.1); color: #a0a0b0; font-size: 12px; }
     
     @media (max-width: 768px) { 
       .nav-container { flex-direction: column; gap: 15px; } 
       .container { padding: 15px; } 
       .card { padding: 20px; } 
       .login-box { margin: 20px; padding: 30px; width: auto; }
+      .order-header { flex-direction: column; align-items: flex-start; }
+      .order-details { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -393,10 +441,10 @@
   let allOrders = [], unsubscribe = null;
   let sessionCheckInterval = null;
   
-  // 🔥 SESSION KEYS - SAMA DENGAN index.html
+  // SESSION KEYS - SAMA DENGAN index.html
   const DISCORD_LOGIN_URL = '/api/discord-login';
-  const JWT_TOKEN_KEY = 'discord_session_token';  // SAMA dengan index.html
-  const DISCORD_USER_KEY = 'discord_user';        // SAMA dengan index.html
+  const JWT_TOKEN_KEY = 'discord_session_token';
+  const DISCORD_USER_KEY = 'discord_user';
 
   // DOM Elements
   const initialLoading = document.getElementById('initialLoading');
@@ -406,7 +454,7 @@
   const adminLogoutBtn = document.getElementById('adminLogoutBtn');
   const adminUserInfo = document.getElementById('adminUserInfo');
 
-  // ========== FUNGSI SHARED SESSION (SAMA DENGAN index.html) ==========
+  // ========== FUNGSI SHARED SESSION ==========
   function isDiscordLoggedIn() {
     const token = localStorage.getItem(JWT_TOKEN_KEY);
     const user = localStorage.getItem(DISCORD_USER_KEY);
@@ -427,11 +475,9 @@
   }
 
   function logoutDiscord() {
-    // Hapus session dari localStorage (sama dengan yang dipakai index.html)
     localStorage.removeItem(JWT_TOKEN_KEY);
     localStorage.removeItem(DISCORD_USER_KEY);
     showLoginScreen();
-    // Redirect ke index.html agar user tidak bingung
     window.location.href = '/';
   }
 
@@ -450,20 +496,14 @@
     if (sessionToken && userData) {
       try {
         const user = JSON.parse(decodeURIComponent(userData));
-        
-        // Simpan ke localStorage (sama dengan index.html)
         localStorage.setItem(JWT_TOKEN_KEY, sessionToken);
         localStorage.setItem(DISCORD_USER_KEY, JSON.stringify(user));
-        
         window.history.replaceState({}, document.title, window.location.pathname);
         
-        // Cek role admin
         if (user.role === 'admin') {
           return true;
         } else {
-          console.error('User is not admin');
           showError('Anda tidak memiliki akses admin!');
-          // Hapus session karena bukan admin
           localStorage.removeItem(JWT_TOKEN_KEY);
           localStorage.removeItem(DISCORD_USER_KEY);
           return false;
@@ -488,11 +528,8 @@
     }
   }
 
-  // ========== SHOW/HIDE SCREENS ==========
   function hideInitialLoading() {
-    if (initialLoading) {
-      initialLoading.style.display = 'none';
-    }
+    if (initialLoading) initialLoading.style.display = 'none';
   }
 
   function showAdminContent() {
@@ -505,14 +542,11 @@
     if (loginScreen) loginScreen.style.display = 'flex';
     if (adminContent) adminContent.style.display = 'none';
     if (initialLoading) initialLoading.style.display = 'none';
-    
     if (unsubscribe) unsubscribe();
     if (sessionCheckInterval) clearInterval(sessionCheckInterval);
   }
 
-  // ========== CHECK AUTH ==========
   async function checkAuth() {
-    // 1. Cek callback dari Discord (jika baru login)
     if (checkDiscordCallback()) {
       const user = getDiscordUser();
       if (user && isUserAdmin(user)) {
@@ -529,17 +563,13 @@
       }
     }
     
-    // 2. Cek session yang sudah ada (dari index.html atau sebelumnya)
     if (isDiscordLoggedIn()) {
       const user = getDiscordUser();
-      
-      // 🔥 VERIFIKASI ULANG ROLE ADMIN DARI FIRESTORE (optional, untuk keamanan)
       try {
         const userDoc = await getDoc(doc(db, 'users', `discord_${user.id}`));
         if (userDoc.exists()) {
           const userData = userDoc.data();
           if (userData.role === 'admin') {
-            // Update role di localStorage jika berbeda
             if (user.role !== 'admin') {
               user.role = 'admin';
               localStorage.setItem(DISCORD_USER_KEY, JSON.stringify(user));
@@ -557,7 +587,6 @@
         console.error('Error verifying admin role:', error);
       }
       
-      // Fallback ke role dari localStorage
       if (user && isUserAdmin(user)) {
         showAdminContent();
         await loadSettings();
@@ -569,31 +598,30 @@
       }
     }
     
-    // 3. Tidak ada session atau bukan admin, tampilkan login
     showLoginScreen();
     hideInitialLoading();
   }
 
   function updateAdminUserInfo(user) {
     if (adminUserInfo && user) {
-      adminUserInfo.innerHTML = `<i class="fab fa-discord"></i> ${user.globalName || user.username} (Admin)`;
+      const avatarUrl = user.avatar 
+        ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=32`
+        : `https://cdn.discordapp.com/embed/avatars/${parseInt(user.id) % 5}.png`;
+      adminUserInfo.innerHTML = `<img src="${avatarUrl}" style="width:28px;height:28px;border-radius:50%;margin-right:8px;"> ${user.globalName || user.username} (Admin)`;
     }
   }
 
-  // Cek session secara berkala (setiap 30 menit)
   function startSessionCheck() {
     if (sessionCheckInterval) clearInterval(sessionCheckInterval);
-    
     sessionCheckInterval = setInterval(() => {
       if (!isDiscordLoggedIn()) {
         console.log('Session expired, redirecting to login...');
         showLoginScreen();
         if (unsubscribe) unsubscribe();
       }
-    }, 30 * 60 * 1000); // 30 menit
+    }, 30 * 60 * 1000);
   }
 
-  // ========== EVENT LISTENERS ==========
   if (discordAdminLogin) {
     discordAdminLogin.onclick = () => {
       const loadingMsg = document.getElementById('loadingMsg');
@@ -608,7 +636,6 @@
     };
   }
 
-  // ========== LOAD SETTINGS ==========
   async function loadSettings() {
     const snap = await getDoc(doc(db, 'config', CONFIG_ID));
     if (snap.exists()) {
@@ -620,7 +647,6 @@
     }
   }
 
-  // ========== SAVE SETTINGS ==========
   document.getElementById('saveSettingsBtn').onclick = async () => {
     await setDoc(doc(db, 'config', CONFIG_ID), {
       pricePerRobux: parseInt(document.getElementById('adminPrice').value),
@@ -634,7 +660,6 @@
     setTimeout(() => fb.textContent = '', 2000);
   };
 
-  // ========== STATS ==========
   function updateStats(orders) {
     document.getElementById('statWaiting').textContent = orders.filter(o => o.status === 'waiting_payment').length;
     document.getElementById('statPending').textContent = orders.filter(o => o.status === 'pending_verification').length;
@@ -643,7 +668,6 @@
     document.getElementById('statTotal').textContent = orders.length;
   }
 
-  // ========== LISTEN ORDERS ==========
   function listenOrders() {
     const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
     if (unsubscribe) unsubscribe();
@@ -655,7 +679,6 @@
     });
   }
 
-  // ========== FORMAT DATE ==========
   function formatDate(dateValue) {
     if (!dateValue) return '-';
     try { if (dateValue?.toDate) return dateValue.toDate().toLocaleString('id-ID'); }
@@ -663,7 +686,6 @@
     return '-';
   }
 
-  // ========== GET EXPIRE TIME ==========
   function getExpireTimeLeft(expireAt, status) {
     if (status !== 'waiting_payment') return '';
     if (!expireAt) return '';
@@ -672,25 +694,22 @@
       const remaining = Math.max(0, Math.floor((expDate - new Date()) / 1000));
       const minutes = Math.floor(remaining / 60);
       const hours = Math.floor(minutes / 60);
-      if (remaining <= 0) return '<span style="color:#dc3545;">⏰ Expired</span>';
+      if (remaining <= 0) return '⏰ Expired';
       if (hours > 0) return `⏱️ ${hours}j ${minutes % 60}m`;
       if (minutes > 0) return `⏱️ ${minutes}m ${remaining % 60}d`;
       return `⏱️ ${remaining}d`;
     } catch { return ''; }
   }
 
-  // ========== GET METHOD NAME ==========
   function getMethodName(method) {
     const names = { bca: 'BCA VA', mandiri: 'Mandiri VA', bni: 'BNI VA', bri: 'BRI VA', qris: 'QRIS' };
     return names[method] || method?.toUpperCase() || '-';
   }
 
-  // ========== UPDATE ORDER STATUS ==========
   async function updateOrderStatus(orderId, newStatus) {
     await updateDoc(doc(db, 'orders', orderId), { status: newStatus, updatedAt: new Date() });
   }
 
-  // ========== FILTER & SEARCH ==========
   function applyFilterAndSearch() {
     const status = document.getElementById('statusFilter')?.value || 'all';
     const search = document.getElementById('searchOrder')?.value?.toLowerCase() || '';
@@ -700,7 +719,21 @@
     renderOrders(filtered);
   }
 
-  // ========== RENDER ORDERS ==========
+  // 🔥 FUNGSI UNTUK MENDAPATKAN JENIS PENGIRIMAN DARI DELIVERY INFO
+  function getDeliveryType(deliveryInfo) {
+    if (!deliveryInfo) return { type: 'instant', text: '⚡ Instant', icon: 'fa-bolt', class: 'delivery-instant' };
+    if (deliveryInfo.includes('PO') || deliveryInfo.includes('Pre-Order') || deliveryInfo.includes('📦')) {
+      return { type: 'po', text: '📦 Pre-Order (15 Hari)', icon: 'fa-calendar-alt', class: 'delivery-po' };
+    }
+    if (deliveryInfo.includes('Ditunda') || deliveryInfo.includes('⏸️') || deliveryInfo.includes('delayed')) {
+      return { type: 'delayed', text: '⏸️ Ditunda', icon: 'fa-pause-circle', class: 'delivery-delayed' };
+    }
+    if (deliveryInfo.includes('Instant') || deliveryInfo.includes('⚡')) {
+      return { type: 'instant', text: '⚡ Instant', icon: 'fa-bolt', class: 'delivery-instant' };
+    }
+    return { type: 'instant', text: '⚡ Instant', icon: 'fa-bolt', class: 'delivery-instant' };
+  }
+
   function renderOrders(orders) {
     const container = document.getElementById('ordersList');
     if (!container) return;
@@ -716,30 +749,53 @@
       else if (order.status === 'delivered') { statusClass = 'status-delivered'; statusText = '🎉 Terkirim'; }
       else if (order.status === 'cancelled') { statusClass = 'status-cancelled'; statusText = '❌ Dibatalkan'; }
       
-      let deliveryClass = 'delivery-instant', deliveryText = '⚡ Instant';
-      if (order.deliveryInfo?.includes('PO') || order.deliveryInfo?.includes('📦')) { deliveryClass = 'delivery-po'; deliveryText = '📦 Pre-Order'; }
-      else if (order.deliveryInfo?.includes('Ditunda') || order.deliveryInfo?.includes('⏸️')) { deliveryClass = 'delivery-delayed'; deliveryText = '⏸️ Ditunda'; }
-      
+      // 🔥 GET DELIVERY TYPE
+      const delivery = getDeliveryType(order.deliveryInfo);
       const timerHtml = getExpireTimeLeft(order.expireAt, order.status);
       
       return `
         <div class="order-item">
           <div class="order-header">
-            <div><span class="order-id"><i class="fas fa-hashtag"></i> ${order.id}</span></div>
-            <div style="display: flex; gap: 10px; align-items: center;">
-              <span class="delivery-badge ${deliveryClass}">${deliveryText}</span>
+            <div>
+              <span class="order-id"><i class="fas fa-hashtag"></i> ${order.id}</span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+              <span class="delivery-badge ${delivery.class}">
+                <i class="fas ${delivery.icon}"></i> ${delivery.text}
+              </span>
               <span class="status-badge ${statusClass}">${statusText}</span>
             </div>
           </div>
+          
           <div class="order-details">
-            <div><div class="order-detail-label"><i class="fas fa-rocket"></i> Username</div><div class="order-detail-value">${order.robloxUsername || '-'}</div></div>
-            <div><div class="order-detail-label"><i class="fas fa-coins"></i> Robux</div><div class="order-detail-value">${(order.robuxAmount || 0).toLocaleString()}</div></div>
-            <div><div class="order-detail-label"><i class="fas fa-money-bill"></i> Total</div><div class="order-detail-value">Rp ${(order.totalPrice || 0).toLocaleString()}</div></div>
-            <div><div class="order-detail-label"><i class="fas fa-credit-card"></i> Metode</div><div class="order-detail-value">${getMethodName(order.paymentMethod)}</div></div>
-            <div><div class="order-detail-label"><i class="fas fa-code"></i> Kode Unik</div><div class="order-detail-value" style="color:#ffc107">${order.uniqueCode || '-'}</div></div>
-            <div><div class="order-detail-label"><i class="fas fa-calendar"></i> Dibuat</div><div class="order-detail-value">${formatDate(order.createdAt)}</div></div>
+            <div>
+              <div class="order-detail-label"><i class="fas fa-rocket"></i> Username</div>
+              <div class="order-detail-value">${order.robloxUsername || '-'}</div>
+            </div>
+            <div>
+              <div class="order-detail-label"><i class="fas fa-coins"></i> Robux</div>
+              <div class="order-detail-value">${(order.robuxAmount || 0).toLocaleString()}</div>
+            </div>
+            <div>
+              <div class="order-detail-label"><i class="fas fa-money-bill"></i> Total</div>
+              <div class="order-detail-value">Rp ${(order.totalPrice || 0).toLocaleString()}</div>
+            </div>
+            <div>
+              <div class="order-detail-label"><i class="fas fa-credit-card"></i> Metode</div>
+              <div class="order-detail-value">${getMethodName(order.paymentMethod)}</div>
+            </div>
+            <div>
+              <div class="order-detail-label"><i class="fas fa-code"></i> Kode Unik</div>
+              <div class="order-detail-value" style="color:#ffc107">${order.uniqueCode || '-'}</div>
+            </div>
+            <div>
+              <div class="order-detail-label"><i class="fas fa-calendar"></i> Dibuat</div>
+              <div class="order-detail-value">${formatDate(order.createdAt)}</div>
+            </div>
           </div>
-          ${timerHtml ? `<div class="timer-display">${timerHtml}</div>` : ''}
+          
+          ${timerHtml ? `<div class="timer-display"><i class="fas fa-hourglass-half"></i> ${timerHtml}</div>` : ''}
+          
           <div class="order-actions">
             <select class="status-select" data-id="${order.id}">
               <option value="waiting_payment" ${order.status === 'waiting_payment' ? 'selected' : ''}>💳 Menunggu Bayar</option>
@@ -761,12 +817,10 @@
     document.querySelectorAll('.btn-status').forEach(b => b.onclick = () => updateOrderStatus(b.dataset.id, b.dataset.status));
   }
 
-  // ========== EVENT LISTENERS ==========
   document.getElementById('statusFilter')?.addEventListener('change', () => applyFilterAndSearch());
   document.getElementById('searchOrder')?.addEventListener('input', () => applyFilterAndSearch());
   document.getElementById('refreshOrders')?.addEventListener('click', () => applyFilterAndSearch());
 
-  // ========== INIT ==========
   checkAuth();
 </script>
 </body>
