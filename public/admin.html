@@ -393,10 +393,10 @@
   let allOrders = [], unsubscribe = null;
   let sessionCheckInterval = null;
   
-  // Discord login URL
+  // 🔥 SESSION KEYS - SAMA DENGAN index.html
   const DISCORD_LOGIN_URL = '/api/discord-login';
-  const JWT_TOKEN_KEY = 'admin_session_token';
-  const ADMIN_USER_KEY = 'admin_user';
+  const JWT_TOKEN_KEY = 'discord_session_token';  // SAMA dengan index.html
+  const DISCORD_USER_KEY = 'discord_user';        // SAMA dengan index.html
 
   // DOM Elements
   const initialLoading = document.getElementById('initialLoading');
@@ -406,15 +406,15 @@
   const adminLogoutBtn = document.getElementById('adminLogoutBtn');
   const adminUserInfo = document.getElementById('adminUserInfo');
 
-  // ========== FUNGSI DISCORD LOGIN ==========
+  // ========== FUNGSI SHARED SESSION (SAMA DENGAN index.html) ==========
   function isDiscordLoggedIn() {
     const token = localStorage.getItem(JWT_TOKEN_KEY);
-    const user = localStorage.getItem(ADMIN_USER_KEY);
+    const user = localStorage.getItem(DISCORD_USER_KEY);
     return token && user;
   }
 
   function getDiscordUser() {
-    const user = localStorage.getItem(ADMIN_USER_KEY);
+    const user = localStorage.getItem(DISCORD_USER_KEY);
     return user ? JSON.parse(user) : null;
   }
 
@@ -427,9 +427,12 @@
   }
 
   function logoutDiscord() {
+    // Hapus session dari localStorage (sama dengan yang dipakai index.html)
     localStorage.removeItem(JWT_TOKEN_KEY);
-    localStorage.removeItem(ADMIN_USER_KEY);
+    localStorage.removeItem(DISCORD_USER_KEY);
     showLoginScreen();
+    // Redirect ke index.html agar user tidak bingung
+    window.location.href = '/';
   }
 
   function checkDiscordCallback() {
@@ -448,14 +451,21 @@
       try {
         const user = JSON.parse(decodeURIComponent(userData));
         
+        // Simpan ke localStorage (sama dengan index.html)
+        localStorage.setItem(JWT_TOKEN_KEY, sessionToken);
+        localStorage.setItem(DISCORD_USER_KEY, JSON.stringify(user));
+        
+        window.history.replaceState({}, document.title, window.location.pathname);
+        
+        // Cek role admin
         if (user.role === 'admin') {
-          localStorage.setItem(JWT_TOKEN_KEY, sessionToken);
-          localStorage.setItem(ADMIN_USER_KEY, JSON.stringify(user));
-          window.history.replaceState({}, document.title, window.location.pathname);
           return true;
         } else {
           console.error('User is not admin');
           showError('Anda tidak memiliki akses admin!');
+          // Hapus session karena bukan admin
+          localStorage.removeItem(JWT_TOKEN_KEY);
+          localStorage.removeItem(DISCORD_USER_KEY);
           return false;
         }
       } catch (e) {
@@ -496,14 +506,13 @@
     if (adminContent) adminContent.style.display = 'none';
     if (initialLoading) initialLoading.style.display = 'none';
     
-    // Hentikan listener jika ada
     if (unsubscribe) unsubscribe();
     if (sessionCheckInterval) clearInterval(sessionCheckInterval);
   }
 
   // ========== CHECK AUTH ==========
   async function checkAuth() {
-    // 1. Cek callback dari Discord
+    // 1. Cek callback dari Discord (jika baru login)
     if (checkDiscordCallback()) {
       const user = getDiscordUser();
       if (user && isUserAdmin(user)) {
@@ -513,23 +522,54 @@
         startSessionCheck();
         updateAdminUserInfo(user);
         return;
+      } else {
+        showLoginScreen();
+        hideInitialLoading();
+        return;
       }
     }
     
-    // 2. Cek session yang sudah ada
+    // 2. Cek session yang sudah ada (dari index.html atau sebelumnya)
     if (isDiscordLoggedIn()) {
       const user = getDiscordUser();
+      
+      // 🔥 VERIFIKASI ULANG ROLE ADMIN DARI FIRESTORE (optional, untuk keamanan)
+      try {
+        const userDoc = await getDoc(doc(db, 'users', `discord_${user.id}`));
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          if (userData.role === 'admin') {
+            // Update role di localStorage jika berbeda
+            if (user.role !== 'admin') {
+              user.role = 'admin';
+              localStorage.setItem(DISCORD_USER_KEY, JSON.stringify(user));
+            }
+            showAdminContent();
+            await loadSettings();
+            listenOrders();
+            startSessionCheck();
+            updateAdminUserInfo(user);
+            hideInitialLoading();
+            return;
+          }
+        }
+      } catch (error) {
+        console.error('Error verifying admin role:', error);
+      }
+      
+      // Fallback ke role dari localStorage
       if (user && isUserAdmin(user)) {
         showAdminContent();
         await loadSettings();
         listenOrders();
         startSessionCheck();
         updateAdminUserInfo(user);
+        hideInitialLoading();
         return;
       }
     }
     
-    // 3. Tidak ada session, tampilkan login
+    // 3. Tidak ada session atau bukan admin, tampilkan login
     showLoginScreen();
     hideInitialLoading();
   }
@@ -549,12 +589,6 @@
         console.log('Session expired, redirecting to login...');
         showLoginScreen();
         if (unsubscribe) unsubscribe();
-      } else {
-        // Refresh user data
-        const user = getDiscordUser();
-        if (user && adminUserInfo) {
-          adminUserInfo.innerHTML = `<i class="fab fa-discord"></i> ${user.globalName || user.username} (Admin)`;
-        }
       }
     }, 30 * 60 * 1000); // 30 menit
   }
@@ -733,7 +767,6 @@
   document.getElementById('refreshOrders')?.addEventListener('click', () => applyFilterAndSearch());
 
   // ========== INIT ==========
-  // Jalankan pengecekan auth saat halaman dimuat
   checkAuth();
 </script>
 </body>
