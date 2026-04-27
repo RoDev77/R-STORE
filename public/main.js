@@ -1,5 +1,5 @@
 import { db, doc, getDoc, setDoc, addDoc, collection, serverTimestamp } from './firebase-config.js';
-import { getDiscordUser, updateUserAfterOrder, isDiscordLoggedIn, fetchUserDataFromFirestore } from './js/discord-auth.js';
+import { getDiscordUser, updateUserAfterOrder, isDiscordLoggedIn, fetchUserDataFromFirestore, getUserBalance, deductUserBalance } from './js/discord-auth.js';
 
 // DOM Elements - dengan pengecekan
 const getElement = (id) => {
@@ -24,6 +24,11 @@ const detailRobux = getElement('detailRobux');
 const detailRate = getElement('detailRate');
 const detailTotal = getElement('detailTotal');
 
+// 🔥 ELEMEN METODE PEMBAYARAN
+const paymentMethodSelect = getElement('paymentMethod');
+const balanceInfo = getElement('balanceInfo');
+const currentBalanceDisplay = getElement('currentBalanceDisplay');
+
 // Config variables
 let PRICE_PER_ROBUX = 115;
 let CURRENT_STOCK = 0;
@@ -36,8 +41,28 @@ function formatNumber(num) {
   return num.toLocaleString('id-ID');
 }
 
+// 🔥 UPDATE TAMPILAN BALANCE DI ORDER SECTION
+async function updateBalanceDisplay() {
+  if (!currentBalanceDisplay) return;
+  
+  if (isDiscordLoggedIn()) {
+    await fetchUserDataFromFirestore();
+    const balance = getUserBalance();
+    currentBalanceDisplay.textContent = `Rp ${balance.toLocaleString('id-ID')}`;
+    if (balanceInfo) balanceInfo.style.display = 'flex';
+  } else {
+    if (balanceInfo) balanceInfo.style.display = 'none';
+  }
+}
+
+// 🔥 CEK APAKAH BALANCE CUKUP
+function isBalanceSufficient(totalAmount) {
+  if (!isDiscordLoggedIn()) return false;
+  const balance = getUserBalance();
+  return balance >= totalAmount;
+}
+
 function updateUI() {
-  // Cek apakah elemen penting ada
   if (!robuxInput) return;
   
   const robux = Number(robuxInput.value || 0);
@@ -49,6 +74,16 @@ function updateUI() {
   if (detailTotal) detailTotal.textContent = 'Rp ' + formatNumber(total);
   
   if (robuxError) robuxError.classList.remove('show');
+  
+  // 🔥 UPDATE INFo BALANCE DI ORDER SUMMARY
+  if (currentBalanceDisplay && isDiscordLoggedIn()) {
+    const balance = getUserBalance();
+    if (balance >= total) {
+      currentBalanceDisplay.style.color = '#28a745';
+    } else {
+      currentBalanceDisplay.style.color = '#dc3545';
+    }
+  }
   
   if (btnBuy) {
     if (robux < 10) {
@@ -117,97 +152,92 @@ async function loadConfig() {
       CURRENT_PO = data.currentPO || 0;
       PO_LIMIT = data.poLimit || 0;
     } else {
-      // Default values if config not exists
       PRICE_PER_ROBUX = 115;
       CURRENT_STOCK = 10000;
       CURRENT_PO = 5000;
       PO_LIMIT = 5000;
     }
     
-    // Update UI
     if (pricePerRobuxInput) pricePerRobuxInput.value = 'Rp ' + formatNumber(PRICE_PER_ROBUX);
     updateStockDisplay();
     updateUI();
     
-    // Hide loading screen
     if (loadingScreen) loadingScreen.style.display = 'none';
     
     console.log('✅ Config loaded - Harga: Rp', PRICE_PER_ROBUX, '/Robux, Stock:', CURRENT_STOCK);
+    
+    // Update balance display after config loaded
+    await updateBalanceDisplay();
   } catch (error) {
     console.error('❌ Failed to load config:', error);
     if (loadingScreen) loadingScreen.style.display = 'none';
   }
 }
 
-// Fungsi untuk generate Order ID format RBX- (13 digit angka)
 function generateOrderId() {
   const randomNum = Math.floor(Math.random() * 10000000000000).toString().padStart(13, '0');
   return `RBX-${randomNum}`;
 }
 
-// Elemen Modal
 const confirmModal = document.getElementById('confirmModal');
 const closeModalBtn = document.getElementById('closeModalBtn');
 const cancelModalBtn = document.getElementById('cancelModalBtn');
 const confirmOrderBtn = document.getElementById('confirmOrderBtn');
 
-// Variabel untuk menyimpan data sementara
-let pendingOrderData = null;
-
-// Update showConfirmModal untuk menampilkan username
 function showConfirmModal() {
-  // Ambil data dari form
   const robux = Number(robuxInput.value);
   const total = robux * PRICE_PER_ROBUX;
   const customerEmail = document.getElementById('customerEmail')?.value?.trim() || '-';
   const customerPhone = document.getElementById('customerPhone')?.value?.trim() || '-';
   const robloxUsername = document.getElementById('robloxUsername')?.value?.trim() || '-';
   const deliveryText = deliveryInfo ? deliveryInfo.textContent : 'Pengiriman Instant';
+  const paymentMethod = paymentMethodSelect ? paymentMethodSelect.value : 'qris';
   
-  // Update modal dengan data
   document.getElementById('confirmRobux').textContent = `${robux.toLocaleString('id-ID')} Robux`;
   document.getElementById('confirmTotal').textContent = `Rp ${total.toLocaleString('id-ID')}`;
   document.getElementById('confirmDelivery').textContent = deliveryText;
   document.getElementById('confirmEmail').textContent = customerEmail || '-';
   document.getElementById('confirmPhone').textContent = customerPhone || '-';
   document.getElementById('confirmUsername').textContent = robloxUsername || '-';
+  document.getElementById('confirmPaymentMethod').textContent = paymentMethod === 'balance' ? '💰 Saldo' : '💳 QRIS';
   
-  // Tampilkan modal
   confirmModal.classList.add('active');
 }
 
-// Fungsi untuk menutup modal
 function closeModal() {
   confirmModal.classList.remove('active');
 }
 
-// 🔥 FUNGSI UPDATE BALANCE SETELAH ORDER
-async function updateUserBalanceAfterOrder(totalAmount, robuxAmount) {
-  // Cek apakah user sudah login
+// 🔥 FUNGSI KURANGI BALANCE SETELAH ORDER (PAKAI SALDO)
+async function deductBalanceAfterOrder(totalAmount, robuxAmount) {
   if (!isDiscordLoggedIn()) {
-    console.log('User belum login, balance tidak diupdate');
-    return;
+    console.log('User belum login, tidak bisa pakai saldo');
+    return false;
   }
   
   const user = getDiscordUser();
-  if (!user) return;
+  if (!user) return false;
   
-  console.log(`💳 Update balance untuk ${user.globalName || user.username}: +Rp ${totalAmount.toLocaleString()}`);
+  const currentBalance = getUserBalance();
+  if (currentBalance < totalAmount) {
+    console.log('Saldo tidak cukup');
+    return false;
+  }
   
-  const success = await updateUserAfterOrder(totalAmount, robuxAmount);
+  console.log(`💰 Kurangi balance untuk ${user.globalName || user.username}: -Rp ${totalAmount.toLocaleString()}`);
+  
+  const success = await deductUserBalance(user.id, totalAmount);
   
   if (success) {
-    console.log('✅ Balance berhasil diupdate');
-    // Refresh data user untuk memastikan balance terbaru
+    console.log('✅ Balance berhasil dikurangi');
     await fetchUserDataFromFirestore();
-  } else {
-    console.log('❌ Gagal update balance');
+    await updateBalanceDisplay();
+    return true;
   }
+  return false;
 }
 
-// Fungsi untuk melanjutkan ke submit order (dipanggil setelah konfirmasi)
 async function proceedSubmitOrder() {
-  // Validasi username Roblox
   const robloxUsername = document.getElementById('robloxUsername')?.value?.trim() || '';
   const usernameError = document.getElementById('usernameError');
   
@@ -224,7 +254,6 @@ async function proceedSubmitOrder() {
     return;
   }
   
-  // Validasi checkbox terms
   const termsCheckbox = document.getElementById('termsCheckbox');
   const termsError = document.getElementById('termsError');
   
@@ -236,7 +265,6 @@ async function proceedSubmitOrder() {
   
   if (termsError) termsError.classList.remove('show');
   
-  // Validasi minimal salah satu kontak
   const customerEmail = document.getElementById('customerEmail')?.value?.trim() || '';
   const customerPhone = document.getElementById('customerPhone')?.value?.trim() || '';
   
@@ -245,13 +273,11 @@ async function proceedSubmitOrder() {
     return;
   }
   
-  // Validasi format email
   if (customerEmail && !isValidEmail(customerEmail)) {
     alert('❌ Format Email tidak valid. Contoh: nama@domain.com');
     return;
   }
   
-  // Validasi format nomor HP
   if (customerPhone && !isValidPhone(customerPhone)) {
     alert('❌ Format Nomor WhatsApp/Telepon tidak valid. Contoh: 081234567890');
     return;
@@ -272,16 +298,29 @@ async function proceedSubmitOrder() {
     return;
   }
   
-  // Tampilkan loading
+  // 🔥 AMBIL METODE PEMBAYARAN
+  const paymentMethod = paymentMethodSelect ? paymentMethodSelect.value : 'qris';
+  
+  // 🔥 JIKA PAKAI SALDO, CEK SALDO
+  if (paymentMethod === 'balance') {
+    if (!isDiscordLoggedIn()) {
+      alert('❌ Silakan login terlebih dahulu untuk menggunakan saldo!');
+      return;
+    }
+    
+    const currentBalance = getUserBalance();
+    if (currentBalance < total) {
+      alert(`❌ Saldo tidak mencukupi! Saldo Anda: Rp ${currentBalance.toLocaleString('id-ID')}, butuh: Rp ${total.toLocaleString('id-ID')}. Silakan top up saldo terlebih dahulu.`);
+      return;
+    }
+  }
+  
   if (btnBuy) {
     btnBuy.disabled = true;
     btnBuy.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Memproses...';
   }
   
-  // Generate custom Order ID
   const orderId = generateOrderId();
-  
-  // Cek apakah ID sudah ada
   const orderRef = doc(db, 'orders', orderId);
   const orderSnap = await getDoc(orderRef);
   
@@ -293,20 +332,19 @@ async function proceedSubmitOrder() {
     return proceedSubmitOrder();
   }
   
-  // Hitung waktu kadaluarsa: 2 jam dari sekarang
   const expireAt = new Date();
   expireAt.setHours(expireAt.getHours() + 2);
   
-  // 🔥 Tambahkan user Discord ID jika login
   const discordUser = getDiscordUser();
   const discordId = discordUser ? discordUser.id : null;
   
-  // Create order
+  // 🔥 TAMBAHKAN PAYMENT METHOD KE ORDER
   const orderData = {
     robuxAmount: robux,
     totalPrice: total,
     deliveryInfo: deliveryInfo ? deliveryInfo.textContent : 'Pengiriman Instant',
-    status: 'pending',
+    status: paymentMethod === 'balance' ? 'paid' : 'pending',
+    paymentMethod: paymentMethod,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
     expireAt: expireAt,
@@ -314,16 +352,29 @@ async function proceedSubmitOrder() {
     customerPhone: customerPhone,
     robloxUsername: robloxUsername,
     termsAgreed: true,
-    discordId: discordId  // 🔥 TAMBAHKAN DISCORD ID
+    discordId: discordId
   };
   
   try {
     await setDoc(orderRef, orderData);
     
-    // 🔥 UPDATE BALANCE USER SETELAH ORDER BERHASIL
-    await updateUserBalanceAfterOrder(total, robux);
-    
-    window.location.href = `payment.html?orderId=${orderId}`;
+    // 🔥 JIKA PAKAI SALDO, KURANGI BALANCE DAN LANGSUNG JADI PAID
+    if (paymentMethod === 'balance') {
+      const deductSuccess = await deductBalanceAfterOrder(total, robux);
+      if (deductSuccess) {
+        alert('✅ Pembayaran berhasil menggunakan saldo! Robux akan segera diproses.');
+        window.location.href = `done.html?orderId=${orderId}`;
+      } else {
+        alert('❌ Gagal memproses pembayaran dengan saldo.');
+        if (btnBuy) {
+          btnBuy.disabled = false;
+          btnBuy.innerHTML = '<i class="fas fa-arrow-right"></i> Lanjutkan Pembayaran';
+        }
+      }
+    } else {
+      // 🔥 QRIS PAYMENT
+      window.location.href = `payment.html?orderId=${orderId}`;
+    }
   } catch (error) {
     console.error('Error creating order:', error);
     alert('Gagal membuat pesanan. Silakan coba lagi.');
@@ -334,9 +385,7 @@ async function proceedSubmitOrder() {
   }
 }
 
-// Update submitOrder untuk validasi username
 async function submitOrder() {
-  // Validasi username Roblox
   const robloxUsername = document.getElementById('robloxUsername')?.value?.trim() || '';
   const usernameError = document.getElementById('usernameError');
   
@@ -348,42 +397,37 @@ async function submitOrder() {
   
   if (usernameError) usernameError.classList.remove('show');
   
-  // Validasi format username
   if (!validateUsername(robloxUsername)) {
-    alert('❌ Username Roblox tidak valid! Minimal 3 karakter, maksimal 50 karakter, dan tidak boleh mengandung karakter aneh.');
+    alert('❌ Username Roblox tidak valid!');
     return;
   }
   
-  // Validasi checkbox terms
   const termsCheckbox = document.getElementById('termsCheckbox');
   const termsError = document.getElementById('termsError');
   
   if (!termsCheckbox || !termsCheckbox.checked) {
     if (termsError) termsError.classList.add('show');
-    alert('❌ Anda harus menyetujui Syarat & Ketentuan dan Kebijakan Privasi untuk melanjutkan.');
+    alert('❌ Anda harus menyetujui Syarat & Ketentuan untuk melanjutkan.');
     return;
   }
   
   if (termsError) termsError.classList.remove('show');
   
-  // Validasi minimal salah satu kontak
   const customerEmail = document.getElementById('customerEmail')?.value?.trim() || '';
   const customerPhone = document.getElementById('customerPhone')?.value?.trim() || '';
   
   if (!customerEmail && !customerPhone) {
-    alert('❌ Anda wajib mengisi minimal salah satu: Email atau Nomor WhatsApp untuk konfirmasi order.');
+    alert('❌ Anda wajib mengisi minimal salah satu: Email atau WhatsApp');
     return;
   }
   
-  // Validasi format email
   if (customerEmail && !isValidEmail(customerEmail)) {
-    alert('❌ Format Email tidak valid. Contoh: nama@domain.com');
+    alert('❌ Format Email tidak valid.');
     return;
   }
   
-  // Validasi format nomor HP
   if (customerPhone && !isValidPhone(customerPhone)) {
-    alert('❌ Format Nomor WhatsApp/Telepon tidak valid. Contoh: 081234567890');
+    alert('❌ Format Nomor WhatsApp tidak valid.');
     return;
   }
   
@@ -394,49 +438,28 @@ async function submitOrder() {
     return;
   }
   
-  const total = robux * PRICE_PER_ROBUX;
-  const maxAvailable = CURRENT_STOCK + CURRENT_PO;
-  
-  if (robux > maxAvailable) {
-    alert(`❌ Maksimal pembelian saat ini: ${formatNumber(maxAvailable)} Robux`);
-    return;
-  }
-  
-  // Tampilkan modal konfirmasi
   showConfirmModal();
 }
 
-// Validasi username Roblox
 function validateUsername(username) {
-  if (!username || username.trim() === '') {
-    return false;
-  }
-  // Minimal 3 karakter, maksimal 50 karakter
-  if (username.length < 3 || username.length > 50) {
-    return false;
-  }
-  // Tidak boleh mengandung karakter spesial berbahaya
+  if (!username || username.trim() === '') return false;
+  if (username.length < 3 || username.length > 50) return false;
   const invalidChars = /[<>{}[\]\\]/;
-  if (invalidChars.test(username)) {
-    return false;
-  }
+  if (invalidChars.test(username)) return false;
   return true;
 }
 
-// Validasi email
 function isValidEmail(email) {
   const emailRegex = /^[^\s@]+@([^\s@.,]+\.)+[^\s@.,]{2,}$/;
   return emailRegex.test(email);
 }
 
-// Validasi nomor HP
 function isValidPhone(phone) {
   const cleanPhone = phone.replace(/\D/g, '');
   const phoneRegex = /^(0|62|8)[0-9]{9,12}$/;
   return phoneRegex.test(cleanPhone) && cleanPhone.length >= 10 && cleanPhone.length <= 13;
 }
 
-// Event listener modal
 if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
 if (cancelModalBtn) cancelModalBtn.addEventListener('click', closeModal);
 if (confirmOrderBtn) confirmOrderBtn.addEventListener('click', () => {
@@ -444,14 +467,12 @@ if (confirmOrderBtn) confirmOrderBtn.addEventListener('click', () => {
   proceedSubmitOrder();
 });
 
-// Klik di luar modal untuk menutup
 if (confirmModal) {
   confirmModal.addEventListener('click', (e) => {
     if (e.target === confirmModal) closeModal();
   });
 }
 
-// Event listeners - dengan pengecekan
 if (robuxInput) {
   robuxInput.addEventListener('input', updateUI);
 }
@@ -460,26 +481,33 @@ if (btnBuy) {
   btnBuy.addEventListener('click', submitOrder);
 }
 
-// Auto-refresh config every 30 seconds
+// 🔥 EVENT LISTENER UNTUK METODE PEMBAYARAN
+if (paymentMethodSelect) {
+  paymentMethodSelect.addEventListener('change', () => {
+    updateBalanceDisplay();
+    updateUI();
+  });
+}
+
 setInterval(() => {
   loadConfig();
 }, 30000);
 
-// 🔥 Refresh balance user setiap 60 detik (jika login)
 setInterval(() => {
   if (isDiscordLoggedIn()) {
     fetchUserDataFromFirestore();
+    updateBalanceDisplay();
   }
 }, 60000);
 
-// Tunggu DOM siap sebelum load config
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
     loadConfig();
+    updateBalanceDisplay();
   });
 } else {
   loadConfig();
+  updateBalanceDisplay();
 }
 
-// Export functions untuk digunakan di file lain
-export { updateUserBalanceAfterOrder };
+export { deductBalanceAfterOrder };

@@ -86,6 +86,64 @@ async function fetchUserDataFromFirestore() {
   return null;
 }
 
+// Tambahkan fungsi untuk menambah balance (deposit)
+async function addUserBalance(discordId, amount) {
+  try {
+    const response = await fetch('/api/user/add-balance', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        discordId: discordId,
+        amount: amount
+      })
+    });
+    
+    const data = await response.json();
+    if (data.success) {
+      // Update localStorage
+      const user = getDiscordUser();
+      if (user) {
+        user.balance = (user.balance || 0) + amount;
+        localStorage.setItem(DISCORD_USER_KEY, JSON.stringify(user));
+      }
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error('Error adding balance:', error);
+    return false;
+  }
+}
+
+// Fungsi untuk mengurangi balance (beli Robux)
+async function deductUserBalance(discordId, amount) {
+  try {
+    const response = await fetch('/api/user/deduct-balance', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        discordId: discordId,
+        amount: amount
+      })
+    });
+    
+    const data = await response.json();
+    if (data.success) {
+      // Update localStorage
+      const user = getDiscordUser();
+      if (user) {
+        user.balance = (user.balance || 0) - amount;
+        localStorage.setItem(DISCORD_USER_KEY, JSON.stringify(user));
+      }
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error('Error deducting balance:', error);
+    return false;
+  }
+}
+
 // Update data user setelah transaksi
 async function updateUserAfterOrder(amount, robuxAmount) {
   const user = getDiscordUser();
@@ -294,5 +352,7 @@ export {
   getUserRole, 
   isAdmin,
   updateUserAfterOrder,
-  fetchUserDataFromFirestore
+  fetchUserDataFromFirestore,
+  addUserBalance,
+  deductUserBalance
 };

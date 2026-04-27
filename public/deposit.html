@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Top Up Saldo - R STORE</title>
+  <link rel="icon" type="image/png" href="/images/favicon.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #0a0a14 0%, #0f0f1a 100%);
+      min-height: 100vh;
+      color: #fff;
+    }
+    .navbar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: rgba(15, 15, 26, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 16px 24px;
+      z-index: 1000;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .nav-container {
+      max-width: 600px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .nav-logo { display: flex; align-items: center; gap: 8px; font-size: 20px; font-weight: 700; }
+    .nav-logo i { color: #667eea; }
+    .btn-home {
+      background: rgba(102,126,234,0.2);
+      padding: 8px 16px;
+      border-radius: 10px;
+      text-decoration: none;
+      color: #fff;
+      font-size: 13px;
+    }
+    .deposit-container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 90px 20px 40px;
+    }
+    .deposit-card {
+      background: rgba(20, 20, 40, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 32px;
+      padding: 32px 28px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .deposit-header { text-align: center; margin-bottom: 28px; }
+    .deposit-header h2 {
+      font-size: 28px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #fff, #667eea);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .balance-info {
+      background: linear-gradient(135deg, rgba(102,126,234,0.15), rgba(118,75,162,0.1));
+      border-radius: 20px;
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 25px;
+    }
+    .balance-label { font-size: 14px; color: #a0a0b0; margin-bottom: 8px; }
+    .balance-amount { font-size: 36px; font-weight: 800; color: #00d4ff; }
+    .input-group { margin-bottom: 20px; }
+    .input-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #a0a0b0;
+    }
+    .input-wrapper {
+      display: flex;
+      align-items: center;
+      background: #1a1a30;
+      border-radius: 12px;
+      padding: 0 15px;
+      border: 1px solid #2a2a40;
+    }
+    .input-wrapper i { color: #667eea; font-size: 18px; }
+    .input-wrapper input {
+      background: transparent;
+      border: none;
+      padding: 14px;
+      width: 100%;
+      color: white;
+      font-size: 16px;
+      outline: none;
+    }
+    .preset-buttons {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .preset-btn {
+      background: #1a1a30;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 10px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .preset-btn:hover {
+      background: rgba(102,126,234,0.2);
+      border-color: #667eea;
+    }
+    .btn-deposit {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #28a745, #20c997);
+      border: none;
+      border-radius: 16px;
+      color: white;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: transform 0.2s;
+    }
+    .btn-deposit:hover { transform: translateY(-2px); }
+    .error-msg {
+      background: rgba(220,53,69,0.15);
+      border-radius: 12px;
+      padding: 12px;
+      margin-top: 15px;
+      color: #f87171;
+      display: none;
+    }
+    .footer { text-align: center; padding: 30px; color: #a0a0b0; font-size: 12px; }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-container">
+    <div class="nav-logo"><i class="fas fa-gamepad"></i><span>R STORE</span></div>
+    <a href="index.html" class="btn-home"><i class="fas fa-home"></i> Beranda</a>
+  </div>
+</nav>
+
+<div class="deposit-container">
+  <div class="deposit-card">
+    <div class="deposit-header">
+      <h2>💰 Top Up Saldo</h2>
+      <p>Isi saldo untuk pembelian Robux</p>
+    </div>
+
+    <div class="balance-info">
+      <div class="balance-label">Saldo Anda saat ini</div>
+      <div class="balance-amount" id="currentBalance">Rp 0</div>
+    </div>
+
+    <div class="preset-buttons">
+      <button class="preset-btn" data-amount="50000">Rp 50.000</button>
+      <button class="preset-btn" data-amount="100000">Rp 100.000</button>
+      <button class="preset-btn" data-amount="200000">Rp 200.000</button>
+      <button class="preset-btn" data-amount="500000">Rp 500.000</button>
+      <button class="preset-btn" data-amount="1000000">Rp 1.000.000</button>
+      <button class="preset-btn" data-amount="custom">Custom</button>
+    </div>
+
+    <div class="input-group" id="customAmountGroup" style="display: none;">
+      <label><i class="fas fa-edit"></i> Jumlah Deposit</label>
+      <div class="input-wrapper">
+        <i class="fas fa-money-bill"></i>
+        <input type="number" id="customAmount" placeholder="Minimal Rp 10.000" />
+      </div>
+    </div>
+
+    <div id="errorMsg" class="error-msg"></div>
+
+    <button id="depositBtn" class="btn-deposit">
+      <i class="fas fa-qrcode"></i> Top Up Saldo
+    </button>
+  </div>
+</div>
+
+<footer class="footer">
+  <p>&copy; 2025 R STORE — Unofficial Roblox Store</p>
+</footer>
+
+<script type="module">
+  import { db, doc, getDoc, updateDoc, collection, addDoc, serverTimestamp } from './firebase-config.js';
+  import { getDiscordUser, isDiscordLoggedIn, fetchUserDataFromFirestore } from './js/discord-auth.js';
+
+  // Cek login
+  if (!isDiscordLoggedIn()) {
+    alert('Silakan login terlebih dahulu!');
+    window.location.href = 'index.html';
+  }
+
+  let currentUser = null;
+  let selectedAmount = 0;
+
+  const currentBalanceEl = document.getElementById('currentBalance');
+  const customAmountGroup = document.getElementById('customAmountGroup');
+  const customAmountInput = document.getElementById('customAmount');
+  const depositBtn = document.getElementById('depositBtn');
+  const errorMsg = document.getElementById('errorMsg');
+
+  // Load user balance
+  async function loadUserBalance() {
+    currentUser = getDiscordUser();
+    if (!currentUser) return;
+    
+    // Fetch latest data dari Firestore
+    const userData = await fetchUserDataFromFirestore();
+    if (userData) {
+      currentUser = userData;
+    }
+    
+    const balance = currentUser.balance || 0;
+    currentBalanceEl.textContent = `Rp ${balance.toLocaleString('id-ID')}`;
+  }
+
+  // Generate Order ID
+  function generateOrderId() {
+    const randomNum = Math.floor(Math.random() * 10000000000000).toString().padStart(13, '0');
+    return `DEP-${randomNum}`;
+  }
+
+  // Proses deposit
+  async function processDeposit() {
+    if (selectedAmount <= 0) {
+      errorMsg.textContent = '❌ Masukkan jumlah deposit yang valid!';
+      errorMsg.style.display = 'block';
+      return;
+    }
+    
+    if (selectedAmount < 10000) {
+      errorMsg.textContent = '❌ Minimal deposit Rp 10.000';
+      errorMsg.style.display = 'block';
+      return;
+    }
+    
+    errorMsg.style.display = 'none';
+    depositBtn.disabled = true;
+    depositBtn.innerHTML = '<div class="loading-spinner" style="width:20px;height:20px;border:2px solid white;border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;display:inline-block;margin-right:8px;"></div> Memproses...';
+    
+    try {
+      const orderId = generateOrderId();
+      const expireAt = new Date();
+      expireAt.setHours(expireAt.getHours() + 2);
+      
+      // Simpan order deposit
+      const orderRef = doc(db, 'deposit_orders', orderId);
+      await setDoc(orderRef, {
+        orderId: orderId,
+        discordId: currentUser.id,
+        username: currentUser.username,
+        amount: selectedAmount,
+        status: 'waiting_payment',
+        createdAt: serverTimestamp(),
+        expireAt: expireAt
+      });
+      
+      // Redirect ke payment untuk deposit
+      window.location.href = `/deposit-payment.html?orderId=${orderId}&amount=${selectedAmount}`;
+      
+    } catch (error) {
+      console.error('Error:', error);
+      errorMsg.textContent = '❌ Gagal memproses deposit';
+      errorMsg.style.display = 'block';
+      depositBtn.disabled = false;
+      depositBtn.innerHTML = '<i class="fas fa-qrcode"></i> Top Up Saldo';
+    }
+  }
+
+  // Preset buttons
+  document.querySelectorAll('.preset-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const amount = btn.dataset.amount;
+      if (amount === 'custom') {
+        customAmountGroup.style.display = 'block';
+        selectedAmount = 0;
+      } else {
+        customAmountGroup.style.display = 'none';
+        selectedAmount = parseInt(amount);
+        errorMsg.style.display = 'none';
+      }
+    });
+  });
+  
+  customAmountInput.addEventListener('input', () => {
+    selectedAmount = parseInt(customAmountInput.value) || 0;
+  });
+  
+  depositBtn.addEventListener('click', processDeposit);
+  
+  loadUserBalance();
+</script>
+</body>
+</html>

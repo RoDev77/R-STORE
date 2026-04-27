@@ -71,6 +71,11 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
+    .payment-header p {
+      color: #a0a0b0;
+      font-size: 13px;
+      margin-top: 5px;
+    }
     .order-summary {
       background: linear-gradient(135deg, rgba(102,126,234,0.1), rgba(118,75,162,0.1));
       border-radius: 20px;
@@ -161,21 +166,47 @@
       color: #00d4ff;
       letter-spacing: 4px;
     }
-    .payment-method-btn {
+
+    /* 🔥 METODE PEMBAYARAN SECTION */
+    .payment-methods-section {
+      margin-bottom: 20px;
+    }
+    .payment-methods-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #a0a0b0;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .payment-methods-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .payment-method-option {
       display: flex;
       align-items: center;
       gap: 15px;
-      width: 100%;
       padding: 16px 20px;
       background: #1a1a30;
-      border: 1px solid rgba(255,255,255,0.08);
+      border: 2px solid rgba(255,255,255,0.08);
       border-radius: 16px;
       cursor: pointer;
       transition: all 0.3s;
     }
-    .payment-method-btn:hover {
-      background: rgba(102,126,234,0.15);
+    .payment-method-option:hover {
+      background: rgba(102,126,234,0.1);
       border-color: rgba(102,126,234,0.3);
+    }
+    .payment-method-option.selected {
+      border-color: #667eea;
+      background: rgba(102,126,234,0.15);
+    }
+    .payment-method-option.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
     .payment-method-icon {
       width: 48px;
@@ -187,6 +218,111 @@
       justify-content: center;
       font-size: 24px;
     }
+    .payment-method-info {
+      flex: 1;
+    }
+    .payment-method-name {
+      font-weight: 700;
+      font-size: 16px;
+      margin-bottom: 4px;
+    }
+    .payment-method-desc {
+      font-size: 12px;
+      color: #a0a0b0;
+    }
+    .payment-method-radio {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #a0a0b0;
+      border-radius: 50%;
+      position: relative;
+    }
+    .payment-method-option.selected .payment-method-radio {
+      border-color: #667eea;
+    }
+    .payment-method-option.selected .payment-method-radio::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 10px;
+      height: 10px;
+      background: #667eea;
+      border-radius: 50%;
+    }
+
+    /* 🔥 BALANCE INFO */
+    .balance-info {
+      background: linear-gradient(135deg, rgba(102,126,234,0.1), rgba(118,75,162,0.05));
+      border-radius: 16px;
+      padding: 16px;
+      margin: 20px 0;
+      border: 1px solid rgba(102,126,234,0.2);
+      display: none;
+    }
+    .balance-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .balance-label {
+      font-size: 13px;
+      color: #a0a0b0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .balance-amount {
+      font-size: 20px;
+      font-weight: 700;
+      color: #00d4ff;
+    }
+    .balance-warning {
+      font-size: 11px;
+      color: #ffc107;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    .insufficient {
+      color: #dc3545;
+    }
+    .topup-link {
+      color: #667eea;
+      text-decoration: none;
+      font-size: 12px;
+    }
+    .topup-link:hover {
+      text-decoration: underline;
+    }
+
+    .btn-pay {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #28a745, #20c997);
+      border: none;
+      border-radius: 16px;
+      color: white;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: transform 0.2s;
+    }
+    .btn-pay:hover {
+      transform: translateY(-2px);
+    }
+    .btn-pay:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
     .error-badge {
       background: rgba(220,53,69,0.15);
       border: 1px solid rgba(220,53,69,0.3);
@@ -250,8 +386,8 @@
 <div class="payment-container">
   <div class="payment-card">
     <div class="payment-header">
-      <h2>💳 QRIS Payment</h2>
-      <p>Bayar dengan DANA / GoPay / OVO</p>
+      <h2>💳 Metode Pembayaran</h2>
+      <p>Pilih metode pembayaran yang tersedia</p>
     </div>
     
     <div id="errorBadge" class="error-badge">
@@ -304,13 +440,52 @@
       <div class="timer-value" id="timerValue">02:00:00</div>
       <div style="font-size: 11px; margin-top: 5px;">⚠️ Pesanan akan otomatis dibatalkan jika melebihi waktu</div>
     </div>
-    
-    <button class="payment-method-btn" id="qrisBtn">
-      <div class="payment-method-icon" style="color: #00a6e0;"><i class="fas fa-qrcode"></i></div>
-      <div>
-        <div>QRIS (DANA / GoPay / OVO)</div>
-        <div style="font-size: 12px; color: #a0a0b0;">Bayar via DANA, GoPay, OVO</div>
+
+    <!-- 🔥 METODE PEMBAYARAN -->
+    <div class="payment-methods-section">
+      <div class="payment-methods-title">
+        <i class="fas fa-credit-card"></i> Pilih Metode Pembayaran
       </div>
+      <div class="payment-methods-grid">
+        <!-- QRIS Option -->
+        <div class="payment-method-option selected" id="methodQRIS">
+          <div class="payment-method-icon" style="color: #00a6e0;"><i class="fas fa-qrcode"></i></div>
+          <div class="payment-method-info">
+            <div class="payment-method-name">QRIS</div>
+            <div class="payment-method-desc">Bayar via DANA, GoPay, OVO, LinkAja</div>
+          </div>
+          <div class="payment-method-radio"></div>
+        </div>
+
+        <!-- Balance Option (hanya tampil jika login) -->
+        <div class="payment-method-option" id="methodBalance" style="display: none;">
+          <div class="payment-method-icon" style="color: #ffc107;"><i class="fas fa-wallet"></i></div>
+          <div class="payment-method-info">
+            <div class="payment-method-name">Saldo Deposit</div>
+            <div class="payment-method-desc">Bayar menggunakan saldo yang sudah di-top up</div>
+          </div>
+          <div class="payment-method-radio"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🔥 INFO SALDO -->
+    <div id="balanceInfo" class="balance-info">
+      <div class="balance-row">
+        <span class="balance-label"><i class="fas fa-wallet"></i> Saldo Anda</span>
+        <span class="balance-amount" id="currentBalance">Rp 0</span>
+      </div>
+      <div class="balance-row">
+        <span class="balance-label"><i class="fas fa-calculator"></i> Sisa setelah bayar</span>
+        <span class="balance-amount" id="balanceAfter" style="font-size: 16px;">Rp 0</span>
+      </div>
+      <div id="insufficientWarning" class="balance-warning" style="display: none;">
+        <i class="fas fa-exclamation-triangle"></i> Saldo tidak mencukupi! Silakan <a href="deposit.html" class="topup-link">Top Up Saldo</a> terlebih dahulu.
+      </div>
+    </div>
+
+    <button id="payBtn" class="btn-pay">
+      <i class="fas fa-arrow-right"></i> Lanjutkan Pembayaran
     </button>
   </div>
 </div>
@@ -328,6 +503,7 @@
 
 <script type="module">
   import { db, doc, getDoc, updateDoc } from './firebase-config.js';
+  import { isDiscordLoggedIn, getDiscordUser, getUserBalance, fetchUserDataFromFirestore, deductUserBalance } from './js/discord-auth.js';
 
   const urlParams = new URLSearchParams(window.location.search);
   const orderId = urlParams.get('orderId');
@@ -343,6 +519,16 @@
   let totalWithUnique = 0;
   let isProcessing = false;
   let timerInterval = null;
+  let selectedMethod = 'qris';
+  let userBalance = 0;
+
+  const methodQRIS = document.getElementById('methodQRIS');
+  const methodBalance = document.getElementById('methodBalance');
+  const balanceInfo = document.getElementById('balanceInfo');
+  const currentBalanceSpan = document.getElementById('currentBalance');
+  const balanceAfterSpan = document.getElementById('balanceAfter');
+  const insufficientWarning = document.getElementById('insufficientWarning');
+  const payBtn = document.getElementById('payBtn');
 
   function generateUniqueCode() {
     return Math.floor(Math.random() * 159) + 59;
@@ -389,11 +575,67 @@
     setTimeout(() => { errorBadge.style.display = 'none'; }, 5000);
   }
 
-  async function processQRIS() {
-    if (isProcessing) return;
-    if (!totalWithUnique || totalWithUnique <= 0) {
-      showError('Nominal pembayaran tidak valid');
+  async function updateBalanceDisplay() {
+    if (!isDiscordLoggedIn()) {
+      methodBalance.style.display = 'none';
+      balanceInfo.style.display = 'none';
       return;
+    }
+    
+    methodBalance.style.display = 'flex';
+    await fetchUserDataFromFirestore();
+    userBalance = getUserBalance();
+    currentBalanceSpan.textContent = `Rp ${userBalance.toLocaleString('id-ID')}`;
+    
+    if (selectedMethod === 'balance') {
+      balanceInfo.style.display = 'block';
+      const remaining = userBalance - totalWithUnique;
+      balanceAfterSpan.textContent = `Rp ${remaining.toLocaleString('id-ID')}`;
+      
+      if (userBalance < totalWithUnique) {
+        insufficientWarning.style.display = 'block';
+        payBtn.disabled = true;
+      } else {
+        insufficientWarning.style.display = 'none';
+        payBtn.disabled = false;
+      }
+    } else {
+      balanceInfo.style.display = 'none';
+      payBtn.disabled = false;
+    }
+  }
+
+  // Method selection
+  methodQRIS.addEventListener('click', () => {
+    methodQRIS.classList.add('selected');
+    methodBalance.classList.remove('selected');
+    selectedMethod = 'qris';
+    updateBalanceDisplay();
+  });
+  
+  methodBalance.addEventListener('click', () => {
+    if (!isDiscordLoggedIn()) {
+      showError('Silakan login terlebih dahulu untuk menggunakan saldo!');
+      return;
+    }
+    methodBalance.classList.add('selected');
+    methodQRIS.classList.remove('selected');
+    selectedMethod = 'balance';
+    updateBalanceDisplay();
+  });
+
+  async function processPayment() {
+    if (isProcessing) return;
+    
+    if (selectedMethod === 'balance') {
+      if (!isDiscordLoggedIn()) {
+        showError('Silakan login untuk menggunakan saldo!');
+        return;
+      }
+      if (userBalance < totalWithUnique) {
+        showError('Saldo tidak mencukupi!');
+        return;
+      }
     }
     
     isProcessing = true;
@@ -401,22 +643,39 @@
     loadingOverlay.classList.add('active');
     
     try {
-      const expireAt = new Date();
-      expireAt.setHours(expireAt.getHours() + 2);
-      
       const orderRef = doc(db, 'orders', orderId);
-      await updateDoc(orderRef, {
-        paymentMethod: 'qris',
-        status: 'waiting_payment',
-        uniqueCode: uniqueCode,
-        totalWithUnique: totalWithUnique,
-        baseAmount: currentAmount,
-        expireAt: expireAt,
-        updatedAt: new Date()
-      });
       
-      window.location.href = `/qris.html?orderId=${orderId}&amount=${totalWithUnique}`;
-      
+      if (selectedMethod === 'balance') {
+        // 🔥 BAYAR PAKAI SALDO
+        const deductSuccess = await deductUserBalance(getDiscordUser().id, totalWithUnique);
+        if (deductSuccess) {
+          await updateDoc(orderRef, {
+            paymentMethod: 'balance',
+            status: 'paid',
+            paidAt: new Date(),
+            updatedAt: new Date()
+          });
+          window.location.href = `/done.html?orderId=${orderId}`;
+        } else {
+          throw new Error('Gagal memproses pembayaran dengan saldo');
+        }
+      } else {
+        // 🔥 BAYAR PAKAI QRIS
+        const expireAt = new Date();
+        expireAt.setHours(expireAt.getHours() + 2);
+        
+        await updateDoc(orderRef, {
+          paymentMethod: 'qris',
+          status: 'waiting_payment',
+          uniqueCode: uniqueCode,
+          totalWithUnique: totalWithUnique,
+          baseAmount: currentAmount,
+          expireAt: expireAt,
+          updatedAt: new Date()
+        });
+        
+        window.location.href = `/qris.html?orderId=${orderId}&amount=${totalWithUnique}`;
+      }
     } catch (error) {
       console.error('Error:', error);
       showError('Gagal memproses: ' + error.message);
@@ -438,7 +697,6 @@
       
       const data = orderSnap.data();
       
-      // Cek status order
       if (data.status === 'cancelled') {
         alert('❌ Pesanan sudah dibatalkan!');
         window.location.href = 'index.html';
@@ -454,17 +712,12 @@
       currentAmount = data.totalPrice;
       currentRobux = data.robuxAmount || 0;
       
-      // 🔥 CEK: Apakah sudah ada kode unik di database?
       if (data.uniqueCode && data.totalWithUnique) {
-        // Gunakan kode unik yang sudah ada (tidak berubah walau refresh)
         uniqueCode = data.uniqueCode;
         totalWithUnique = data.totalWithUnique;
       } else {
-        // Belum ada kode unik, generate baru
         uniqueCode = generateUniqueCode();
         totalWithUnique = currentAmount + uniqueCode;
-        
-        // Simpan ke database agar tidak berubah saat refresh
         await updateDoc(orderRef, {
           uniqueCode: uniqueCode,
           totalWithUnique: totalWithUnique,
@@ -473,12 +726,10 @@
         });
       }
       
-      // Cek apakah sudah ada expireAt
       const existingExpireAt = data.expireAt?.toDate();
       if (existingExpireAt && new Date() < existingExpireAt && data.status === 'waiting_payment') {
         startTimer(existingExpireAt);
       } else if (data.status !== 'waiting_payment') {
-        // Jika status bukan waiting_payment, sembunyikan timer
         const timerContainer = document.getElementById('timerContainer');
         if (timerContainer) timerContainer.style.display = 'none';
       }
@@ -497,13 +748,16 @@
       
       document.getElementById('copyOrderIdBtn').addEventListener('click', () => copyToClipboard(orderId));
       
+      // Update balance display
+      await updateBalanceDisplay();
+      
     } catch (error) {
       console.error('Error loading order:', error);
       showError('Gagal memuat data pesanan');
     }
   }
 
-  document.getElementById('qrisBtn').addEventListener('click', processQRIS);
+  payBtn.addEventListener('click', processPayment);
   loadOrder();
 </script>
 </body>
