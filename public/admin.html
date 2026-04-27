@@ -1154,9 +1154,41 @@
     } catch { return ''; }
   }
 
+  // ========== GET METHOD NAME ==========
   function getMethodName(method) {
-    const names = { bca: 'BCA VA', mandiri: 'Mandiri VA', bni: 'BNI VA', bri: 'BRI VA', qris: 'QRIS' };
-    return names[method] || method?.toUpperCase() || '-';
+    // Method names mapping yang lengkap
+    const methodNames = {
+      'bca': 'BCA VA',
+      'mandiri': 'Mandiri VA', 
+      'bni': 'BNI VA',
+      'bri': 'BRI VA',
+      'qris': 'QRIS',
+      'gopay': 'GoPay',
+      'dana': 'DANA',
+      'ovo': 'OVO',
+      'linkaja': 'LinkAja',
+      'bank_transfer': 'Transfer Bank',
+      'virtual_account': 'Virtual Account'
+    };
+    
+    // Jika method adalah string kosong, undefined, atau null
+    if (!method) {
+      return '-';
+    }
+    
+    // Cek apakah method ada di mapping
+    if (methodNames[method]) {
+      return methodNames[method];
+    }
+    
+    // Jika method dalam bentuk huruf besar semua (contoh: "QRIS")
+    const lowerMethod = method.toLowerCase();
+    if (methodNames[lowerMethod]) {
+      return methodNames[lowerMethod];
+    }
+    
+    // Fallback: tampilkan method asli dengan huruf kapital
+    return method.charAt(0).toUpperCase() + method.slice(1);
   }
 
   async function updateOrderStatus(orderId, newStatus) {
