@@ -1,5 +1,5 @@
 // File: public/js/discord-auth.js
-// Login dengan Discord - Style seperti OxRodi™
+// Login dengan Discord - Lengkap dengan data user dari Firestore
 
 const DISCORD_LOGIN_URL = '/api/discord-login';
 const JWT_TOKEN_KEY = 'discord_session_token';
@@ -30,11 +30,68 @@ function getDiscordUser() {
   return user ? JSON.parse(user) : null;
 }
 
-// Ambil saldo user (dari Firestore atau localStorage)
+// Ambil role user (admin/member)
+function getUserRole() {
+  const user = getDiscordUser();
+  return user?.role || 'member';
+}
+
+// Cek apakah user adalah admin
+function isAdmin() {
+  return getUserRole() === 'admin';
+}
+
+// Ambil saldo user
 function getUserBalance() {
-  // TODO: Ambil dari Firestore nanti
-  const savedBalance = localStorage.getItem('user_balance');
-  return savedBalance ? parseInt(savedBalance) : 0;
+  const user = getDiscordUser();
+  return user?.balance || 0;
+}
+
+// Ambil total pengeluaran user
+function getUserTotalSpent() {
+  const user = getDiscordUser();
+  return user?.totalSpent || 0;
+}
+
+// Update data user setelah transaksi
+async function updateUserAfterOrder(amount) {
+  const user = getDiscordUser();
+  if (!user) return;
+  
+  const newBalance = (user.balance || 0) + amount;
+  const newTotalSpent = (user.totalSpent || 0) + amount;
+  
+  // Update localStorage
+  const updatedUser = {
+    ...user,
+    balance: newBalance,
+    totalSpent: newTotalSpent
+  };
+  localStorage.setItem(DISCORD_USER_KEY, JSON.stringify(updatedUser));
+  
+  // Update UI
+  if (userBalance) {
+    userBalance.textContent = `Rp ${newBalance.toLocaleString('id-ID')}`;
+  }
+  
+  // Update di Firestore via API
+  try {
+    const response = await fetch('/api/user/update-balance', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        discordId: user.id,
+        balance: newBalance,
+        totalSpent: newTotalSpent
+      })
+    });
+    const data = await response.json();
+    if (!data.success) {
+      console.error('Failed to update balance in Firestore');
+    }
+  } catch (error) {
+    console.error('Error updating balance:', error);
+  }
 }
 
 // Mulai login Discord
@@ -46,7 +103,6 @@ function loginWithDiscord() {
 function logoutDiscord() {
   localStorage.removeItem(JWT_TOKEN_KEY);
   localStorage.removeItem(DISCORD_USER_KEY);
-  localStorage.removeItem('user_balance');
   updateUIBasedOnLogin();
   showNotification('Anda telah logout', 'info');
   setTimeout(() => {
@@ -77,7 +133,6 @@ function showNotification(message, type = 'success') {
 function updateUIBasedOnLogin() {
   const isLoggedIn = isDiscordLoggedIn();
   const user = getDiscordUser();
-  const balance = getUserBalance();
   
   if (isLoggedIn && user) {
     // Sembunyikan "belum login", tampilkan "sudah login"
@@ -89,7 +144,6 @@ function updateUIBasedOnLogin() {
       const avatarUrl = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=64`;
       userAvatar.src = avatarUrl;
     } else if (userAvatar && user.id) {
-      // Default avatar jika tidak ada custom avatar
       const defaultAvatar = `https://cdn.discordapp.com/embed/avatars/${parseInt(user.id) % 5}.png`;
       userAvatar.src = defaultAvatar;
     }
@@ -102,20 +156,17 @@ function updateUIBasedOnLogin() {
     
     // Set saldo
     if (userBalance) {
-      userBalance.textContent = `Rp ${balance.toLocaleString('id-ID')}`;
+      userBalance.textContent = `Rp ${(user.balance || 0).toLocaleString('id-ID')}`;
     }
+    
+    // Sembunyikan tombol Discord login
+    if (discordLoginBtn) discordLoginBtn.style.display = 'none';
+    
   } else {
     // Tampilkan "belum login", sembunyikan "sudah login"
     if (authNotLoggedIn) authNotLoggedIn.style.display = 'flex';
     if (authLoggedIn) authLoggedIn.style.display = 'none';
-  }
-}
-
-// Update saldo (dipanggil setelah transaksi)
-function updateBalance(newBalance) {
-  localStorage.setItem('user_balance', newBalance);
-  if (userBalance) {
-    userBalance.textContent = `Rp ${newBalance.toLocaleString('id-ID')}`;
+    if (discordLoginBtn) discordLoginBtn.style.display = 'inline-flex';
   }
 }
 
@@ -140,11 +191,6 @@ function checkDiscordCallback() {
       localStorage.setItem(JWT_TOKEN_KEY, sessionToken);
       localStorage.setItem(DISCORD_USER_KEY, JSON.stringify(user));
       
-      // Set saldo awal 0
-      if (!localStorage.getItem('user_balance')) {
-        localStorage.setItem('user_balance', '0');
-      }
-      
       showNotification(`Selamat datang, ${user.globalName || user.username}!`, 'success');
       
       // Bersihkan URL
@@ -152,6 +198,11 @@ function checkDiscordCallback() {
       
       // Update UI
       updateUIBasedOnLogin();
+      
+      // Refresh untuk update UI
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
       
     } catch (e) {
       console.error('Error parsing user data:', e);
@@ -164,14 +215,12 @@ function checkDiscordCallback() {
 function setupDropdown() {
   if (!userInfo || !userDropdown || !userMenu) return;
   
-  // Toggle dropdown saat klik user info
   userInfo.addEventListener('click', (e) => {
     e.stopPropagation();
     userDropdown.classList.toggle('show');
     userMenu.classList.toggle('active');
   });
   
-  // Tutup dropdown jika klik di luar
   document.addEventListener('click', (e) => {
     if (!userMenu.contains(e.target)) {
       userDropdown.classList.remove('show');
@@ -202,5 +251,13 @@ document.addEventListener('DOMContentLoaded', () => {
   setupDropdown();
 });
 
-// Export functions untuk digunakan di file lain
-export { updateBalance, getUserBalance, isDiscordLoggedIn, getDiscordUser };
+// Export functions
+export { 
+  isDiscordLoggedIn, 
+  getDiscordUser, 
+  getUserBalance, 
+  getUserTotalSpent, 
+  getUserRole, 
+  isAdmin,
+  updateUserAfterOrder 
+};
