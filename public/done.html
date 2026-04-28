@@ -256,6 +256,18 @@
       font-size: 15px;
     }
     
+    /* Delivery Badge */
+    .delivery-badge-done {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 30px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .delivery-instant-done { background: rgba(40,167,69,0.2); color: #28a745; border: 1px solid rgba(40,167,69,0.3); }
+    .delivery-po-done { background: rgba(255,193,7,0.2); color: #ffc107; border: 1px solid rgba(255,193,7,0.3); }
+    .delivery-delayed-done { background: rgba(255,193,7,0.2); color: #ffc107; border: 1px solid rgba(255,193,7,0.3); }
+    
     .status-badge-done {
       display: inline-block;
       padding: 6px 16px;
@@ -267,6 +279,7 @@
     .status-pending-done { background: #ffc107; color: #000; }
     .status-waiting_payment-done { background: #ffc107; color: #000; }
     .status-paid-done { background: #28a745; color: #fff; }
+    .status-completed-done { background: #00d4ff; color: #000; }
     .status-delivered-done { background: #17a2b8; color: #fff; }
     .status-cancelled-done { background: #dc3545; color: #fff; }
     
@@ -315,6 +328,24 @@
     .success-box-done {
       background: rgba(40,167,69,0.15);
       border-left: 4px solid #28a745;
+      border-radius: 12px;
+      padding: 18px;
+      margin: 20px 0;
+      text-align: left;
+    }
+    
+    .deposit-success-box {
+      background: rgba(0,212,255,0.15);
+      border-left: 4px solid #00d4ff;
+      border-radius: 12px;
+      padding: 18px;
+      margin: 20px 0;
+      text-align: left;
+    }
+    
+    .deposit-pending-box {
+      background: rgba(255,193,7,0.1);
+      border-left: 4px solid #ffc107;
       border-radius: 12px;
       padding: 18px;
       margin: 20px 0;
@@ -449,6 +480,11 @@
         <div class="detail-value-done" id="payMethod">-</div>
       </div>
       
+      <div class="detail-row-done" id="deliveryRow">
+        <div class="detail-label-done"><i class="fas fa-truck"></i> Jenis Pengiriman</div>
+        <div class="detail-value-done"><span id="deliveryBadge" class="delivery-badge-done delivery-instant-done">⚡ Instant</span></div>
+      </div>
+      
       <div class="detail-row-done">
         <div class="detail-label-done"><i class="fas fa-money-bill-wave"></i> Total Pembayaran</div>
         <div class="detail-value-done" id="totalAmount">-</div>
@@ -470,6 +506,7 @@
     
     <div class="btn-group-done">
       <a href="index.html" class="btn-secondary-done"><i class="fas fa-shopping-cart"></i> Beli Lagi</a>
+      <a href="deposit.html" class="btn-secondary-done"><i class="fas fa-wallet"></i> Top Up Saldo</a>
       <a href="track.html" class="btn-secondary-done"><i class="fas fa-search"></i> Lacak Pesanan</a>
     </div>
     
@@ -490,6 +527,7 @@
       <ul>
         <li><a href="index.html">Home</a></li>
         <li><a href="track.html">Lacak Pesanan</a></li>
+        <li><a href="deposit.html">Top Up Saldo</a></li>
       </ul>
     </div>
     <div class="footer-links">
@@ -519,9 +557,11 @@
 
   const urlParams = new URLSearchParams(window.location.search);
   const orderId = urlParams.get('orderId');
+  const type = urlParams.get('type');
 
   let timerInterval = null;
   let unsubscribe = null;
+  let isDeposit = type === 'deposit' || (orderId && orderId.startsWith('DEP-'));
 
   function formatTime(seconds) {
     const hours = Math.floor(seconds / 3600);
@@ -575,6 +615,21 @@
     }
   }
 
+  // 🔥 Fungsi untuk mendapatkan jenis pengiriman
+  function getDeliveryType(deliveryInfo) {
+    if (!deliveryInfo) return { text: '⚡ Instant', class: 'delivery-instant-done' };
+    if (deliveryInfo.includes('PO') || deliveryInfo.includes('Pre-Order') || deliveryInfo.includes('📦')) {
+      return { text: '📦 Pre-Order (15 Hari)', class: 'delivery-po-done' };
+    }
+    if (deliveryInfo.includes('Ditunda') || deliveryInfo.includes('⏸️') || deliveryInfo.includes('delayed')) {
+      return { text: '⏸️ Ditunda', class: 'delivery-delayed-done' };
+    }
+    if (deliveryInfo.includes('Instant') || deliveryInfo.includes('⚡')) {
+      return { text: '⚡ Instant', class: 'delivery-instant-done' };
+    }
+    return { text: '⚡ Instant', class: 'delivery-instant-done' };
+  }
+
   function updateUIByStatus(status, orderData = {}) {
     const statusIcon = document.getElementById('statusIcon');
     const statusTitle = document.getElementById('statusTitle');
@@ -592,7 +647,10 @@
       
       if (status === 'paid') { 
         statusClass = 'status-paid-done'; 
-        statusText = '✅ Dibayar - Sedang diproses'; 
+        statusText = '✅ Dibayar - Menunggu Verifikasi Admin'; 
+      } else if (status === 'completed') { 
+        statusClass = 'status-completed-done'; 
+        statusText = '💰 Selesai - Saldo Bertambah'; 
       } else if (status === 'delivered') { 
         statusClass = 'status-delivered-done'; 
         statusText = '🎉 Robux sudah dikirim!'; 
@@ -607,6 +665,85 @@
       orderStatus.className = `status-badge-done ${statusClass}`;
       orderStatus.textContent = statusText;
     }
+    
+    // 🔥 Update jenis pengiriman untuk topup Robux
+    if (!isDeposit && orderData.deliveryInfo) {
+      const delivery = getDeliveryType(orderData.deliveryInfo);
+      const deliveryBadge = document.getElementById('deliveryBadge');
+      if (deliveryBadge) {
+        deliveryBadge.textContent = delivery.text;
+        deliveryBadge.className = `delivery-badge-done ${delivery.class}`;
+      }
+    }
+    
+    // KHUSUS DEPOSIT
+    if (isDeposit) {
+      // Sembunyikan baris jenis pengiriman untuk deposit
+      const deliveryRow = document.getElementById('deliveryRow');
+      if (deliveryRow) deliveryRow.style.display = 'none';
+      
+      if (status === 'paid') {
+        statusIcon.innerHTML = '<i class="fas fa-clock"></i>';
+        statusIcon.style.background = 'linear-gradient(135deg, #ffc107, #ff9800)';
+        statusIcon.classList.add('pulse');
+        statusTitle.textContent = '⏳ Menunggu Verifikasi Admin';
+        statusDesc.textContent = 'Pembayaran deposit Anda telah dikonfirmasi. Admin akan segera memproses.';
+        dynamicBox.innerHTML = `<div class="deposit-pending-box">
+          <strong><i class="fas fa-clock"></i> Menunggu Verifikasi Admin</strong>
+          <p style="margin-top: 10px;">Deposit Anda telah dikonfirmasi. Admin akan segera menambahkan saldo ke akun Anda.</p>
+          <p>Proses verifikasi biasanya memakan waktu 1-5 menit.</p>
+        </div>`;
+        autoRefresh.innerHTML = '<i class="fas fa-sync-alt fa-pulse"></i> <span>Menunggu verifikasi admin...</span>';
+        if (timerContainer) timerContainer.style.display = 'none';
+      } else if (status === 'completed') {
+        statusIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
+        statusIcon.style.background = 'linear-gradient(135deg, #00d4ff, #667eea)';
+        statusIcon.classList.remove('pulse');
+        statusTitle.textContent = '✅ Deposit Berhasil!';
+        statusDesc.textContent = 'Saldo Anda telah bertambah.';
+        dynamicBox.innerHTML = `<div class="deposit-success-box">
+          <strong><i class="fas fa-wallet"></i> Deposit Berhasil!</strong>
+          <p style="margin-top: 10px;">Saldo sebesar <strong>Rp ${(orderData.amount || 0).toLocaleString('id-ID')}</strong> telah ditambahkan ke akun Anda.</p>
+          <p>Saldo dapat digunakan untuk pembelian Robux tanpa perlu transfer ulang.</p>
+        </div>`;
+        autoRefresh.innerHTML = '<i class="fas fa-check-circle"></i> <span>Deposit selesai! Terima kasih.</span>';
+        if (timerContainer) timerContainer.style.display = 'none';
+      } else if (status === 'cancelled') {
+        statusIcon.innerHTML = '<i class="fas fa-times-circle"></i>';
+        statusIcon.style.background = 'linear-gradient(135deg, #dc3545, #c82333)';
+        statusIcon.classList.remove('pulse');
+        statusTitle.textContent = '❌ Deposit Dibatalkan';
+        statusDesc.textContent = 'Deposit Anda telah dibatalkan. Silakan hubungi admin.';
+        dynamicBox.innerHTML = `<div class="cancel-box-done">
+          <strong style="color:#dc3545;"><i class="fas fa-exclamation-triangle"></i> Deposit Dibatalkan</strong>
+          <p style="margin-top: 10px;">Deposit Anda telah dibatalkan. Jika ini kesalahan, silakan hubungi admin.</p>
+        </div>`;
+        autoRefresh.style.display = 'none';
+        if (timerContainer) timerContainer.style.display = 'none';
+      } else if (status === 'waiting_payment') {
+        statusIcon.innerHTML = '<i class="fas fa-clock"></i>';
+        statusIcon.style.background = 'linear-gradient(135deg, #ffc107, #ff9800)';
+        statusIcon.classList.add('pulse');
+        statusTitle.textContent = '💳 Menunggu Pembayaran Deposit';
+        statusDesc.textContent = 'Silakan selesaikan pembayaran deposit Anda.';
+        dynamicBox.innerHTML = `<div class="instruction-box-done">
+          <strong><i class="fas fa-info-circle"></i> Instruksi Pembayaran Deposit</strong>
+          <ul style="margin-top: 10px; margin-left: 20px;">
+            <li>✅ Buka aplikasi DANA, GoPay, atau OVO</li>
+            <li>✅ Pilih menu Scan QRIS</li>
+            <li>✅ Scan QR Code yang sudah ditampilkan</li>
+            <li>✅ Konfirmasi pembayaran dengan nominal yang tertera</li>
+            <li>✅ Setelah bayar, klik "Saya sudah bayar"</li>
+          </ul>
+        </div>`;
+        autoRefresh.innerHTML = '<i class="fas fa-sync-alt fa-pulse"></i> <span>Memantau status deposit...</span>';
+      }
+      return;
+    }
+    
+    // UNTUK TOPUP ROBUX - tampilkan baris jenis pengiriman
+    const deliveryRow = document.getElementById('deliveryRow');
+    if (deliveryRow) deliveryRow.style.display = 'flex';
     
     if (status === 'paid') {
       statusIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
@@ -627,7 +764,7 @@
       statusIcon.style.background = 'linear-gradient(135deg, #17a2b8, #0dcaf0)';
       statusIcon.classList.remove('pulse');
       statusTitle.textContent = '🎉 Robux Telah Dikirim!';
-      statusDesc.textContent = 'Robux sudah masuk ke akun Roblox Anda. Terima kasih telah berbelanja di R STORE!';
+      statusDesc.textContent = 'Robux sudah masuk ke akun Roblox Anda. Terima kasih!';
       dynamicBox.innerHTML = `<div class="success-box-done">
         <strong><i class="fas fa-rocket"></i> Pesanan Selesai!</strong>
         <p style="margin-top: 10px;">Robux sebanyak <strong>${orderData.robuxAmount?.toLocaleString('id-ID') || '-'} Robux</strong> telah berhasil dikirim ke akun <strong>${orderData.robloxUsername || '-'}</strong>.</p>
@@ -641,7 +778,7 @@
       statusIcon.style.background = 'linear-gradient(135deg, #dc3545, #c82333)';
       statusIcon.classList.remove('pulse');
       statusTitle.textContent = '❌ Pesanan Dibatalkan';
-      statusDesc.textContent = 'Pesanan Anda telah dibatalkan. Silakan hubungi admin jika ada pertanyaan.';
+      statusDesc.textContent = 'Pesanan Anda telah dibatalkan. Silakan hubungi admin.';
       dynamicBox.innerHTML = `<div class="cancel-box-done">
         <strong style="color:#dc3545;"><i class="fas fa-exclamation-triangle"></i> Pesanan Dibatalkan</strong>
         <p style="margin-top: 10px;">Pesanan Anda telah dibatalkan. Jika ini kesalahan, silakan hubungi admin kami.</p>
@@ -662,7 +799,7 @@
           <li>✅ Pilih menu Scan QRIS</li>
           <li>✅ Scan QR Code yang sudah ditampilkan</li>
           <li>✅ Konfirmasi pembayaran dengan nominal yang tertera</li>
-          <li>✅ Robux akan dikirim otomatis setelah pembayaran dikonfirmasi</li>
+          <li>✅ Robux akan dikirim setelah pembayaran dikonfirmasi</li>
         </ul>
       </div>`;
       autoRefresh.innerHTML = '<i class="fas fa-sync-alt fa-pulse"></i> <span>Memantau status pembayaran...</span>';
@@ -676,57 +813,108 @@
       return;
     }
     
-    const orderRef = doc(db, 'orders', orderId);
-    const orderSnap = await getDoc(orderRef);
+    let orderRef;
+    let orderSnap;
     
-    if (!orderSnap.exists()) {
-      const wrapper = document.getElementById('orderIdWrapper');
-      if (wrapper) wrapper.innerHTML = '<span style="color:#dc3545;">❌ Pesanan tidak ditemukan</span>';
-      return;
-    }
-    
-    const data = orderSnap.data();
-    
-    const wrapper = document.getElementById('orderIdWrapper');
-    wrapper.innerHTML = `<span class="order-id-value">${orderId}</span>
-      <button class="copy-btn-done" id="copyOrderIdBtn"><i class="fas fa-copy"></i> Copy</button>`;
-    document.getElementById('copyOrderIdBtn')?.addEventListener('click', (e) => copyToClipboard(orderId, e.currentTarget));
-    
-    document.getElementById('robloxUsername').textContent = data.robloxUsername || '-';
-    
-    const methodNames = { 
-      'bca': 'BCA Virtual Account', 
-      'mandiri': 'Mandiri Virtual Account', 
-      'bni': 'BNI Virtual Account', 
-      'bri': 'BRI Virtual Account', 
-      'qris': 'QRIS (DANA/GoPay/OVO)', 
-      'gopay': 'GoPay', 
-      'dana': 'DANA' 
-    };
-    document.getElementById('payMethod').textContent = methodNames[data.paymentMethod] || data.paymentMethod?.toUpperCase() || 'QRIS';
-    document.getElementById('totalAmount').textContent = 'Rp ' + (data.totalPrice || 0).toLocaleString('id-ID');
-    
-    updateUIByStatus(data.status, data);
-    
-    const expireAt = data.expireAt?.toDate();
-    if ((data.status === 'waiting_payment' || data.status === 'pending') && expireAt && expireAt > new Date()) {
-      startTimer(expireAt);
-    }
-    
-    // Listen to real-time status changes
-    unsubscribe = onSnapshot(orderRef, (docSnap) => {
-      if (docSnap.exists()) {
-        const newData = docSnap.data();
-        updateUIByStatus(newData.status, newData);
-        
-        // Hentikan timer jika status bukan waiting_payment
-        if (newData.status !== 'waiting_payment' && newData.status !== 'pending') {
-          if (timerInterval) clearInterval(timerInterval);
-          const timerContainer = document.getElementById('timerContainer');
-          if (timerContainer) timerContainer.style.display = 'none';
-        }
+    if (isDeposit) {
+      orderRef = doc(db, 'deposit_orders', orderId);
+      orderSnap = await getDoc(orderRef);
+      
+      if (!orderSnap.exists()) {
+        const wrapper = document.getElementById('orderIdWrapper');
+        if (wrapper) wrapper.innerHTML = '<span style="color:#dc3545;">❌ Deposit tidak ditemukan</span>';
+        return;
       }
-    }, (error) => console.error('Error listening:', error));
+      
+      const data = orderSnap.data();
+      
+      const wrapper = document.getElementById('orderIdWrapper');
+      wrapper.innerHTML = `<span class="order-id-value">${orderId}</span>
+        <button class="copy-btn-done" id="copyOrderIdBtn"><i class="fas fa-copy"></i> Copy</button>`;
+      document.getElementById('copyOrderIdBtn')?.addEventListener('click', (e) => copyToClipboard(orderId, e.currentTarget));
+      
+      document.getElementById('robloxUsername').textContent = '-';
+      document.getElementById('payMethod').textContent = 'QRIS (Deposit Saldo)';
+      document.getElementById('totalAmount').textContent = 'Rp ' + (data.amount || 0).toLocaleString('id-ID');
+      
+      updateUIByStatus(data.status, data);
+      
+      const expireAt = data.expireAt?.toDate();
+      if ((data.status === 'waiting_payment' || data.status === 'pending') && expireAt && expireAt > new Date()) {
+        startTimer(expireAt);
+      }
+      
+      unsubscribe = onSnapshot(orderRef, (docSnap) => {
+        if (docSnap.exists()) {
+          const newData = docSnap.data();
+          updateUIByStatus(newData.status, newData);
+          if (newData.status !== 'waiting_payment' && newData.status !== 'pending') {
+            if (timerInterval) clearInterval(timerInterval);
+            const timerContainer = document.getElementById('timerContainer');
+            if (timerContainer) timerContainer.style.display = 'none';
+          }
+        }
+      }, (error) => console.error('Error listening:', error));
+      
+    } else {
+      orderRef = doc(db, 'orders', orderId);
+      orderSnap = await getDoc(orderRef);
+      
+      if (!orderSnap.exists()) {
+        const wrapper = document.getElementById('orderIdWrapper');
+        if (wrapper) wrapper.innerHTML = '<span style="color:#dc3545;">❌ Pesanan tidak ditemukan</span>';
+        return;
+      }
+      
+      const data = orderSnap.data();
+      
+      const wrapper = document.getElementById('orderIdWrapper');
+      wrapper.innerHTML = `<span class="order-id-value">${orderId}</span>
+        <button class="copy-btn-done" id="copyOrderIdBtn"><i class="fas fa-copy"></i> Copy</button>`;
+      document.getElementById('copyOrderIdBtn')?.addEventListener('click', (e) => copyToClipboard(orderId, e.currentTarget));
+      
+      document.getElementById('robloxUsername').textContent = data.robloxUsername || '-';
+      
+      const methodNames = { 
+        'bca': 'BCA Virtual Account', 
+        'mandiri': 'Mandiri Virtual Account', 
+        'bni': 'BNI Virtual Account', 
+        'bri': 'BRI Virtual Account', 
+        'qris': 'QRIS (DANA/GoPay/OVO)', 
+        'balance': '💰 Saldo Deposit',
+        'gopay': 'GoPay', 
+        'dana': 'DANA' 
+      };
+      document.getElementById('payMethod').textContent = methodNames[data.paymentMethod] || data.paymentMethod?.toUpperCase() || 'QRIS';
+      document.getElementById('totalAmount').textContent = 'Rp ' + (data.totalPrice || 0).toLocaleString('id-ID');
+      
+      // 🔥 Update jenis pengiriman
+      const delivery = getDeliveryType(data.deliveryInfo);
+      const deliveryBadge = document.getElementById('deliveryBadge');
+      if (deliveryBadge) {
+        deliveryBadge.textContent = delivery.text;
+        deliveryBadge.className = `delivery-badge-done ${delivery.class}`;
+      }
+      
+      updateUIByStatus(data.status, data);
+      
+      const expireAt = data.expireAt?.toDate();
+      if ((data.status === 'waiting_payment' || data.status === 'pending') && expireAt && expireAt > new Date()) {
+        startTimer(expireAt);
+      }
+      
+      unsubscribe = onSnapshot(orderRef, (docSnap) => {
+        if (docSnap.exists()) {
+          const newData = docSnap.data();
+          updateUIByStatus(newData.status, newData);
+          if (newData.status !== 'waiting_payment' && newData.status !== 'pending') {
+            if (timerInterval) clearInterval(timerInterval);
+            const timerContainer = document.getElementById('timerContainer');
+            if (timerContainer) timerContainer.style.display = 'none';
+          }
+        }
+      }, (error) => console.error('Error listening:', error));
+    }
   }
 
   loadOrder();
@@ -736,6 +924,5 @@
     if (timerInterval) clearInterval(timerInterval); 
   });
 </script>
-
 </body>
 </html>

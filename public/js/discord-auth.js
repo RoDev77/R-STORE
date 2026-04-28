@@ -256,6 +256,14 @@ async function updateUIBasedOnLogin() {
     if (userBalance) {
       userBalance.textContent = `Rp ${(user.balance || 0).toLocaleString('id-ID')}`;
     }
+
+    // Di dalam fungsi updateUIBasedOnLogin, setelah user login
+    const depositLink = document.querySelector('.user-dropdown a[href="deposit.html"]');
+    if (depositLink) {
+      depositLink.addEventListener('click', (e) => {
+        // sudah benar, hanya redirect
+      });
+    }
     
     // Fetch data terbaru dari Firestore untuk memastikan balance up to date
     await fetchUserDataFromFirestore();

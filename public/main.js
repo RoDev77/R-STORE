@@ -20,14 +20,14 @@ const stockReady = getElement('stockReady');
 const poAvailable = getElement('poAvailable');
 const btnBuy = getElement('btnBuy');
 const robuxError = getElement('robuxError');
-const detailRobux = getElement('detailRobux');
-const detailRate = getElement('detailRate');
-const detailTotal = getElement('detailTotal');
 
-// 🔥 ELEMEN METODE PEMBAYARAN
-const paymentMethodSelect = getElement('paymentMethod');
-const balanceInfo = getElement('balanceInfo');
-const currentBalanceDisplay = getElement('currentBalanceDisplay');
+// 🔥 ELEMEN YANG TIDAK ADA - DIKOMENTARI
+// const detailRobux = getElement('detailRobux');
+// const detailRate = getElement('detailRate');
+// const detailTotal = getElement('detailTotal');
+// const paymentMethodSelect = getElement('paymentMethod');
+// const balanceInfo = getElement('balanceInfo');
+// const currentBalanceDisplay = getElement('currentBalanceDisplay');
 
 // Config variables
 let PRICE_PER_ROBUX = 115;
@@ -41,27 +41,6 @@ function formatNumber(num) {
   return num.toLocaleString('id-ID');
 }
 
-// 🔥 UPDATE TAMPILAN BALANCE DI ORDER SECTION
-async function updateBalanceDisplay() {
-  if (!currentBalanceDisplay) return;
-  
-  if (isDiscordLoggedIn()) {
-    await fetchUserDataFromFirestore();
-    const balance = getUserBalance();
-    currentBalanceDisplay.textContent = `Rp ${balance.toLocaleString('id-ID')}`;
-    if (balanceInfo) balanceInfo.style.display = 'flex';
-  } else {
-    if (balanceInfo) balanceInfo.style.display = 'none';
-  }
-}
-
-// 🔥 CEK APAKAH BALANCE CUKUP
-function isBalanceSufficient(totalAmount) {
-  if (!isDiscordLoggedIn()) return false;
-  const balance = getUserBalance();
-  return balance >= totalAmount;
-}
-
 function updateUI() {
   if (!robuxInput) return;
   
@@ -69,21 +48,11 @@ function updateUI() {
   const total = robux * PRICE_PER_ROBUX;
   
   if (totalPrice) totalPrice.textContent = 'Rp ' + formatNumber(total);
-  if (detailRobux) detailRobux.textContent = formatNumber(robux);
-  if (detailRate) detailRate.textContent = 'Rp ' + formatNumber(PRICE_PER_ROBUX);
-  if (detailTotal) detailTotal.textContent = 'Rp ' + formatNumber(total);
+  // if (detailRobux) detailRobux.textContent = formatNumber(robux);
+  // if (detailRate) detailRate.textContent = 'Rp ' + formatNumber(PRICE_PER_ROBUX);
+  // if (detailTotal) detailTotal.textContent = 'Rp ' + formatNumber(total);
   
   if (robuxError) robuxError.classList.remove('show');
-  
-  // 🔥 UPDATE INFo BALANCE DI ORDER SUMMARY
-  if (currentBalanceDisplay && isDiscordLoggedIn()) {
-    const balance = getUserBalance();
-    if (balance >= total) {
-      currentBalanceDisplay.style.color = '#28a745';
-    } else {
-      currentBalanceDisplay.style.color = '#dc3545';
-    }
-  }
   
   if (btnBuy) {
     if (robux < 10) {
@@ -142,6 +111,7 @@ function updateStockDisplay() {
 
 async function loadConfig() {
   try {
+    console.log('🔄 Loading config...');
     const configRef = doc(db, 'config', CONFIG_ID);
     const configSnap = await getDoc(configRef);
     
@@ -151,7 +121,9 @@ async function loadConfig() {
       CURRENT_STOCK = data.currentStock || 0;
       CURRENT_PO = data.currentPO || 0;
       PO_LIMIT = data.poLimit || 0;
+      console.log('✅ Config loaded:', { PRICE_PER_ROBUX, CURRENT_STOCK, CURRENT_PO });
     } else {
+      console.warn('⚠️ Config not found, using defaults');
       PRICE_PER_ROBUX = 115;
       CURRENT_STOCK = 10000;
       CURRENT_PO = 5000;
@@ -164,12 +136,9 @@ async function loadConfig() {
     
     if (loadingScreen) loadingScreen.style.display = 'none';
     
-    console.log('✅ Config loaded - Harga: Rp', PRICE_PER_ROBUX, '/Robux, Stock:', CURRENT_STOCK);
-    
-    // Update balance display after config loaded
-    await updateBalanceDisplay();
   } catch (error) {
     console.error('❌ Failed to load config:', error);
+    if (stockDesc) stockDesc.textContent = 'Error loading stock: ' + error.message;
     if (loadingScreen) loadingScreen.style.display = 'none';
   }
 }
@@ -191,7 +160,6 @@ function showConfirmModal() {
   const customerPhone = document.getElementById('customerPhone')?.value?.trim() || '-';
   const robloxUsername = document.getElementById('robloxUsername')?.value?.trim() || '-';
   const deliveryText = deliveryInfo ? deliveryInfo.textContent : 'Pengiriman Instant';
-  const paymentMethod = paymentMethodSelect ? paymentMethodSelect.value : 'qris';
   
   document.getElementById('confirmRobux').textContent = `${robux.toLocaleString('id-ID')} Robux`;
   document.getElementById('confirmTotal').textContent = `Rp ${total.toLocaleString('id-ID')}`;
@@ -199,42 +167,12 @@ function showConfirmModal() {
   document.getElementById('confirmEmail').textContent = customerEmail || '-';
   document.getElementById('confirmPhone').textContent = customerPhone || '-';
   document.getElementById('confirmUsername').textContent = robloxUsername || '-';
-  document.getElementById('confirmPaymentMethod').textContent = paymentMethod === 'balance' ? '💰 Saldo' : '💳 QRIS';
   
   confirmModal.classList.add('active');
 }
 
 function closeModal() {
   confirmModal.classList.remove('active');
-}
-
-// 🔥 FUNGSI KURANGI BALANCE SETELAH ORDER (PAKAI SALDO)
-async function deductBalanceAfterOrder(totalAmount, robuxAmount) {
-  if (!isDiscordLoggedIn()) {
-    console.log('User belum login, tidak bisa pakai saldo');
-    return false;
-  }
-  
-  const user = getDiscordUser();
-  if (!user) return false;
-  
-  const currentBalance = getUserBalance();
-  if (currentBalance < totalAmount) {
-    console.log('Saldo tidak cukup');
-    return false;
-  }
-  
-  console.log(`💰 Kurangi balance untuk ${user.globalName || user.username}: -Rp ${totalAmount.toLocaleString()}`);
-  
-  const success = await deductUserBalance(user.id, totalAmount);
-  
-  if (success) {
-    console.log('✅ Balance berhasil dikurangi');
-    await fetchUserDataFromFirestore();
-    await updateBalanceDisplay();
-    return true;
-  }
-  return false;
 }
 
 async function proceedSubmitOrder() {
@@ -298,23 +236,6 @@ async function proceedSubmitOrder() {
     return;
   }
   
-  // 🔥 AMBIL METODE PEMBAYARAN
-  const paymentMethod = paymentMethodSelect ? paymentMethodSelect.value : 'qris';
-  
-  // 🔥 JIKA PAKAI SALDO, CEK SALDO
-  if (paymentMethod === 'balance') {
-    if (!isDiscordLoggedIn()) {
-      alert('❌ Silakan login terlebih dahulu untuk menggunakan saldo!');
-      return;
-    }
-    
-    const currentBalance = getUserBalance();
-    if (currentBalance < total) {
-      alert(`❌ Saldo tidak mencukupi! Saldo Anda: Rp ${currentBalance.toLocaleString('id-ID')}, butuh: Rp ${total.toLocaleString('id-ID')}. Silakan top up saldo terlebih dahulu.`);
-      return;
-    }
-  }
-  
   if (btnBuy) {
     btnBuy.disabled = true;
     btnBuy.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Memproses...';
@@ -338,13 +259,12 @@ async function proceedSubmitOrder() {
   const discordUser = getDiscordUser();
   const discordId = discordUser ? discordUser.id : null;
   
-  // 🔥 TAMBAHKAN PAYMENT METHOD KE ORDER
   const orderData = {
     robuxAmount: robux,
     totalPrice: total,
     deliveryInfo: deliveryInfo ? deliveryInfo.textContent : 'Pengiriman Instant',
-    status: paymentMethod === 'balance' ? 'paid' : 'pending',
-    paymentMethod: paymentMethod,
+    status: 'pending',
+    paymentMethod: 'qris',
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
     expireAt: expireAt,
@@ -357,24 +277,7 @@ async function proceedSubmitOrder() {
   
   try {
     await setDoc(orderRef, orderData);
-    
-    // 🔥 JIKA PAKAI SALDO, KURANGI BALANCE DAN LANGSUNG JADI PAID
-    if (paymentMethod === 'balance') {
-      const deductSuccess = await deductBalanceAfterOrder(total, robux);
-      if (deductSuccess) {
-        alert('✅ Pembayaran berhasil menggunakan saldo! Robux akan segera diproses.');
-        window.location.href = `done.html?orderId=${orderId}`;
-      } else {
-        alert('❌ Gagal memproses pembayaran dengan saldo.');
-        if (btnBuy) {
-          btnBuy.disabled = false;
-          btnBuy.innerHTML = '<i class="fas fa-arrow-right"></i> Lanjutkan Pembayaran';
-        }
-      }
-    } else {
-      // 🔥 QRIS PAYMENT
-      window.location.href = `payment.html?orderId=${orderId}`;
-    }
+    window.location.href = `payment.html?orderId=${orderId}`;
   } catch (error) {
     console.error('Error creating order:', error);
     alert('Gagal membuat pesanan. Silakan coba lagi.');
@@ -481,33 +384,14 @@ if (btnBuy) {
   btnBuy.addEventListener('click', submitOrder);
 }
 
-// 🔥 EVENT LISTENER UNTUK METODE PEMBAYARAN
-if (paymentMethodSelect) {
-  paymentMethodSelect.addEventListener('change', () => {
-    updateBalanceDisplay();
-    updateUI();
-  });
-}
-
 setInterval(() => {
   loadConfig();
 }, 30000);
 
-setInterval(() => {
-  if (isDiscordLoggedIn()) {
-    fetchUserDataFromFirestore();
-    updateBalanceDisplay();
-  }
-}, 60000);
-
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
     loadConfig();
-    updateBalanceDisplay();
   });
 } else {
   loadConfig();
-  updateBalanceDisplay();
 }
-
-export { deductBalanceAfterOrder };

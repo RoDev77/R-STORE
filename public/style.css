@@ -1683,6 +1683,19 @@ body {
   }
 }
 
+/* Deposit link style */
+.deposit-link {
+  background: rgba(0,212,255,0.15);
+  color: #00d4ff !important;
+  border-radius: 30px;
+  padding: 8px 16px !important;
+}
+
+.deposit-link:hover {
+  background: rgba(0,212,255,0.3) !important;
+  color: white !important;
+}
+
 /* User Menu Styles - Seperti contoh OxRodi™ */
 .user-menu {
   position: relative;

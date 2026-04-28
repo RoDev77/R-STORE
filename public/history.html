@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Riwayat Transaksi - R STORE</title>
+  <meta name="description" content="Lihat riwayat top up Robux dan deposit saldo Anda" />
+  <link rel="icon" type="image/png" href="/images/favicon.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0a0a14;
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    /* Navbar */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(10, 10, 20, 0.95);
+      backdrop-filter: blur(10px);
+      z-index: 100;
+      padding: 15px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    .nav-logo i {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-logo span {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .btn-back {
+      background: rgba(102,126,234,0.2);
+      color: #667eea;
+      padding: 8px 20px;
+      border-radius: 30px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .btn-back:hover {
+      background: rgba(102,126,234,0.4);
+      transform: translateY(-2px);
+    }
+
+    /* Main Content */
+    .history-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 100px 20px 60px;
+    }
+
+    .history-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .history-header h1 {
+      font-size: 36px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #fff, #667eea);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+
+    .history-header p {
+      color: #a0a0b0;
+    }
+
+    /* Tabs */
+    .history-tabs {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      background: #1a1a30;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 40px;
+      color: #a0a0b0;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+    }
+
+    .tab-btn:hover:not(.active) {
+      background: rgba(102,126,234,0.2);
+      color: white;
+    }
+
+    /* Balance Card */
+    .balance-card {
+      background: linear-gradient(135deg, rgba(102,126,234,0.15), rgba(118,75,162,0.1));
+      border-radius: 24px;
+      padding: 25px;
+      margin-bottom: 30px;
+      text-align: center;
+      border: 1px solid rgba(102,126,234,0.2);
+    }
+
+    .balance-card h3 {
+      font-size: 14px;
+      color: #a0a0b0;
+      margin-bottom: 8px;
+    }
+
+    .balance-card .balance-amount {
+      font-size: 36px;
+      font-weight: 800;
+      color: #00d4ff;
+    }
+
+    /* Orders List */
+    .orders-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .order-card {
+      background: #13132a;
+      border-radius: 20px;
+      padding: 20px;
+      border: 1px solid rgba(255,255,255,0.08);
+      transition: all 0.3s;
+    }
+
+    .order-card:hover {
+      border-color: rgba(102,126,234,0.3);
+      transform: translateX(5px);
+    }
+
+    .order-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 15px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .order-id {
+      font-family: monospace;
+      font-size: 13px;
+      font-weight: 600;
+      color: #667eea;
+    }
+
+    .order-type {
+      padding: 4px 12px;
+      border-radius: 30px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .type-topup { background: rgba(102,126,234,0.2); color: #667eea; }
+    .type-deposit { background: rgba(0,212,255,0.2); color: #00d4ff; }
+
+    .order-status {
+      padding: 4px 12px;
+      border-radius: 30px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .status-waiting_payment { background: #ffc107; color: #000; }
+    .status-paid { background: #28a745; color: #fff; }
+    .status-completed { background: #00d4ff; color: #000; }
+    .status-pending_verification { background: #fd7e14; color: #fff; }
+    .status-delivered { background: #17a2b8; color: #fff; }
+    .status-cancelled { background: #dc3545; color: #fff; }
+
+    .order-details-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .order-detail {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .order-detail-label {
+      font-size: 11px;
+      color: #8a8aa0;
+      text-transform: uppercase;
+    }
+
+    .order-detail-value {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .order-date {
+      font-size: 12px;
+      color: #6c6c8a;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px;
+      color: #6c6c8a;
+    }
+
+    .empty-state i {
+      font-size: 64px;
+      margin-bottom: 20px;
+      opacity: 0.5;
+    }
+
+    /* Loading */
+    .loading-state {
+      text-align: center;
+      padding: 60px;
+    }
+
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(102,126,234,0.3);
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .footer {
+      text-align: center;
+      padding: 30px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      color: #a0a0b0;
+      font-size: 12px;
+      margin-top: 40px;
+    }
+
+    @media (max-width: 768px) {
+      .history-container { padding: 80px 15px 40px; }
+      .history-header h1 { font-size: 28px; }
+      .balance-card .balance-amount { font-size: 28px; }
+      .order-details-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="nav-container">
+    <div class="nav-logo">
+      <i class="fas fa-gamepad"></i>
+      <span>R STORE</span>
+    </div>
+    <a href="index.html" class="btn-back">
+      <i class="fas fa-arrow-left"></i> Kembali
+    </a>
+  </div>
+</nav>
+
+<div class="history-container">
+  <div class="history-header">
+    <h1>📋 Riwayat Transaksi</h1>
+    <p>Lihat semua top up Robux dan deposit saldo Anda</p>
+  </div>
+
+  <!-- Balance Card -->
+  <div class="balance-card">
+    <h3><i class="fas fa-wallet"></i> Saldo Saat Ini</h3>
+    <div class="balance-amount" id="userBalance">Rp 0</div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="history-tabs">
+    <button class="tab-btn active" data-tab="all">📦 Semua</button>
+    <button class="tab-btn" data-tab="topup">🎮 Top Up Robux</button>
+    <button class="tab-btn" data-tab="deposit">💰 Deposit Saldo</button>
+  </div>
+
+  <!-- Orders List -->
+  <div id="ordersContainer">
+    <div class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Memuat riwayat...</p>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <p>&copy; 2025 R STORE — Unofficial Roblox Store</p>
+</footer>
+
+<script type="module">
+  import { db, collection, query, orderBy, getDocs, where } from './firebase-config.js';
+  import { isDiscordLoggedIn, getDiscordUser, fetchUserDataFromFirestore } from './js/discord-auth.js';
+
+  // Cek login
+  if (!isDiscordLoggedIn()) {
+    alert('Silakan login terlebih dahulu!');
+    window.location.href = 'index.html';
+  }
+
+  let currentUser = null;
+  let allOrders = [];
+  let currentTab = 'all';
+
+  const ordersContainer = document.getElementById('ordersContainer');
+  const userBalanceSpan = document.getElementById('userBalance');
+
+  // Load user balance
+  async function loadUserBalance() {
+    const userData = await fetchUserDataFromFirestore();
+    if (userData) {
+      currentUser = userData;
+      userBalanceSpan.textContent = `Rp ${(userData.balance || 0).toLocaleString('id-ID')}`;
+    }
+  }
+
+  // Format date
+  function formatDate(dateValue) {
+    if (!dateValue) return '-';
+    try {
+      if (dateValue?.toDate) return dateValue.toDate().toLocaleString('id-ID');
+      if (dateValue?.seconds) return new Date(dateValue.seconds * 1000).toLocaleString('id-ID');
+      if (typeof dateValue === 'string') return new Date(dateValue).toLocaleString('id-ID');
+      return '-';
+    } catch { return '-'; }
+  }
+
+  // Get status badge class
+  function getStatusClass(status, type) {
+    if (type === 'deposit') {
+      if (status === 'waiting_payment') return 'status-waiting_payment';
+      if (status === 'paid') return 'status-paid';
+      if (status === 'completed') return 'status-completed';
+      if (status === 'cancelled') return 'status-cancelled';
+      return 'status-waiting_payment';
+    } else {
+      if (status === 'waiting_payment') return 'status-waiting_payment';
+      if (status === 'pending_verification') return 'status-pending_verification';
+      if (status === 'paid') return 'status-paid';
+      if (status === 'delivered') return 'status-delivered';
+      if (status === 'cancelled') return 'status-cancelled';
+      return 'status-waiting_payment';
+    }
+  }
+
+  // Get status text
+  function getStatusText(status, type) {
+    if (type === 'deposit') {
+      if (status === 'waiting_payment') return '💳 Menunggu Bayar';
+      if (status === 'paid') return '✅ Menunggu Verifikasi Admin';
+      if (status === 'completed') return '💰 Selesai (Saldo)';
+      if (status === 'cancelled') return '❌ Dibatalkan';
+      return '💳 Menunggu Bayar';
+    } else {
+      if (status === 'waiting_payment') return '💳 Menunggu Bayar';
+      if (status === 'pending_verification') return '⏰ Menunggu Verifikasi';
+      if (status === 'paid') return '✅ Dibayar - Diproses';
+      if (status === 'delivered') return '🎉 Robux Terkirim';
+      if (status === 'cancelled') return '❌ Dibatalkan';
+      return '💳 Menunggu Bayar';
+    }
+  }
+
+  // Render orders
+  function renderOrders() {
+    let filteredOrders = allOrders;
+    
+    if (currentTab === 'topup') {
+      filteredOrders = allOrders.filter(o => o.type === 'topup');
+    } else if (currentTab === 'deposit') {
+      filteredOrders = allOrders.filter(o => o.type === 'deposit');
+    }
+    
+    if (filteredOrders.length === 0) {
+      ordersContainer.innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-inbox"></i>
+          <p>Belum ada transaksi</p>
+          <p style="font-size: 13px; margin-top: 8px;">Top up Robux atau deposit saldo untuk memulai</p>
+        </div>
+      `;
+      return;
+    }
+    
+    ordersContainer.innerHTML = filteredOrders.map(order => {
+      const typeClass = order.type === 'topup' ? 'type-topup' : 'type-deposit';
+      const typeText = order.type === 'topup' ? '🎮 Top Up Robux' : '💰 Deposit Saldo';
+      const statusClass = getStatusClass(order.status, order.type);
+      const statusText = getStatusText(order.status, order.type);
+      
+      if (order.type === 'topup') {
+        return `
+          <div class="order-card">
+            <div class="order-header">
+              <span class="order-id"><i class="fas fa-hashtag"></i> ${order.id}</span>
+              <div style="display: flex; gap: 8px;">
+                <span class="order-type ${typeClass}">${typeText}</span>
+                <span class="order-status ${statusClass}">${statusText}</span>
+              </div>
+            </div>
+            <div class="order-details-grid">
+              <div class="order-detail">
+                <div class="order-detail-label">🎮 Username Roblox</div>
+                <div class="order-detail-value">${order.robloxUsername || '-'}</div>
+              </div>
+              <div class="order-detail">
+                <div class="order-detail-label">💰 Jumlah Robux</div>
+                <div class="order-detail-value">${(order.robuxAmount || 0).toLocaleString()} Robux</div>
+              </div>
+              <div class="order-detail">
+                <div class="order-detail-label">💳 Total Pembayaran</div>
+                <div class="order-detail-value">Rp ${(order.totalPrice || 0).toLocaleString('id-ID')}</div>
+              </div>
+              <div class="order-detail">
+                <div class="order-detail-label">💳 Metode</div>
+                <div class="order-detail-value">${order.paymentMethod === 'balance' ? '💰 Saldo Deposit' : 'QRIS'}</div>
+              </div>
+            </div>
+            <div class="order-date">
+              <i class="fas fa-calendar-alt"></i> ${formatDate(order.createdAt)}
+            </div>
+          </div>
+        `;
+      } else {
+        return `
+          <div class="order-card">
+            <div class="order-header">
+              <span class="order-id"><i class="fas fa-hashtag"></i> ${order.id}</span>
+              <div style="display: flex; gap: 8px;">
+                <span class="order-type ${typeClass}">${typeText}</span>
+                <span class="order-status ${statusClass}">${statusText}</span>
+              </div>
+            </div>
+            <div class="order-details-grid">
+              <div class="order-detail">
+                <div class="order-detail-label">💰 Jumlah Deposit</div>
+                <div class="order-detail-value">Rp ${(order.amount || 0).toLocaleString('id-ID')}</div>
+              </div>
+              <div class="order-detail">
+                <div class="order-detail-label">💳 Metode</div>
+                <div class="order-detail-value">QRIS</div>
+              </div>
+            </div>
+            <div class="order-date">
+              <i class="fas fa-calendar-alt"></i> ${formatDate(order.createdAt)}
+            </div>
+          </div>
+        `;
+      }
+    }).join('');
+  }
+
+  // Load all orders
+  async function loadOrders() {
+    ordersContainer.innerHTML = '<div class="loading-state"><div class="loading-spinner"></div><p>Memuat riwayat...</p></div>';
+    
+    const user = getDiscordUser();
+    if (!user || !user.id) {
+      ordersContainer.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>Gagal memuat data</p></div>';
+      return;
+    }
+    
+    const discordId = user.id;
+    let allData = [];
+    
+    try {
+      // Load topup orders
+      const topupQuery = query(
+        collection(db, 'orders'),
+        where('discordId', '==', discordId),
+        orderBy('createdAt', 'desc')
+      );
+      const topupSnapshot = await getDocs(topupQuery);
+      topupSnapshot.forEach(doc => {
+        allData.push({ id: doc.id, ...doc.data(), type: 'topup' });
+      });
+      
+      // Load deposit orders
+      const depositQuery = query(
+        collection(db, 'deposit_orders'),
+        where('discordId', '==', discordId),
+        orderBy('createdAt', 'desc')
+      );
+      const depositSnapshot = await getDocs(depositQuery);
+      depositSnapshot.forEach(doc => {
+        allData.push({ id: doc.id, ...doc.data(), type: 'deposit' });
+      });
+      
+      // Sort by createdAt (newest first)
+      allData.sort((a, b) => {
+        const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(0);
+        const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(0);
+        return dateB - dateA;
+      });
+      
+      allOrders = allData;
+      renderOrders();
+      
+    } catch (error) {
+      console.error('Error loading orders:', error);
+      ordersContainer.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>Gagal memuat riwayat</p></div>';
+    }
+  }
+
+  // Tab switching
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentTab = btn.dataset.tab;
+      renderOrders();
+    });
+  });
+
+  // Initialize
+  async function init() {
+    await loadUserBalance();
+    await loadOrders();
+  }
+  
+  init();
+</script>
+</body>
+</html>

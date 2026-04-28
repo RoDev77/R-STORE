@@ -133,6 +133,7 @@
       transition: transform 0.2s;
     }
     .btn-deposit:hover { transform: translateY(-2px); }
+    .btn-deposit:disabled { opacity: 0.6; cursor: not-allowed; }
     .error-msg {
       background: rgba(220,53,69,0.15);
       border-radius: 12px;
@@ -142,6 +143,10 @@
       display: none;
     }
     .footer { text-align: center; padding: 30px; color: #a0a0b0; font-size: 12px; }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
@@ -195,7 +200,7 @@
 </footer>
 
 <script type="module">
-  import { db, doc, getDoc, updateDoc, collection, addDoc, serverTimestamp } from './firebase-config.js';
+  import { db, doc, setDoc, serverTimestamp } from './firebase-config.js';
   import { getDiscordUser, isDiscordLoggedIn, fetchUserDataFromFirestore } from './js/discord-auth.js';
 
   // Cek login
@@ -228,8 +233,8 @@
     currentBalanceEl.textContent = `Rp ${balance.toLocaleString('id-ID')}`;
   }
 
-  // Generate Order ID
-  function generateOrderId() {
+  // Generate Order ID untuk deposit
+  function generateDepositOrderId() {
     const randomNum = Math.floor(Math.random() * 10000000000000).toString().padStart(13, '0');
     return `DEP-${randomNum}`;
   }
@@ -250,14 +255,14 @@
     
     errorMsg.style.display = 'none';
     depositBtn.disabled = true;
-    depositBtn.innerHTML = '<div class="loading-spinner" style="width:20px;height:20px;border:2px solid white;border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;display:inline-block;margin-right:8px;"></div> Memproses...';
+    depositBtn.innerHTML = '<div style="width:20px;height:20px;border:2px solid white;border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;display:inline-block;margin-right:8px;"></div> Memproses...';
     
     try {
-      const orderId = generateOrderId();
+      const orderId = generateDepositOrderId();
       const expireAt = new Date();
       expireAt.setHours(expireAt.getHours() + 2);
       
-      // Simpan order deposit
+      // Simpan order deposit ke collection 'deposit_orders'
       const orderRef = doc(db, 'deposit_orders', orderId);
       await setDoc(orderRef, {
         orderId: orderId,
@@ -269,12 +274,12 @@
         expireAt: expireAt
       });
       
-      // Redirect ke payment untuk deposit
-      window.location.href = `/deposit-payment.html?orderId=${orderId}&amount=${selectedAmount}`;
+      // Redirect ke halaman pembayaran deposit (pakai payment.html yang sudah ada)
+      window.location.href = `/payment.html?orderId=${orderId}&amount=${selectedAmount}&type=deposit`;
       
     } catch (error) {
       console.error('Error:', error);
-      errorMsg.textContent = '❌ Gagal memproses deposit';
+      errorMsg.textContent = '❌ Gagal memproses deposit: ' + error.message;
       errorMsg.style.display = 'block';
       depositBtn.disabled = false;
       depositBtn.innerHTML = '<i class="fas fa-qrcode"></i> Top Up Saldo';
@@ -288,6 +293,7 @@
       if (amount === 'custom') {
         customAmountGroup.style.display = 'block';
         selectedAmount = 0;
+        errorMsg.style.display = 'none';
       } else {
         customAmountGroup.style.display = 'none';
         selectedAmount = parseInt(amount);
@@ -296,9 +302,11 @@
     });
   });
   
-  customAmountInput.addEventListener('input', () => {
-    selectedAmount = parseInt(customAmountInput.value) || 0;
-  });
+  if (customAmountInput) {
+    customAmountInput.addEventListener('input', () => {
+      selectedAmount = parseInt(customAmountInput.value) || 0;
+    });
+  }
   
   depositBtn.addEventListener('click', processDeposit);
   
