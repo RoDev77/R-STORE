@@ -71,6 +71,42 @@
     }
     .balance-label { font-size: 14px; color: #a0a0b0; margin-bottom: 8px; }
     .balance-amount { font-size: 36px; font-weight: 800; color: #00d4ff; }
+    
+    /* Bonus Info */
+    .bonus-info {
+      background: linear-gradient(135deg, rgba(255,193,7,0.15), rgba(255,152,0,0.08));
+      border-radius: 16px;
+      padding: 15px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(255,193,7,0.3);
+      text-align: center;
+    }
+    .bonus-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #ffc107;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .bonus-list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+    }
+    .bonus-item {
+      background: rgba(255,255,255,0.05);
+      padding: 6px 12px;
+      border-radius: 30px;
+      font-size: 12px;
+    }
+    .bonus-item strong {
+      color: #ffc107;
+    }
+    
     .input-group { margin-bottom: 20px; }
     .input-group label {
       display: block;
@@ -111,10 +147,43 @@
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
+      position: relative;
     }
     .preset-btn:hover {
       background: rgba(102,126,234,0.2);
       border-color: #667eea;
+    }
+    .preset-btn.has-bonus::after {
+      content: '+ Bonus';
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: #ffc107;
+      color: #000;
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 20px;
+    }
+    .total-display {
+      background: rgba(0,212,255,0.1);
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin: 15px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .total-label {
+      font-size: 13px;
+      color: #a0a0b0;
+    }
+    .total-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: #00d4ff;
     }
     .btn-deposit {
       width: 100%;
@@ -170,13 +239,26 @@
       <div class="balance-amount" id="currentBalance">Rp 0</div>
     </div>
 
+    <!-- Bonus Info -->
+    <div class="bonus-info">
+      <div class="bonus-title">
+        <i class="fas fa-gift"></i> Bonus Deposit!
+      </div>
+      <div class="bonus-list">
+        <div class="bonus-item">Deposit <strong>Rp 100.000</strong> → Bonus <strong>+Rp 5.000</strong></div>
+        <div class="bonus-item">Deposit <strong>Rp 200.000</strong> → Bonus <strong>+Rp 5.000</strong></div>
+        <div class="bonus-item">Deposit <strong>Rp 500.000</strong> → Bonus <strong>+Rp 8.000</strong></div>
+        <div class="bonus-item">Deposit <strong>Rp 1.000.000</strong> → Bonus <strong>+Rp 12.000</strong></div>
+      </div>
+    </div>
+
     <div class="preset-buttons">
-      <button class="preset-btn" data-amount="50000">Rp 50.000</button>
-      <button class="preset-btn" data-amount="100000">Rp 100.000</button>
-      <button class="preset-btn" data-amount="200000">Rp 200.000</button>
-      <button class="preset-btn" data-amount="500000">Rp 500.000</button>
-      <button class="preset-btn" data-amount="1000000">Rp 1.000.000</button>
-      <button class="preset-btn" data-amount="custom">Custom</button>
+      <button class="preset-btn" data-amount="50000" data-bonus="0">Rp 50.000</button>
+      <button class="preset-btn has-bonus" data-amount="100000" data-bonus="5000">Rp 100.000 <span style="font-size:10px;">+5k</span></button>
+      <button class="preset-btn has-bonus" data-amount="200000" data-bonus="5000">Rp 200.000 <span style="font-size:10px;">+5k</span></button>
+      <button class="preset-btn has-bonus" data-amount="500000" data-bonus="8000">Rp 500.000 <span style="font-size:10px;">+8k</span></button>
+      <button class="preset-btn has-bonus" data-amount="1000000" data-bonus="12000">Rp 1.000.000 <span style="font-size:10px;">+12k</span></button>
+      <button class="preset-btn" data-amount="custom" data-bonus="0">Custom</button>
     </div>
 
     <div class="input-group" id="customAmountGroup" style="display: none;">
@@ -184,6 +266,16 @@
       <div class="input-wrapper">
         <i class="fas fa-money-bill"></i>
         <input type="number" id="customAmount" placeholder="Minimal Rp 10.000" />
+      </div>
+    </div>
+
+    <!-- Total Display with Bonus -->
+    <div class="total-display" id="totalDisplay" style="display: none;">
+      <span class="total-label"><i class="fas fa-calculator"></i> Detail Deposit</span>
+      <div style="text-align: right;">
+        <div style="font-size: 12px;" id="detailBase">Deposit: Rp 0</div>
+        <div style="font-size: 12px; color: #ffc107;" id="detailBonus">Bonus: Rp 0</div>
+        <div class="total-value" id="totalAmount">Rp 0</div>
       </div>
     </div>
 
@@ -211,19 +303,49 @@
 
   let currentUser = null;
   let selectedAmount = 0;
+  let selectedBonus = 0;
 
   const currentBalanceEl = document.getElementById('currentBalance');
   const customAmountGroup = document.getElementById('customAmountGroup');
   const customAmountInput = document.getElementById('customAmount');
   const depositBtn = document.getElementById('depositBtn');
   const errorMsg = document.getElementById('errorMsg');
+  const totalDisplay = document.getElementById('totalDisplay');
+  const detailBase = document.getElementById('detailBase');
+  const detailBonus = document.getElementById('detailBonus');
+  const totalAmountEl = document.getElementById('totalAmount');
+
+  // 🔥 Fungsi hitung bonus sesuai permintaan
+  function getBonusAmount(amount) {
+    if (amount >= 1000000) return 12000;
+    if (amount >= 500000) return 8000;
+    if (amount >= 200000) return 5000;
+    if (amount >= 100000) return 5000;
+    return 0;
+  }
+
+  // Update total display
+  function updateTotalDisplay(amount, bonus) {
+    if (amount > 0) {
+      totalDisplay.style.display = 'flex';
+      detailBase.textContent = `Deposit: Rp ${amount.toLocaleString('id-ID')}`;
+      if (bonus > 0) {
+        detailBonus.textContent = `Bonus: +Rp ${bonus.toLocaleString('id-ID')}`;
+        totalAmountEl.textContent = `Rp ${(amount + bonus).toLocaleString('id-ID')}`;
+      } else {
+        detailBonus.textContent = `Bonus: Rp 0`;
+        totalAmountEl.textContent = `Rp ${amount.toLocaleString('id-ID')}`;
+      }
+    } else {
+      totalDisplay.style.display = 'none';
+    }
+  }
 
   // Load user balance
   async function loadUserBalance() {
     currentUser = getDiscordUser();
     if (!currentUser) return;
     
-    // Fetch latest data dari Firestore
     const userData = await fetchUserDataFromFirestore();
     if (userData) {
       currentUser = userData;
@@ -257,25 +379,27 @@
     depositBtn.disabled = true;
     depositBtn.innerHTML = '<div style="width:20px;height:20px;border:2px solid white;border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;display:inline-block;margin-right:8px;"></div> Memproses...';
     
+    const totalWithBonus = selectedAmount + selectedBonus;
+    
     try {
       const orderId = generateDepositOrderId();
       const expireAt = new Date();
       expireAt.setHours(expireAt.getHours() + 2);
       
-      // Simpan order deposit ke collection 'deposit_orders'
       const orderRef = doc(db, 'deposit_orders', orderId);
       await setDoc(orderRef, {
         orderId: orderId,
         discordId: currentUser.id,
         username: currentUser.username,
         amount: selectedAmount,
+        bonus: selectedBonus,
+        totalAmount: totalWithBonus,
         status: 'waiting_payment',
         createdAt: serverTimestamp(),
         expireAt: expireAt
       });
       
-      // Redirect ke halaman pembayaran deposit (pakai payment.html yang sudah ada)
-      window.location.href = `/payment.html?orderId=${orderId}&amount=${selectedAmount}&type=deposit`;
+      window.location.href = `/payment.html?orderId=${orderId}&amount=${totalWithBonus}&type=deposit`;
       
     } catch (error) {
       console.error('Error:', error);
@@ -290,14 +414,20 @@
   document.querySelectorAll('.preset-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const amount = btn.dataset.amount;
+      const bonus = parseInt(btn.dataset.bonus) || 0;
+      
       if (amount === 'custom') {
         customAmountGroup.style.display = 'block';
         selectedAmount = 0;
+        selectedBonus = 0;
         errorMsg.style.display = 'none';
+        updateTotalDisplay(0, 0);
       } else {
         customAmountGroup.style.display = 'none';
         selectedAmount = parseInt(amount);
+        selectedBonus = bonus;
         errorMsg.style.display = 'none';
+        updateTotalDisplay(selectedAmount, selectedBonus);
       }
     });
   });
@@ -305,6 +435,8 @@
   if (customAmountInput) {
     customAmountInput.addEventListener('input', () => {
       selectedAmount = parseInt(customAmountInput.value) || 0;
+      selectedBonus = getBonusAmount(selectedAmount);
+      updateTotalDisplay(selectedAmount, selectedBonus);
     });
   }
   

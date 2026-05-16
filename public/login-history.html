@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Riwayat Login - R STORE</title>
+  <link rel="icon" type="image/png" href="/images/favicon.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #0a0a14 0%, #0f0f1a 100%);
+      min-height: 100vh;
+      color: #fff;
+    }
+    .navbar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: rgba(15,15,26,0.95);
+      backdrop-filter: blur(10px);
+      padding: 16px 24px;
+      z-index: 1000;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .nav-logo { display: flex; align-items: center; gap: 8px; font-size: 20px; font-weight: 700; }
+    .nav-logo i { color: #667eea; }
+    .btn-back {
+      background: rgba(102,126,234,0.2);
+      padding: 8px 16px;
+      border-radius: 10px;
+      text-decoration: none;
+      color: #fff;
+      font-size: 13px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 100px 20px 40px;
+    }
+    .card {
+      background: rgba(19,19,42,0.8);
+      backdrop-filter: blur(10px);
+      border-radius: 28px;
+      padding: 28px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .card h2 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .login-item {
+      background: rgba(26,26,48,0.6);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      transition: all 0.3s;
+    }
+    .login-item:hover {
+      background: rgba(26,26,48,0.9);
+      transform: translateX(4px);
+    }
+    .login-info { flex: 2; }
+    .login-device { display: flex; align-items: center; gap: 12px; }
+    .device-icon {
+      width: 40px;
+      height: 40px;
+      background: rgba(102,126,234,0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .device-details h4 { font-size: 14px; margin-bottom: 4px; }
+    .device-details p { font-size: 11px; color: #a0a0b0; }
+    .login-time { font-size: 13px; color: #00d4ff; font-family: monospace; }
+    .login-ip {
+      font-size: 12px;
+      color: #a0a0b0;
+      background: rgba(0,0,0,0.3);
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+    .current-badge {
+      background: rgba(40,167,69,0.2);
+      color: #28a745;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .empty-state { text-align: center; padding: 60px; color: #a0a0b0; }
+    .footer {
+      text-align: center;
+      padding: 30px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      color: #a0a0b0;
+      font-size: 12px;
+      margin-top: 40px;
+    }
+    @media (max-width: 640px) {
+      .login-item { flex-direction: column; align-items: flex-start; }
+      .login-time { align-self: flex-end; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-container">
+    <div class="nav-logo"><i class="fas fa-gamepad"></i><span>R STORE</span></div>
+    <a href="javascript:history.back()" class="btn-back"><i class="fas fa-arrow-left"></i> Kembali</a>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="card">
+    <h2><i class="fas fa-history"></i> Riwayat Login</h2>
+    <div id="loginHistoryList">
+      <div class="empty-state"><i class="fas fa-spinner fa-pulse"></i> Memuat data...</div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <p>&copy; 2025 R STORE — Unofficial Roblox Store</p>
+</footer>
+
+<script type="module">
+  import { db, collection, query, where, getDocs, orderBy, limit } from './firebase-config.js';
+  import { isDiscordLoggedIn, getDiscordUser } from './js/discord-auth.js';
+
+  async function loadLoginHistory() {
+    const isLoggedIn = isDiscordLoggedIn();
+    const user = getDiscordUser();
+    
+    if (!isLoggedIn || !user) {
+      document.getElementById('loginHistoryList').innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-lock"></i>
+          <p>Silakan login terlebih dahulu</p>
+          <a href="index.html" style="display: inline-block; margin-top: 16px; padding: 8px 20px; background: #667eea; border-radius: 8px; color: white; text-decoration: none;">
+            <i class="fas fa-sign-in-alt"></i> Login Sekarang
+          </a>
+        </div>
+      `;
+      return;
+    }
+    
+    const container = document.getElementById('loginHistoryList');
+    
+    try {
+      const loginHistoryRef = collection(db, 'login_history');
+      const q = query(loginHistoryRef, where('discordId', '==', user.id), orderBy('loginTime', 'desc'), limit(50));
+      const querySnapshot = await getDocs(q);
+      
+      if (querySnapshot.empty) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <p>Belum ada riwayat login</p>
+            <p style="font-size: 12px; margin-top: 8px;">Login pertama Anda akan tercatat di sini</p>
+          </div>
+        `;
+        return;
+      }
+      
+      const currentSession = localStorage.getItem('discord_session_token');
+      
+      container.innerHTML = querySnapshot.docs.map(doc => {
+        const data = doc.data();
+        const loginTime = data.loginTime?.toDate ? data.loginTime.toDate() : new Date(data.loginTime);
+        const isCurrent = data.sessionToken === currentSession;
+        
+        let deviceIcon = 'fa-desktop';
+        const deviceType = (data.device || '').toLowerCase();
+        if (deviceType.includes('mobile')) deviceIcon = 'fa-mobile-alt';
+        else if (deviceType.includes('tablet')) deviceIcon = 'fa-tablet-alt';
+        
+        return `
+          <div class="login-item">
+            <div class="login-info">
+              <div class="login-device">
+                <div class="device-icon"><i class="fas ${deviceIcon}"></i></div>
+                <div class="device-details">
+                  <h4>${escapeHtml(data.device || 'Perangkat Tidak Dikenal')}</h4>
+                  <p>${escapeHtml(data.browser || '')} ${escapeHtml(data.os || '')}</p>
+                </div>
+              </div>
+            </div>
+            <div class="login-time">
+              ${loginTime.toLocaleDateString('id-ID')} ${loginTime.toLocaleTimeString('id-ID')}
+            </div>
+            <div>
+              ${isCurrent ? '<span class="current-badge">Sesi Aktif</span>' : ''}
+              ${data.ip ? `<span class="login-ip"><i class="fas fa-map-marker-alt"></i> ${escapeHtml(data.ip)}</span>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+    } catch (error) {
+      console.error('Error loading login history:', error);
+      container.innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-exclamation-triangle"></i>
+          <p>Gagal memuat riwayat login</p>
+          <p style="font-size: 12px; margin-top: 8px;">Error: ${error.message}</p>
+          <button onclick="location.reload()" style="margin-top: 16px; padding: 8px 20px; background: #667eea; border: none; border-radius: 8px; color: white; cursor: pointer;">
+            <i class="fas fa-sync-alt"></i> Coba Lagi
+          </button>
+        </div>
+      `;
+    }
+  }
+  
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    });
+  }
+  
+  loadLoginHistory();
+</script>
+</body>
+</html>

@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Referral - R STORE</title>
+  <meta name="description" content="Dapatkan bonus dengan mengajak teman bergabung di R STORE" />
+  <link rel="icon" type="image/png" href="/images/favicon.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0a0a14;
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(10, 10, 20, 0.95);
+      backdrop-filter: blur(10px);
+      z-index: 100;
+      padding: 15px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    .nav-logo i {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-logo span {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .btn-back {
+      background: rgba(102,126,234,0.2);
+      color: #667eea;
+      padding: 8px 20px;
+      border-radius: 30px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .btn-back:hover {
+      background: rgba(102,126,234,0.4);
+      transform: translateY(-2px);
+    }
+
+    .referral-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 100px 20px 60px;
+    }
+
+    .referral-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .referral-header h1 {
+      font-size: 36px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #fff, #667eea);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+
+    .referral-header p {
+      color: #a0a0b0;
+    }
+
+    .login-required {
+      text-align: center;
+      padding: 60px;
+      background: #13132a;
+      border-radius: 32px;
+      margin: 40px auto;
+      max-width: 500px;
+    }
+
+    .login-required i {
+      font-size: 64px;
+      color: #667eea;
+      margin-bottom: 20px;
+    }
+
+    .login-required h3 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    .login-required p {
+      color: #a0a0b0;
+      margin-bottom: 20px;
+    }
+
+    .btn-login-discord {
+      background: #5865F2;
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 40px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.3s;
+    }
+
+    .btn-login-discord:hover {
+      background: #4752C4;
+      transform: translateY(-2px);
+    }
+
+    .stats-referral {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    .stat-card-referral {
+      background: linear-gradient(135deg, rgba(102,126,234,0.12), rgba(118,75,162,0.08));
+      border-radius: 24px;
+      padding: 25px;
+      text-align: center;
+      border: 1px solid rgba(102,126,234,0.15);
+    }
+
+    .stat-number-referral {
+      font-size: 36px;
+      font-weight: 800;
+      color: #00d4ff;
+    }
+
+    .stat-label-referral {
+      font-size: 13px;
+      color: #a0a0b0;
+      margin-top: 8px;
+    }
+
+    .referral-code-card {
+      background: linear-gradient(135deg, rgba(102,126,234,0.15), rgba(118,75,162,0.1));
+      border-radius: 32px;
+      padding: 30px;
+      text-align: center;
+      margin-bottom: 40px;
+      border: 1px solid rgba(102,126,234,0.3);
+    }
+
+    .referral-code-title {
+      font-size: 14px;
+      color: #a0a0b0;
+      margin-bottom: 10px;
+    }
+
+    .referral-code {
+      background: #1a1a30;
+      border-radius: 60px;
+      padding: 15px 25px;
+      display: inline-flex;
+      align-items: center;
+      gap: 15px;
+      margin: 15px 0;
+    }
+
+    .referral-code span {
+      font-size: 28px;
+      font-weight: 800;
+      font-family: monospace;
+      letter-spacing: 2px;
+      color: #00d4ff;
+    }
+
+    .copy-code-btn {
+      background: rgba(102,126,234,0.2);
+      border: none;
+      color: #667eea;
+      padding: 8px 20px;
+      border-radius: 40px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .copy-code-btn:hover {
+      background: rgba(102,126,234,0.4);
+      transform: scale(1.02);
+    }
+
+    .referral-link {
+      background: #1a1a30;
+      border-radius: 60px;
+      padding: 12px 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .referral-link .link-text {
+      font-size: 13px;
+      color: #00d4ff;
+      font-family: monospace;
+      word-break: break-all;
+    }
+
+    .bonus-info-card {
+      background: rgba(255,193,7,0.1);
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 40px;
+      border: 1px solid rgba(255,193,7,0.3);
+    }
+
+    .bonus-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #ffc107;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .bonus-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+    }
+
+    .bonus-item {
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      padding: 12px 16px;
+    }
+
+    .bonus-item strong {
+      color: #ffc107;
+    }
+
+    .referral-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 25px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding-bottom: 10px;
+    }
+
+    .tab-btn-referral {
+      background: transparent;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 30px;
+      color: #a0a0b0;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .tab-btn-referral.active {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+    }
+
+    .tab-btn-referral:hover:not(.active) {
+      background: rgba(102,126,234,0.2);
+      color: white;
+    }
+
+    .referrals-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .referral-item {
+      background: #13132a;
+      border-radius: 16px;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .referral-user {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .referral-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(102,126,234,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .referral-info h4 {
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .referral-info p {
+      font-size: 11px;
+      color: #6c6c8a;
+    }
+
+    .referral-bonus {
+      font-size: 16px;
+      font-weight: 700;
+      color: #00d4ff;
+    }
+
+    .referral-date {
+      font-size: 11px;
+      color: #6c6c8a;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px;
+      color: #6c6c8a;
+    }
+
+    .empty-state i {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 30px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      color: #a0a0b0;
+      font-size: 12px;
+      margin-top: 40px;
+    }
+
+    @media (max-width: 768px) {
+      .referral-container { padding: 80px 15px 40px; }
+      .referral-header h1 { font-size: 28px; }
+      .referral-code span { font-size: 20px; }
+      .stats-referral { grid-template-columns: repeat(2, 1fr); }
+      .bonus-list { grid-template-columns: 1fr; }
+      .referral-item { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-container">
+    <div class="nav-logo">
+      <i class="fas fa-gamepad"></i>
+      <span>R STORE</span>
+    </div>
+    <a href="index.html" class="btn-back">
+      <i class="fas fa-arrow-left"></i> Kembali
+    </a>
+  </div>
+</nav>
+
+<div class="referral-container" id="referralContainer">
+  <div class="login-required" id="loginRequired" style="display: none;">
+    <i class="fab fa-discord"></i>
+    <h3>Login Required</h3>
+    <p>Silakan login dengan Discord untuk mengakses program referral.</p>
+    <button id="discordLoginBtnReferral" class="btn-login-discord">
+      <i class="fab fa-discord"></i> Login dengan Discord
+    </button>
+  </div>
+
+  <div id="referralContent" style="display: none;">
+    <div class="referral-header">
+      <h1>🎁 Program Referral</h1>
+      <p>Ajakan teman, dapatkan bonus saldo</p>
+    </div>
+
+    <div class="stats-referral">
+      <div class="stat-card-referral">
+        <div class="stat-number-referral" id="totalReferrals">0</div>
+        <div class="stat-label-referral">Total Referral</div>
+      </div>
+      <div class="stat-card-referral">
+        <div class="stat-number-referral" id="totalBonus">Rp 0</div>
+        <div class="stat-label-referral">Total Bonus Didapat</div>
+      </div>
+      <div class="stat-card-referral">
+        <div class="stat-number-referral" id="pendingBonus">Rp 0</div>
+        <div class="stat-label-referral">Bonus Tertunda</div>
+      </div>
+    </div>
+
+    <div class="referral-code-card">
+      <div class="referral-code-title">
+        <i class="fas fa-code"></i> Kode Referral Anda
+      </div>
+      <div class="referral-code">
+        <span id="referralCode">-</span>
+        <button class="copy-code-btn" id="copyCodeBtn">
+          <i class="fas fa-copy"></i> Copy
+        </button>
+      </div>
+      <div class="referral-link">
+        <span class="link-text" id="referralLink">-</span>
+        <button class="copy-code-btn" id="copyLinkBtn">
+          <i class="fas fa-copy"></i> Copy Link
+        </button>
+      </div>
+      <p style="font-size: 12px; color: #a0a0b0; margin-top: 15px;">
+        <i class="fas fa-info-circle"></i> Bagikan kode/link ke teman. Setiap teman yang mendaftar dan melakukan transaksi, Anda akan mendapatkan bonus.
+      </p>
+    </div>
+
+    <div class="bonus-info-card">
+      <div class="bonus-title">
+        <i class="fas fa-gift"></i> Bonus Referral
+      </div>
+      <div class="bonus-list">
+        <div class="bonus-item">
+          🎮 Teman deposit pertama <strong>Rp 50.000+</strong> → <strong>+Rp 2.500</strong>
+        </div>
+        <div class="bonus-item">
+          🎮 Teman top up Robux <strong>pertama 100+ Robux</strong> → <strong>+Rp 1.000</strong>
+        </div>
+        <div class="bonus-item">
+          🎮 Setiap transaksi teman (setelah pertama) → <strong>+1%</strong> dari nominal
+        </div>
+      </div>
+    </div>
+
+    <div class="referral-tabs">
+      <button class="tab-btn-referral active" data-tab="referred">👥 Yang Menggunakan Kode Saya</button>
+      <button class="tab-btn-referral" data-tab="earned">💰 Bonus yang Saya Dapat</button>
+    </div>
+
+    <div id="referredList" class="referrals-list">
+      <div class="empty-state">
+        <i class="fas fa-spinner fa-pulse"></i>
+        <p>Memuat data...</p>
+      </div>
+    </div>
+
+    <div id="earnedList" class="referrals-list" style="display: none;">
+      <div class="empty-state">
+        <i class="fas fa-spinner fa-pulse"></i>
+        <p>Memuat data...</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <p>&copy; 2025 R STORE — Unofficial Roblox Store</p>
+</footer>
+
+<script type="module">
+  import { db, doc, getDoc, setDoc, collection, query, where, getDocs, serverTimestamp, updateDoc } from './firebase-config.js';
+  import { isDiscordLoggedIn, getDiscordUser, fetchUserDataFromFirestore } from './js/discord-auth.js';
+
+  const DISCORD_LOGIN_URL = '/api/discord-login';
+  const loginRequiredDiv = document.getElementById('loginRequired');
+  const referralContentDiv = document.getElementById('referralContent');
+
+  let currentUser = null;
+  let referralData = null;
+  let currentTab = 'referred';
+
+  // Fungsi untuk format tanggal
+  function formatDate(dateValue) {
+    if (!dateValue) return '-';
+    try {
+      if (dateValue?.toDate) return dateValue.toDate().toLocaleDateString('id-ID');
+      if (dateValue?.seconds) return new Date(dateValue.seconds * 1000).toLocaleDateString('id-ID');
+      if (typeof dateValue === 'string') return new Date(dateValue).toLocaleDateString('id-ID');
+      return '-';
+    } catch (e) {
+      return '-';
+    }
+  }
+
+  // 🔥 Fungsi untuk generate kode referral unik dengan prefix RSTORE-
+  async function generateUniqueReferralCode() {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    const prefix = 'RSTORE-';
+    let randomPart = '';
+    let isUnique = false;
+    
+    while (!isUnique) {
+      randomPart = '';
+      for (let i = 0; i < 8; i++) {
+        randomPart += characters.charAt(Math.floor(Math.random() * characters.length));
+      }
+      const fullCode = prefix + randomPart;
+      
+      const checkQuery = await getDocs(query(collection(db, 'referrals'), where('referralCode', '==', fullCode)));
+      if (checkQuery.empty) {
+        isUnique = true;
+      }
+    }
+    return prefix + randomPart;
+  }
+
+  // 🔥 Buat atau ambil data referral dari Firestore
+  async function getOrCreateReferral(userId, username, globalName) {
+    const referralRef = doc(db, 'referrals', userId);
+    const referralSnap = await getDoc(referralRef);
+    
+    if (!referralSnap.exists()) {
+      const referralCode = await generateUniqueReferralCode();
+      
+      const newReferral = {
+        userId: userId,
+        username: username || 'Unknown',
+        globalName: globalName || username || 'Unknown',
+        referralCode: referralCode,
+        referredUsers: [],
+        earnedBonuses: [],
+        totalBonus: 0,
+        totalReferred: 0,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      
+      await setDoc(referralRef, newReferral);
+      return newReferral;
+    }
+    
+    return { id: referralSnap.id, ...referralSnap.data() };
+  }
+
+  // 🔥 Load referral data
+  async function loadReferralData() {
+    currentUser = getDiscordUser();
+    if (!currentUser || !currentUser.id) return;
+
+    referralData = await getOrCreateReferral(currentUser.id, currentUser.username, currentUser.globalName);
+    
+    document.getElementById('referralCode').textContent = referralData.referralCode;
+    document.getElementById('referralLink').textContent = `${window.location.origin}/?ref=${referralData.referralCode}`;
+    document.getElementById('totalReferrals').textContent = referralData.totalReferred || 0;
+    document.getElementById('totalBonus').textContent = `Rp ${(referralData.totalBonus || 0).toLocaleString('id-ID')}`;
+    
+    const pendingBonuses = (referralData.referredUsers || []).filter(u => !u.bonusPaid);
+    const pendingTotal = pendingBonuses.reduce((sum, u) => sum + (u.bonusAmount || 0), 0);
+    document.getElementById('pendingBonus').textContent = `Rp ${pendingTotal.toLocaleString('id-ID')}`;
+
+    renderReferredList();
+    renderEarnedList();
+  }
+
+  // 🔥 Render daftar user yang menggunakan referral code
+  function renderReferredList() {
+    const container = document.getElementById('referredList');
+    const referredUsers = referralData.referredUsers || [];
+
+    if (referredUsers.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-users"></i>
+          <p>Belum ada teman yang menggunakan kode referral Anda</p>
+          <p style="font-size: 13px; margin-top: 8px;">Bagikan kode referral Anda untuk mendapatkan bonus!</p>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = referredUsers.map(user => {
+      const createdAt = user.createdAt;
+      const dateStr = formatDate(createdAt);
+      
+      const bonusStatus = user.bonusPaid 
+        ? '<span style="color: #28a745;">✅ Bonus Dibayar</span>' 
+        : '<span style="color: #ffc107;">⏳ Menunggu Transaksi</span>';
+      
+      return `
+        <div class="referral-item">
+          <div class="referral-user">
+            <div class="referral-avatar">
+              <i class="fas fa-user"></i>
+            </div>
+            <div class="referral-info">
+              <h4>${user.username || user.globalName || '-'}</h4>
+              <p>Daftar: ${dateStr}</p>
+            </div>
+          </div>
+          <div class="referral-bonus">
+            Bonus: Rp ${(user.bonusAmount || 0).toLocaleString('id-ID')}
+          </div>
+          <div class="referral-date">
+            ${bonusStatus}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // 🔥 Render daftar bonus yang didapat
+  function renderEarnedList() {
+    const container = document.getElementById('earnedList');
+    const earnedBonuses = referralData.earnedBonuses || [];
+
+    if (earnedBonuses.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-coins"></i>
+          <p>Belum ada bonus yang didapat</p>
+          <p style="font-size: 13px; margin-top: 8px;">Ajak teman untuk mendapatkan bonus referral!</p>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = earnedBonuses.map(bonus => {
+      let typeText = '';
+      let typeIcon = '';
+      let bonusClass = '';
+      
+      if (bonus.type === 'first_deposit') {
+        typeText = 'Bonus Deposit Pertama';
+        typeIcon = '💰';
+        bonusClass = 'bonus-deposit';
+      } else if (bonus.type === 'first_topup') {
+        typeText = 'Bonus Top Up Robux Pertama';
+        typeIcon = '🎮';
+        bonusClass = 'bonus-topup';
+      } else if (bonus.type === 'daily_transaction') {
+        typeText = 'Bonus Transaksi Harian';
+        typeIcon = '🔄';
+        bonusClass = 'bonus-transaction';
+      } else {
+        typeText = 'Bonus Referral';
+        typeIcon = '🎁';
+        bonusClass = 'bonus-referral';
+      }
+
+      const bonusDate = bonus.createdAt || bonus.paidAt;
+      const dateStr = formatDate(bonusDate);
+      
+      return `
+        <div class="referral-item ${bonusClass}">
+          <div class="referral-user">
+            <div class="referral-avatar">
+              <i class="fas ${bonus.type === 'first_topup' ? 'fa-gamepad' : (bonus.type === 'first_deposit' ? 'fa-money-bill' : 'fa-gift')}"></i>
+            </div>
+            <div class="referral-info">
+              <h4>${typeIcon} ${typeText}</h4>
+              <p>Dari: ${bonus.fromUsername || 'User'}</p>
+              ${bonus.description ? `<p style="font-size: 10px; color: #ffc107;">${bonus.description}</p>` : ''}
+            </div>
+          </div>
+          <div class="referral-bonus">
+            + Rp ${(bonus.amount || 0).toLocaleString('id-ID')}
+          </div>
+          <div class="referral-date">
+            ${dateStr}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Copy ke clipboard
+  async function copyToClipboard(text, successMsg) {
+    try {
+      await navigator.clipboard.writeText(text);
+      alert(successMsg);
+    } catch (err) {
+      alert('Gagal menyalin');
+    }
+  }
+
+  // 🔥 Update status bonus saat user melakukan transaksi
+  async function updateReferralBonus(userId, bonusAmount, bonusType, transactionData) {
+    const referralRef = doc(db, 'referrals', userId);
+    const referralSnap = await getDoc(referralRef);
+    
+    if (referralSnap.exists()) {
+      const referral = referralSnap.data();
+      const updatedReferredUsers = (referral.referredUsers || []).map(u => {
+        if (u.userId === transactionData.discordId && !u.bonusPaid) {
+          return { ...u, bonusAmount: bonusAmount, bonusPaid: true, bonusPaidAt: new Date() };
+        }
+        return u;
+      });
+      
+      const newBonus = {
+        type: bonusType,
+        amount: bonusAmount,
+        description: transactionData.description || '',
+        fromUserId: transactionData.discordId,
+        fromUsername: transactionData.username || 'User',
+        transactionAmount: transactionData.amount,
+        createdAt: new Date()
+      };
+      
+      await updateDoc(referralRef, {
+        referredUsers: updatedReferredUsers,
+        earnedBonuses: [...(referral.earnedBonuses || []), newBonus],
+        totalBonus: (referral.totalBonus || 0) + bonusAmount,
+        updatedAt: new Date()
+      });
+    }
+  }
+
+  // Cek status login
+  async function checkLogin() {
+    const isLoggedIn = isDiscordLoggedIn();
+    
+    if (!isLoggedIn) {
+      loginRequiredDiv.style.display = 'block';
+      referralContentDiv.style.display = 'none';
+      
+      const discordBtn = document.getElementById('discordLoginBtnReferral');
+      if (discordBtn) {
+        discordBtn.onclick = () => {
+          window.location.href = DISCORD_LOGIN_URL;
+        };
+      }
+      return;
+    }
+    
+    loginRequiredDiv.style.display = 'none';
+    referralContentDiv.style.display = 'block';
+    
+    await loadReferralData();
+    
+    document.getElementById('copyCodeBtn').onclick = () => {
+      const code = document.getElementById('referralCode').textContent;
+      copyToClipboard(code, '✅ Kode referral berhasil disalin!');
+    };
+    
+    document.getElementById('copyLinkBtn').onclick = () => {
+      const link = document.getElementById('referralLink').textContent;
+      copyToClipboard(link, '✅ Link referral berhasil disalin!');
+    };
+    
+    // Tab switching
+    document.querySelectorAll('.tab-btn-referral').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('.tab-btn-referral').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        currentTab = btn.dataset.tab;
+        
+        if (currentTab === 'referred') {
+          document.getElementById('referredList').style.display = 'block';
+          document.getElementById('earnedList').style.display = 'none';
+        } else {
+          document.getElementById('referredList').style.display = 'none';
+          document.getElementById('earnedList').style.display = 'block';
+        }
+      };
+    });
+  }
+
+  // Cek callback dari Discord login
+  function checkDiscordCallback() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionToken = urlParams.get('discord_token');
+    const userData = urlParams.get('user');
+    const error = urlParams.get('error');
+    
+    if (error) {
+      console.error('Discord login error:', error);
+      return;
+    }
+    
+    if (sessionToken && userData) {
+      try {
+        const user = JSON.parse(decodeURIComponent(userData));
+        localStorage.setItem('discord_session_token', sessionToken);
+        localStorage.setItem('discord_user', JSON.stringify(user));
+        window.history.replaceState({}, document.title, window.location.pathname);
+        window.location.reload();
+      } catch (e) {
+        console.error('Error parsing user data:', e);
+      }
+    }
+  }
+
+  // Initialize
+  checkDiscordCallback();
+  checkLogin();
+</script>
+</body>
+</html>

@@ -1,6 +1,8 @@
 // File: public/js/discord-auth.js
 // Login dengan Discord - Lengkap dengan balance dari Firestore
 
+import { db, doc, setDoc, getDoc } from '../firebase-config.js';
+
 const DISCORD_LOGIN_URL = '/api/discord-login';
 const JWT_TOKEN_KEY = 'discord_session_token';
 const DISCORD_USER_KEY = 'discord_user';
@@ -17,6 +19,19 @@ const userInfo = document.getElementById('userInfo');
 const userDropdown = document.getElementById('userDropdown');
 const userMenu = document.querySelector('.user-menu');
 
+// Bersihkan token dari URL jika ada (untuk keamanan)
+function cleanDiscordTokenFromURL() {
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.has('discord_token') || urlParams.has('user')) {
+    urlParams.delete('discord_token');
+    urlParams.delete('user');
+    const newSearch = urlParams.toString();
+    const newUrl = newSearch ? `${window.location.pathname}?${newSearch}` : window.location.pathname;
+    window.history.replaceState({}, document.title, newUrl);
+  }
+}
+cleanDiscordTokenFromURL();
+
 // Cek apakah user sudah login
 function isDiscordLoggedIn() {
   const token = localStorage.getItem(JWT_TOKEN_KEY);
@@ -30,30 +45,25 @@ function getDiscordUser() {
   return user ? JSON.parse(user) : null;
 }
 
-// Ambil role user (admin/member)
 function getUserRole() {
   const user = getDiscordUser();
   return user?.role || 'member';
 }
 
-// Cek apakah user adalah admin
 function isAdmin() {
   return getUserRole() === 'admin';
 }
 
-// Ambil saldo user dari localStorage (cache)
 function getUserBalance() {
   const user = getDiscordUser();
   return user?.balance || 0;
 }
 
-// Ambil total pengeluaran user
 function getUserTotalSpent() {
   const user = getDiscordUser();
   return user?.totalSpent || 0;
 }
 
-// Fetch data user terbaru dari Firestore
 async function fetchUserDataFromFirestore() {
   const user = getDiscordUser();
   if (!user || !user.id) return null;
@@ -63,7 +73,6 @@ async function fetchUserDataFromFirestore() {
     const data = await response.json();
     
     if (data.success && data.user) {
-      // Update localStorage dengan data terbaru
       const updatedUser = {
         ...user,
         balance: data.user.balance || 0,
@@ -73,11 +82,9 @@ async function fetchUserDataFromFirestore() {
       };
       localStorage.setItem(DISCORD_USER_KEY, JSON.stringify(updatedUser));
       
-      // Update UI balance
       if (userBalance) {
         userBalance.textContent = `Rp ${(updatedUser.balance || 0).toLocaleString('id-ID')}`;
       }
-      
       return updatedUser;
     }
   } catch (error) {
@@ -86,21 +93,15 @@ async function fetchUserDataFromFirestore() {
   return null;
 }
 
-// Tambahkan fungsi untuk menambah balance (deposit)
 async function addUserBalance(discordId, amount) {
   try {
     const response = await fetch('/api/user/add-balance', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        discordId: discordId,
-        amount: amount
-      })
+      body: JSON.stringify({ discordId, amount })
     });
-    
     const data = await response.json();
     if (data.success) {
-      // Update localStorage
       const user = getDiscordUser();
       if (user) {
         user.balance = (user.balance || 0) + amount;
@@ -115,21 +116,15 @@ async function addUserBalance(discordId, amount) {
   }
 }
 
-// Fungsi untuk mengurangi balance (beli Robux)
 async function deductUserBalance(discordId, amount) {
   try {
     const response = await fetch('/api/user/deduct-balance', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        discordId: discordId,
-        amount: amount
-      })
+      body: JSON.stringify({ discordId, amount })
     });
-    
     const data = await response.json();
     if (data.success) {
-      // Update localStorage
       const user = getDiscordUser();
       if (user) {
         user.balance = (user.balance || 0) - amount;
@@ -144,7 +139,6 @@ async function deductUserBalance(discordId, amount) {
   }
 }
 
-// Update data user setelah transaksi
 async function updateUserAfterOrder(amount, robuxAmount) {
   const user = getDiscordUser();
   if (!user) return false;
@@ -166,11 +160,8 @@ async function updateUserAfterOrder(amount, robuxAmount) {
         lastOrderRobux: robuxAmount
       })
     });
-    
     const data = await response.json();
-    
     if (data.success) {
-      // Update localStorage
       const updatedUser = {
         ...user,
         balance: newBalance,
@@ -178,12 +169,9 @@ async function updateUserAfterOrder(amount, robuxAmount) {
         totalOrders: newTotalOrders
       };
       localStorage.setItem(DISCORD_USER_KEY, JSON.stringify(updatedUser));
-      
-      // Update UI
       if (userBalance) {
         userBalance.textContent = `Rp ${newBalance.toLocaleString('id-ID')}`;
       }
-      
       return true;
     }
   } catch (error) {
@@ -192,33 +180,25 @@ async function updateUserAfterOrder(amount, robuxAmount) {
   return false;
 }
 
-// Mulai login Discord
 function loginWithDiscord() {
   window.location.href = DISCORD_LOGIN_URL;
 }
 
-// Logout
 function logoutDiscord() {
   localStorage.removeItem(JWT_TOKEN_KEY);
   localStorage.removeItem(DISCORD_USER_KEY);
   updateUIBasedOnLogin();
   showNotification('Anda telah logout', 'info');
-  setTimeout(() => {
-    window.location.reload();
-  }, 500);
+  setTimeout(() => window.location.reload(), 500);
 }
 
-// Tampilkan notifikasi
 function showNotification(message, type = 'success') {
   const oldToast = document.querySelector('.notification-toast');
   if (oldToast) oldToast.remove();
   
   const toast = document.createElement('div');
   toast.className = `notification-toast ${type}`;
-  toast.innerHTML = `
-    <i class="fas ${type === 'success' ? 'fa-check-circle' : (type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle')}"></i>
-    <span>${message}</span>
-  `;
+  toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : (type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle')}"></i><span>${message}</span>`;
   document.body.appendChild(toast);
   
   setTimeout(() => {
@@ -227,106 +207,138 @@ function showNotification(message, type = 'success') {
   }, 3000);
 }
 
-// Update UI berdasarkan status login
 async function updateUIBasedOnLogin() {
   const isLoggedIn = isDiscordLoggedIn();
   const user = getDiscordUser();
   
   if (isLoggedIn && user) {
-    // Sembunyikan "belum login", tampilkan "sudah login"
     if (authNotLoggedIn) authNotLoggedIn.style.display = 'none';
     if (authLoggedIn) authLoggedIn.style.display = 'block';
     
-    // Set avatar
     if (userAvatar && user.avatar) {
-      const avatarUrl = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=64`;
-      userAvatar.src = avatarUrl;
+      userAvatar.src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=64`;
     } else if (userAvatar && user.id) {
-      const defaultAvatar = `https://cdn.discordapp.com/embed/avatars/${parseInt(user.id) % 5}.png`;
-      userAvatar.src = defaultAvatar;
+      userAvatar.src = `https://cdn.discordapp.com/embed/avatars/${parseInt(user.id) % 5}.png`;
     }
     
-    // Set username dengan format "Username™"
-    if (userName) {
-      const displayName = user.globalName || user.username;
-      userName.textContent = displayName;
-    }
+    if (userName) userName.textContent = user.globalName || user.username;
+    if (userBalance) userBalance.textContent = `Rp ${(user.balance || 0).toLocaleString('id-ID')}`;
     
-    // Set saldo dari data user
-    if (userBalance) {
-      userBalance.textContent = `Rp ${(user.balance || 0).toLocaleString('id-ID')}`;
-    }
-
-    // Di dalam fungsi updateUIBasedOnLogin, setelah user login
-    const depositLink = document.querySelector('.user-dropdown a[href="deposit.html"]');
-    if (depositLink) {
-      depositLink.addEventListener('click', (e) => {
-        // sudah benar, hanya redirect
-      });
-    }
-    
-    // Fetch data terbaru dari Firestore untuk memastikan balance up to date
     await fetchUserDataFromFirestore();
-    
   } else {
-    // Tampilkan "belum login", sembunyikan "sudah login"
     if (authNotLoggedIn) authNotLoggedIn.style.display = 'flex';
     if (authLoggedIn) authLoggedIn.style.display = 'none';
   }
 }
 
-// Cek parameter dari redirect Discord
-function checkDiscordCallback() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const sessionToken = urlParams.get('discord_token');
-  const userData = urlParams.get('user');
-  const error = urlParams.get('error');
+// 🔥 FUNGSI UTAMA: Simpan data user ke Firestore (dipanggil dari HTML response atau saat login)
+async function saveDiscordUserToFirestore(user) {
+  if (!user || !user.id) return false;
   
-  if (error) {
-    showNotification('Login Discord gagal: ' + error, 'error');
-    window.history.replaceState({}, document.title, window.location.pathname);
-    return;
-  }
-  
-  if (sessionToken && userData) {
-    try {
-      const user = JSON.parse(decodeURIComponent(userData));
-      
-      // Simpan ke localStorage
-      localStorage.setItem(JWT_TOKEN_KEY, sessionToken);
-      localStorage.setItem(DISCORD_USER_KEY, JSON.stringify(user));
-      
-      showNotification(`Selamat datang, ${user.globalName || user.username}!`, 'success');
-      
-      // Bersihkan URL
-      window.history.replaceState({}, document.title, window.location.pathname);
-      
-      // Update UI
-      updateUIBasedOnLogin();
-      
-    } catch (e) {
-      console.error('Error parsing user data:', e);
-      showNotification('Gagal memproses login', 'error');
+  try {
+    const userRef = doc(db, 'users', `discord_${user.id}`);
+    const userSnap = await getDoc(userRef);
+    const nowISO = new Date().toISOString();
+    
+    if (!userSnap.exists()) {
+      // FIRST LOGIN - simpan semua termasuk discordVerifiedAt
+      await setDoc(userRef, {
+        discordId: user.id,
+        discordUsername: user.username,
+        discordGlobalName: user.globalName || user.username,
+        discordAvatar: user.avatar,
+        discordEmail: user.email || null,
+        discordVerifiedAt: nowISO,
+        discordConnected: true,
+        balance: 0,
+        totalSpent: 0,
+        totalOrders: 0,
+        role: 'member',
+        createdAt: nowISO,
+        lastLogin: nowISO
+      });
+      console.log('✅ First login - saved discordVerifiedAt:', nowISO);
+      return true;
+    } else {
+      const existingData = userSnap.data();
+      if (!existingData.discordVerifiedAt) {
+        await setDoc(userRef, { discordVerifiedAt: nowISO, lastLogin: nowISO }, { merge: true });
+        console.log('✅ Added missing discordVerifiedAt:', nowISO);
+      } else {
+        await setDoc(userRef, { lastLogin: nowISO }, { merge: true });
+        console.log('✅ Existing user - discordVerifiedAt already:', existingData.discordVerifiedAt);
+      }
+      return true;
     }
+  } catch (error) {
+    console.error('Error saving discord user:', error);
+    return false;
+  }
+}
+
+// 🔥 CEK APAKAH USER BARU LOGIN (dipanggil dari halaman utama saat load)
+async function checkAndSaveUserFromLocalStorage() {
+  const user = getDiscordUser();
+  const token = localStorage.getItem(JWT_TOKEN_KEY);
+  
+  if (user && token) {
+    console.log('✅ User found in localStorage:', user.username);
+    await saveDiscordUserToFirestore(user);
+    await updateUIBasedOnLogin();
+  } else {
+    updateUIBasedOnLogin();
   }
 }
 
 // Setup dropdown menu
 function setupDropdown() {
-  if (!userInfo || !userDropdown || !userMenu) return;
-  
-  userInfo.addEventListener('click', (e) => {
-    e.stopPropagation();
-    userDropdown.classList.toggle('show');
-    userMenu.classList.toggle('active');
-  });
-  
-  document.addEventListener('click', (e) => {
-    if (!userMenu.contains(e.target)) {
-      userDropdown.classList.remove('show');
-      userMenu.classList.remove('active');
+  const checkInterval = setInterval(() => {
+    const userInfoEl = document.getElementById('userInfo');
+    const userDropdownEl = document.getElementById('userDropdown');
+    const userMenuEl = document.querySelector('.user-menu');
+    
+    if (userInfoEl && userDropdownEl && userMenuEl) {
+      clearInterval(checkInterval);
+      
+      let backdrop = document.querySelector('.dropdown-backdrop');
+      if (!backdrop) {
+        backdrop = document.createElement('div');
+        backdrop.className = 'dropdown-backdrop';
+        document.body.appendChild(backdrop);
+      }
+      
+      const finalUserInfo = document.getElementById('userInfo');
+      const finalUserDropdown = document.getElementById('userDropdown');
+      const finalUserMenu = document.querySelector('.user-menu');
+      const finalBackdrop = document.querySelector('.dropdown-backdrop');
+      
+      if (finalUserInfo && finalUserDropdown && finalUserMenu) {
+        finalUserInfo.addEventListener('click', (e) => {
+          e.stopPropagation();
+          finalUserDropdown.classList.toggle('show');
+          finalUserMenu.classList.toggle('active');
+          if (finalBackdrop) finalBackdrop.classList.toggle('show');
+        });
+        
+        if (finalBackdrop) {
+          finalBackdrop.addEventListener('click', () => {
+            finalUserDropdown.classList.remove('show');
+            finalUserMenu.classList.remove('active');
+            finalBackdrop.classList.remove('show');
+          });
+        }
+        
+        document.addEventListener('click', (e) => {
+          if (!finalUserMenu.contains(e.target)) {
+            finalUserDropdown.classList.remove('show');
+            finalUserMenu.classList.remove('active');
+            if (finalBackdrop) finalBackdrop.classList.remove('show');
+          }
+        });
+      }
     }
-  });
+  }, 100);
+  setTimeout(() => clearInterval(checkInterval), 5000);
 }
 
 // Event listeners
@@ -346,8 +358,7 @@ if (logoutBtn) {
 
 // Inisialisasi
 document.addEventListener('DOMContentLoaded', () => {
-  checkDiscordCallback();
-  updateUIBasedOnLogin();
+  checkAndSaveUserFromLocalStorage();
   setupDropdown();
 });
 
@@ -362,5 +373,6 @@ export {
   updateUserAfterOrder,
   fetchUserDataFromFirestore,
   addUserBalance,
-  deductUserBalance
+  deductUserBalance,
+  saveDiscordUserToFirestore
 };

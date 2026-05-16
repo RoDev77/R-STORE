@@ -8,6 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <style>
+    /* (sama seperti kode Anda, tidak perlu diubah) */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Inter', sans-serif;
@@ -40,7 +41,9 @@
       text-decoration: none;
       color: #fff;
       font-size: 13px;
+      transition: all 0.3s;
     }
+    .btn-home:hover { background: rgba(102,126,234,0.4); transform: translateY(-2px); }
     .qris-container {
       max-width: 500px;
       margin: 0 auto;
@@ -53,6 +56,7 @@
       padding: 32px 28px;
       text-align: center;
       border: 1px solid rgba(255,255,255,0.1);
+      transition: all 0.3s;
     }
     .qr-wrapper {
       background: white;
@@ -60,6 +64,7 @@
       border-radius: 24px;
       display: inline-block;
       margin: 20px 0;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     }
     .qr-wrapper img { width: 250px; height: 250px; }
     .amount-display {
@@ -70,6 +75,13 @@
       margin: 15px 0;
     }
     .amount-display span { font-size: 28px; font-weight: 800; color: #00d4ff; }
+    .original-price {
+      color: #a0a0b0;
+      text-decoration: line-through;
+      font-size: 14px;
+      display: block;
+      margin-bottom: 5px;
+    }
     .timer-box {
       background: rgba(255,193,7,0.1);
       border-radius: 16px;
@@ -88,7 +100,9 @@
       font-size: 16px;
       cursor: pointer;
       margin-top: 20px;
+      transition: all 0.3s;
     }
+    .btn-confirm:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(40,167,69,0.3); }
     .btn-confirm:disabled { opacity: 0.5; cursor: not-allowed; }
     .status-box {
       background: rgba(102,126,234,0.15);
@@ -112,7 +126,27 @@
       font-size: 12px;
       color: #a0a0b0;
     }
+    .voucher-info {
+      background: rgba(40,167,69,0.1);
+      border-radius: 12px;
+      padding: 12px;
+      margin: 15px 0;
+      border-left: 3px solid #28a745;
+      text-align: left;
+      display: none;
+    }
+    .voucher-info p { margin: 4px 0; font-size: 13px; }
+    .voucher-code { color: #ffc107; font-weight: bold; font-family: monospace; letter-spacing: 1px; }
+    .discount-amount { color: #28a745; font-weight: bold; }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
     .footer { text-align: center; padding: 30px; color: #a0a0b0; font-size: 12px; }
+    @media (max-width: 480px) {
+      .qr-wrapper img { width: 200px; height: 200px; }
+      .amount-display span { font-size: 22px; }
+      .timer-value { font-size: 22px; }
+    }
   </style>
 </head>
 <body>
@@ -133,8 +167,20 @@
       <img id="qrisImage" src="" alt="QRIS Code">
     </div>
 
+    <!-- HARGA ASLI (dengan coret) -->
+    <div id="originalPriceContainer" style="display: none;">
+      <div class="original-price" id="originalPriceDisplay">Rp 0</div>
+    </div>
+
+    <!-- TOTAL YANG HARUS DIBAYAR (setelah diskon) -->
     <div class="amount-display">
       <span id="qrisAmount">Rp 0</span>
+    </div>
+
+    <!-- Voucher Info (jika ada) -->
+    <div id="voucherInfoBox" class="voucher-info">
+      <p><i class="fas fa-ticket-alt"></i> <strong>Voucher Digunakan:</strong> <span id="voucherCodeDisplay" class="voucher-code">-</span></p>
+      <p><i class="fas fa-tag"></i> <strong>Diskon:</strong> <span id="voucherDiscountDisplay" class="discount-amount">-</span></p>
     </div>
 
     <div class="timer-box">
@@ -178,10 +224,11 @@
     window.location.href = 'index.html';
   }
 
-  let currentAmount = parseInt(amountParam) || 0;
+  let currentAmount = 0;
   let isDeposit = type === 'deposit' || (orderId && orderId.startsWith('DEP-'));
   let unsubscribe = null;
   let timerInterval = null;
+  let orderData = {};
 
   function formatTime(seconds) {
     const hours = Math.floor(seconds / 3600);
@@ -202,6 +249,10 @@
         if (timerInterval) clearInterval(timerInterval);
         document.getElementById('statusText').innerHTML = '<i class="fas fa-times-circle"></i> Waktu habis! Pesanan dibatalkan.';
         document.getElementById('confirmBtn').disabled = true;
+      } else if (remaining <= 600) {
+        document.getElementById('statusText').innerHTML = '<i class="fas fa-exclamation-triangle"></i> ⚠️ Waktu tersisa kurang dari 10 menit!';
+      } else if (remaining <= 1800) {
+        document.getElementById('statusText').innerHTML = '<i class="fas fa-hourglass-end"></i> Sisa waktu kurang dari 30 menit.';
       }
     }
     updateTimer();
@@ -231,7 +282,6 @@
     confirmBtn.innerHTML = '<div style="display:inline-block; width:16px; height:16px; border:2px solid white; border-top-color:transparent; border-radius:50%; animation:spin 0.8s linear infinite;"></div> Memproses...';
     
     try {
-        // Di qris.html, untuk deposit, HANYA update status ke 'paid'
         if (isDeposit) {
           const orderRef = doc(db, 'deposit_orders', orderId);
           await updateDoc(orderRef, {
@@ -240,15 +290,11 @@
             updatedAt: new Date()
           });
           
-          // 🔥 JANGAN TAMBAH BALANCE DI SINI
-          // Balance akan ditambah oleh admin saat klik "Selesai"
-          
           document.getElementById('statusText').innerHTML = '<i class="fas fa-check-circle"></i> ✅ Deposit berhasil dikonfirmasi! Menunggu verifikasi admin untuk menambah saldo.';
           setTimeout(() => {
             window.location.href = `/done.html?orderId=${orderId}&type=deposit`;
           }, 2000);
         } else {
-        // 🔥 TOPUP ROBUX: Update ke pending_verification
         const orderRef = doc(db, 'orders', orderId);
         await updateDoc(orderRef, {
           status: 'pending_verification',
@@ -258,7 +304,7 @@
         });
         
         document.getElementById('statusText').innerHTML = '<i class="fas fa-clock"></i> ✅ Pesanan masuk antrian admin. Mohon tunggu verifikasi.';
-        document.getElementById('confirmBtn').innerHTML = '<i class="fas fa-check-circle"></i> Menunggu Verifikasi Admin';
+        document.getElementById('confirmBtn').innerHTML = '<i class="fas fa-hourglass-half"></i> Menunggu Verifikasi Admin';
         document.getElementById('confirmBtn').disabled = true;
       }
       
@@ -268,6 +314,22 @@
       document.getElementById('errorBox').style.display = 'block';
       confirmBtn.disabled = false;
       confirmBtn.innerHTML = '<i class="fas fa-check-circle"></i> Coba lagi';
+    }
+  }
+
+  function updateVoucherInfo(data) {
+    const voucherInfoBox = document.getElementById('voucherInfoBox');
+    const voucherCodeDisplay = document.getElementById('voucherCodeDisplay');
+    const voucherDiscountDisplay = document.getElementById('voucherDiscountDisplay');
+    
+    if (data.voucherCode && data.voucherCode !== '') {
+      voucherInfoBox.style.display = 'block';
+      voucherCodeDisplay.textContent = data.voucherCode;
+      if (data.discountAmount) {
+        voucherDiscountDisplay.textContent = `- Rp ${data.discountAmount.toLocaleString('id-ID')}`;
+      }
+    } else {
+      voucherInfoBox.style.display = 'none';
     }
   }
 
@@ -283,11 +345,13 @@
       if (docSnap.exists()) {
         const data = docSnap.data();
         const status = data.status;
-        const statusText = document.getElementById('statusText');
+        const statusTextSpan = document.getElementById('statusText');
         const confirmBtn = document.getElementById('confirmBtn');
         
+        updateVoucherInfo(data);
+        
         if (status === 'paid') {
-          statusText.innerHTML = '<i class="fas fa-check-circle"></i> ✅ Pembayaran diterima! Mengarahkan...';
+          statusTextSpan.innerHTML = '<i class="fas fa-check-circle"></i> ✅ Pembayaran diterima! Mengarahkan...';
           setTimeout(() => { 
             if (isDeposit) {
               window.location.href = `/done.html?orderId=${orderId}&type=deposit`;
@@ -298,10 +362,10 @@
         } else if (status === 'delivered') {
           window.location.href = `/done.html?orderId=${orderId}`;
         } else if (status === 'cancelled') {
-          statusText.innerHTML = '<i class="fas fa-times-circle"></i> ❌ Pesanan dibatalkan';
+          statusTextSpan.innerHTML = '<i class="fas fa-times-circle"></i> ❌ Pesanan dibatalkan';
           if (confirmBtn) confirmBtn.disabled = true;
         } else if (status === 'pending_verification') {
-          statusText.innerHTML = '<i class="fas fa-clock"></i> ⏳ Menunggu verifikasi admin...';
+          statusTextSpan.innerHTML = '<i class="fas fa-clock"></i> ⏳ Menunggu verifikasi admin...';
           if (confirmBtn) {
             confirmBtn.disabled = true;
             confirmBtn.innerHTML = '<i class="fas fa-hourglass-half"></i> Menunggu Admin';
@@ -311,21 +375,23 @@
         const expireAt = data.expireAt?.toDate();
         if (expireAt && expireAt > new Date() && (status === 'waiting_payment' || status === 'pending_verification')) {
           startTimer(expireAt);
+        } else if (timerInterval && (status === 'paid' || status === 'delivered' || status === 'cancelled')) {
+          clearInterval(timerInterval);
+          timerInterval = null;
         }
       }
-    });
+    }, (error) => console.error('Error listening:', error));
   }
 
   async function loadOrder() {
     try {
       if (isDeposit) {
-        // 🔥 LOAD DEPOSIT ORDER
         document.getElementById('paymentDesc').textContent = 'Bayar untuk isi saldo deposit';
         const infoBox = document.getElementById('infoBox');
         const infoText = document.getElementById('infoText');
         if (infoBox && infoText) {
           infoBox.style.display = 'block';
-          infoText.textContent = 'Setelah pembayaran, saldo akan langsung bertambah.';
+          infoText.textContent = 'Setelah pembayaran, admin akan memverifikasi dan saldo akan otomatis bertambah.';
         }
         
         const orderRef = doc(db, 'deposit_orders', orderId);
@@ -338,6 +404,7 @@
         }
         
         const data = orderSnap.data();
+        orderData = data;
         
         if (data.status === 'paid') {
           window.location.href = `/done.html?orderId=${orderId}&type=deposit`;
@@ -355,7 +422,8 @@
         listenOrderStatus();
         
       } else {
-        // 🔥 LOAD TOPUP ROBUX ORDER
+        document.getElementById('paymentDesc').textContent = 'Bayar untuk Top Up Robux';
+        
         const orderRef = doc(db, 'orders', orderId);
         const orderSnap = await getDoc(orderRef);
         
@@ -366,6 +434,7 @@
         }
         
         const data = orderSnap.data();
+        orderData = data;
         
         if (data.status === 'paid' || data.status === 'delivered') {
           window.location.href = `/done.html?orderId=${orderId}`;
@@ -378,7 +447,33 @@
           return;
         }
         
-        currentAmount = data.totalWithUnique || data.totalPrice;
+        // 🔥 PRIORITAS #1: Gunakan amount dari URL (sudah termasuk diskon)
+        let finalAmount = null;
+        if (amountParam && !isNaN(parseInt(amountParam)) && parseInt(amountParam) > 0) {
+          finalAmount = parseInt(amountParam);
+          console.log('💰 Menggunakan amount dari URL (sudah diskon):', finalAmount);
+        } else {
+          // fallback ke finalTotal dari Firestore
+          finalAmount = data.finalTotal || data.totalWithUnique || data.totalPrice;
+          console.log('⚠️ Menggunakan dari database:', finalAmount);
+        }
+        currentAmount = finalAmount;
+        
+        // Tampilkan harga asli dengan coret jika ada diskon
+        const originalTotal = data.totalWithUnique || data.totalPrice;
+        const discountAmountDB = data.discountAmount || 0;
+        const originalPriceContainer = document.getElementById('originalPriceContainer');
+        const originalPriceDisplay = document.getElementById('originalPriceDisplay');
+        if (discountAmountDB > 0 && originalTotal > currentAmount) {
+          originalPriceContainer.style.display = 'block';
+          originalPriceDisplay.textContent = `Rp ${originalTotal.toLocaleString('id-ID')}`;
+        } else {
+          originalPriceContainer.style.display = 'none';
+        }
+        
+        // Tampilkan info voucher
+        updateVoucherInfo(data);
+        
         await generateQRIS();
         listenOrderStatus();
       }
@@ -396,6 +491,11 @@
   }
   
   loadOrder();
+  
+  window.addEventListener('beforeunload', () => {
+    if (unsubscribe) unsubscribe();
+    if (timerInterval) clearInterval(timerInterval);
+  });
 </script>
 </body>
 </html>

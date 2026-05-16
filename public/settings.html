@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pengaturan Akun - R STORE</title>
+  <link rel="icon" type="image/png" href="/images/favicon.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #0a0a14 0%, #0f0f1a 100%); color: #fff; min-height: 100vh; }
+    .navbar { position: fixed; top: 0; left: 0; width: 100%; background: rgba(10, 10, 20, 0.98); backdrop-filter: blur(20px); z-index: 100; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .nav-container { max-width: 1200px; margin: 0 auto; padding: 0 24px; display: flex; justify-content: space-between; align-items: center; }
+    .nav-logo { display: flex; align-items: center; gap: 10px; font-size: 22px; font-weight: 800; }
+    .nav-logo i { background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .nav-logo span { background: linear-gradient(135deg, #fff, #667eea); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .btn-back { background: rgba(102,126,234,0.15); color: #667eea; padding: 8px 20px; border-radius: 40px; text-decoration: none; font-weight: 600; font-size: 14px; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px; }
+    .btn-back:hover { background: rgba(102,126,234,0.3); transform: translateY(-2px); }
+    .settings-container { max-width: 800px; margin: 0 auto; padding: 100px 24px 60px; }
+    .settings-header { text-align: center; margin-bottom: 40px; }
+    .settings-header h1 { font-size: 36px; font-weight: 800; background: linear-gradient(135deg, #fff, #667eea); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 12px; }
+    .settings-header p { color: #a0a0b0; font-size: 15px; }
+    .settings-card { background: rgba(19, 19, 42, 0.8); backdrop-filter: blur(10px); border-radius: 28px; padding: 28px; margin-bottom: 24px; border: 1px solid rgba(255,255,255,0.08); transition: all 0.3s ease; }
+    .settings-card:hover { border-color: rgba(102,126,234,0.3); transform: translateY(-2px); }
+    .card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .card-header i { font-size: 24px; color: #667eea; }
+    .card-header h2 { font-size: 20px; font-weight: 700; }
+    .connection-item { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; padding: 20px; background: rgba(26, 26, 48, 0.6); border-radius: 20px; margin-bottom: 16px; transition: all 0.3s ease; }
+    .connection-item:last-child { margin-bottom: 0; }
+    .connection-item:hover { background: rgba(26, 26, 48, 0.9); }
+    .connection-left { display: flex; align-items: center; gap: 16px; flex: 2; }
+    .connection-icon { width: 52px; height: 52px; background: rgba(102,126,234,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+    .connection-icon.roblox { background: rgba(224,61,33,0.15); color: #e03d21; }
+    .connection-info { flex: 1; }
+    .connection-info h3 { font-size: 16px; font-weight: 600; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .connection-info .username { font-size: 13px; color: #00d4ff; font-weight: 500; display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
+    .connection-info .subtext { font-size: 11px; color: #8a8aa0; line-height: 1.5; }
+    .connection-info .subtext i { width: 14px; margin-right: 4px; }
+    .connection-right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+    .status-badge { padding: 6px 14px; border-radius: 30px; font-size: 11px; font-weight: 600; }
+    .status-badge.connected { background: rgba(40,167,69,0.2); color: #28a745; border: 1px solid rgba(40,167,69,0.3); }
+    .status-badge.disconnected { background: rgba(220,53,69,0.2); color: #dc3545; border: 1px solid rgba(220,53,69,0.3); }
+    .status-badge.verified { background: rgba(0,212,255,0.2); color: #00d4ff; border: 1px solid rgba(0,212,255,0.3); }
+    .action-btn { padding: 8px 20px; border-radius: 40px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; border: none; white-space: nowrap; }
+    .action-btn.discord { background: #5865F2; color: white; }
+    .action-btn.discord:hover { background: #4752c4; transform: translateY(-1px); }
+    .action-btn.roblox { background: #e03d21; color: white; }
+    .action-btn.roblox:hover { background: #c0321a; transform: translateY(-1px); }
+    .action-btn.logout { background: rgba(220,53,69,0.2); color: #dc3545; }
+    .action-btn.logout:hover { background: rgba(220,53,69,0.3); }
+    .action-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .avatar-img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+    .avatar-placeholder { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); display: inline-flex; align-items: center; justify-content: center; }
+    .avatar-placeholder i { font-size: 14px; color: white; }
+    .form-group { margin-bottom: 24px; }
+    .form-group label { display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500; color: #a0a0b0; }
+    .input-wrapper { display: flex; align-items: center; background: rgba(26, 26, 48, 0.8); border-radius: 16px; padding: 0 16px; border: 1px solid rgba(255,255,255,0.08); transition: all 0.2s; }
+    .input-wrapper:focus-within { border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.1); }
+    .input-wrapper i { color: #667eea; font-size: 16px; }
+    .input-wrapper input { background: transparent; border: none; padding: 14px 12px; width: 100%; color: white; font-size: 14px; outline: none; }
+    .input-wrapper input::placeholder { color: #5a5a70; }
+    .info-text { font-size: 12px; color: #ffc107; margin-top: 8px; display: flex; align-items: center; gap: 6px; }
+    .btn-save { width: 100%; background: linear-gradient(135deg, #28a745, #20c997); border: none; padding: 14px; border-radius: 40px; color: white; font-weight: 600; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; margin-top: 8px; }
+    .btn-save:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(40,167,69,0.3); }
+    .footer { text-align: center; padding: 30px; border-top: 1px solid rgba(255,255,255,0.08); color: #6c6c8a; font-size: 12px; margin-top: 40px; }
+    .loading-spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 6px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .toast { position: fixed; bottom: 24px; right: 24px; background: rgba(26, 26, 48, 0.95); backdrop-filter: blur(10px); border-radius: 16px; padding: 14px 20px; display: flex; align-items: center; gap: 12px; z-index: 1000; transform: translateX(450px); transition: transform 0.3s ease; border-left: 4px solid; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+    .toast.show { transform: translateX(0); }
+    .toast.success { border-left-color: #28a745; }
+    .toast.success i { color: #28a745; }
+    .toast.error { border-left-color: #dc3545; }
+    .toast.error i { color: #dc3545; }
+    .toast.info { border-left-color: #00d4ff; }
+    .toast.info i { color: #00d4ff; }
+    @media (max-width: 640px) {
+      .settings-container { padding: 80px 16px 40px; }
+      .settings-header h1 { font-size: 28px; }
+      .connection-item { flex-direction: column; align-items: stretch; }
+      .connection-right { justify-content: flex-end; }
+      .toast { bottom: 16px; right: 16px; left: 16px; transform: translateY(100px); }
+      .toast.show { transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-container">
+    <div class="nav-logo"><i class="fas fa-gamepad"></i><span>R STORE</span></div>
+    <a href="index.html" class="btn-back"><i class="fas fa-arrow-left"></i> Kembali</a>
+  </div>
+</nav>
+
+<div class="settings-container">
+  <div class="settings-header">
+    <h1>⚙️ Pengaturan Akun</h1>
+    <p>Kelola informasi dan koneksi akun Anda</p>
+  </div>
+
+  <div class="settings-card">
+    <div class="card-header"><i class="fas fa-link"></i><h2>Koneksi Akun</h2></div>
+    
+    <div class="connection-item" id="discordConnection">
+      <div class="connection-left">
+        <div class="connection-icon"><i class="fab fa-discord"></i></div>
+        <div class="connection-info">
+          <h3>Discord</h3>
+          <div class="username" id="discordUsernameDisplay"><span>Tidak terhubung</span></div>
+          <div class="subtext" id="discordSubText"><i class="fas fa-info-circle"></i> Login untuk mengakses akun</div>
+        </div>
+      </div>
+      <div class="connection-right">
+        <span id="discordStatusBadge" class="status-badge disconnected">Disconnected</span>
+        <button id="discordConnectBtn" class="action-btn discord">Login Discord</button>
+      </div>
+    </div>
+
+    <div class="connection-item" id="robloxConnection">
+      <div class="connection-left">
+        <div class="connection-icon roblox"><i class="fas fa-gamepad"></i></div>
+        <div class="connection-info">
+          <h3>Roblox</h3>
+          <div class="username" id="robloxUsernameDisplay"><span><i class="fas fa-gamepad"></i> Belum terhubung</span></div>
+          <div class="subtext" id="robloxSubText"><i class="fas fa-info-circle"></i> Verifikasi dengan akun Roblox resmi</div>
+        </div>
+      </div>
+      <div class="connection-right">
+        <span id="robloxStatusBadge" class="status-badge disconnected">Disconnected</span>
+        <button id="robloxConnectBtn" class="action-btn roblox">Connect Roblox</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="settings-card">
+    <div class="card-header"><i class="fas fa-address-card"></i><h2>Informasi Kontak</h2></div>
+    
+    <div class="form-group">
+      <label><i class="fas fa-envelope"></i> Email</label>
+      <div class="input-wrapper"><i class="fas fa-envelope"></i><input type="email" id="userEmail" placeholder="email@example.com" autocomplete="email" /></div>
+      <div class="info-text"><i class="fas fa-info-circle"></i> Untuk notifikasi status pesanan</div>
+    </div>
+
+    <div class="form-group">
+      <label><i class="fab fa-whatsapp"></i> Nomor WhatsApp</label>
+      <div class="input-wrapper"><i class="fab fa-whatsapp"></i><input type="tel" id="userPhone" placeholder="6281234567890" autocomplete="tel" /></div>
+      <div class="info-text"><i class="fas fa-info-circle"></i> Gunakan format tanpa tanda + (contoh: 6281234567890)</div>
+    </div>
+
+    <button id="saveContactBtn" class="btn-save"><i class="fas fa-save"></i> Simpan Informasi Kontak</button>
+  </div>
+</div>
+
+<footer class="footer"><p>&copy; 2025 R STORE — Unofficial Roblox Store</p></footer>
+<div id="toast" class="toast"><i class="fas"></i><span id="toastMessage"></span></div>
+
+<script type="module">
+  import { db, doc, getDoc, setDoc } from './firebase-config.js';
+  import { isDiscordLoggedIn, getDiscordUser } from './js/discord-auth.js';
+
+  let currentUser = null;
+  const ROBLOX_CLIENT_ID = '1133370743348709945';
+  const API_BASE_URL = 'https://api.store.rstudiolab.online';
+  const REDIRECT_URI = `${API_BASE_URL}/roblox/callback`;
+  
+  function showToast(message, type = 'info') {
+    const toast = document.getElementById('toast');
+    const icon = toast.querySelector('i');
+    const msgSpan = document.getElementById('toastMessage');
+    icon.className = type === 'success' ? 'fas fa-check-circle' : type === 'error' ? 'fas fa-exclamation-circle' : 'fas fa-info-circle';
+    msgSpan.textContent = message;
+    toast.className = `toast ${type} show`;
+    setTimeout(() => toast.classList.remove('show'), 3000);
+  }
+
+  function generateRandomString(length) {
+    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let text = '';
+    for (let i = 0; i < length; i++) text += possible.charAt(Math.floor(Math.random() * possible.length));
+    return text;
+  }
+  
+  async function startRobloxOAuth() {
+    if (!currentUser || !currentUser.id) {
+      showToast('Silakan login Discord terlebih dahulu!', 'error');
+      return;
+    }
+    const state = generateRandomString(32);
+    const discordId = currentUser.id;
+    sessionStorage.setItem('roblox_oauth_state', state);
+    sessionStorage.setItem('roblox_oauth_discord_id', discordId);
+    const authUrl = `https://apis.roblox.com/oauth/v1/authorize?client_id=${ROBLOX_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=openid%20profile&response_type=code&state=${state}_${discordId}`;
+    window.location.href = authUrl;
+  }
+  
+  async function handleOAuthCallback() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const success = urlParams.get('roblox_success');
+    const error = urlParams.get('error');
+    if (success === 'true') {
+      showToast('✅ Berhasil menghubungkan Roblox!', 'success');
+      await checkRobloxConnection();
+      window.history.replaceState({}, document.title, window.location.pathname);
+    } else if (error === 'roblox_failed') {
+      showToast('❌ Gagal menghubungkan Roblox', 'error');
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }
+  
+  async function disconnectRoblox() {
+    if (!confirm('Apakah Anda yakin ingin memutuskan koneksi Roblox?')) return;
+    const connectBtn = document.getElementById('robloxConnectBtn');
+    connectBtn.innerHTML = '<span class="loading-spinner"></span> Memutuskan...';
+    connectBtn.disabled = true;
+    try {
+      const userRef = doc(db, 'users', `discord_${currentUser.id}`);
+      await setDoc(userRef, { robloxData: null, robloxConnected: false, robloxUsername: null, updatedAt: new Date() }, { merge: true });
+      showToast('Koneksi Roblox berhasil diputuskan', 'success');
+      await checkRobloxConnection();
+    } catch (error) {
+      showToast('Gagal memutuskan koneksi', 'error');
+    } finally {
+      connectBtn.innerHTML = 'Connect Roblox';
+      connectBtn.disabled = false;
+    }
+  }
+  
+  async function checkRobloxConnection() {
+    if (!currentUser || !currentUser.id) {
+      document.getElementById('robloxUsernameDisplay').innerHTML = '<span><i class="fas fa-gamepad"></i> Login Discord dulu</span>';
+      document.getElementById('robloxSubText').innerHTML = '<i class="fas fa-exclamation-triangle"></i> Silakan login Discord terlebih dahulu';
+      return;
+    }
+    const userRef = doc(db, 'users', `discord_${currentUser.id}`);
+    const userSnap = await getDoc(userRef);
+    const robloxData = userSnap.data()?.robloxData || null;
+    const usernameDisplay = document.getElementById('robloxUsernameDisplay');
+    const subText = document.getElementById('robloxSubText');
+    const statusBadge = document.getElementById('robloxStatusBadge');
+    const connectBtn = document.getElementById('robloxConnectBtn');
+    
+    if (robloxData && robloxData.username) {
+      usernameDisplay.innerHTML = `<strong style="color:#00d4ff;">${robloxData.displayName || robloxData.username}</strong> <span style="font-size:10px; background:rgba(0,212,255,0.2); padding:2px 8px; border-radius:20px;">✓ Terverifikasi</span>`;
+      let verifiedDate = 'Belum tersedia';
+      let verifiedAt = robloxData.verifiedAt || robloxData.verifiedAtISO;
+      if (verifiedAt) {
+        try {
+          let date;
+          if (verifiedAt.toDate) date = verifiedAt.toDate();
+          else if (verifiedAt.seconds) date = new Date(verifiedAt.seconds * 1000);
+          else date = new Date(verifiedAt);
+          if (!isNaN(date.getTime())) verifiedDate = date.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+        } catch(e) { console.error(e); }
+      }
+      subText.innerHTML = `<div><i class="fas fa-id-card"></i> User ID: ${robloxData.userId}</div><div style="margin-top:4px;"><i class="fas fa-calendar"></i> Terverifikasi: ${verifiedDate}</div><div style="margin-top:4px;"><i class="fas fa-globe"></i> Profile: <a href="${robloxData.profileUrl}" target="_blank" style="color:#00d4ff; text-decoration:none;">roblox.com/users/${robloxData.userId}</a></div>`;
+      statusBadge.textContent = 'Connected';
+      statusBadge.className = 'status-badge verified';
+      connectBtn.textContent = 'Disconnect Roblox';
+      connectBtn.classList.add('logout');
+      connectBtn.classList.remove('roblox');
+      connectBtn.onclick = disconnectRoblox;
+    } else {
+      usernameDisplay.innerHTML = '<span><i class="fas fa-gamepad"></i> Belum terhubung</span>';
+      subText.innerHTML = '<i class="fab fa-roblox"></i> Klik tombol Connect untuk verifikasi OAuth 2.0 resmi dari Roblox';
+      statusBadge.textContent = 'Disconnected';
+      statusBadge.className = 'status-badge disconnected';
+      connectBtn.textContent = 'Connect Roblox';
+      connectBtn.classList.add('roblox');
+      connectBtn.classList.remove('logout');
+      connectBtn.onclick = startRobloxOAuth;
+    }
+  }
+  
+  async function loadUserData() {
+    currentUser = getDiscordUser();
+    if (!currentUser || !currentUser.id) return;
+    const userRef = doc(db, 'users', `discord_${currentUser.id}`);
+    const userSnap = await getDoc(userRef);
+    if (userSnap.exists()) {
+      const data = userSnap.data();
+      document.getElementById('userEmail').value = data.email || '';
+      document.getElementById('userPhone').value = data.phone || '';
+    }
+  }
+  
+  async function saveContactInfo() {
+    if (!currentUser || !currentUser.id) { showToast('Silakan login Discord terlebih dahulu!', 'error'); return; }
+    const email = document.getElementById('userEmail').value.trim();
+    const phone = document.getElementById('userPhone').value.trim();
+    const saveBtn = document.getElementById('saveContactBtn');
+    const originalText = saveBtn.innerHTML;
+    saveBtn.innerHTML = '<span class="loading-spinner"></span> Menyimpan...';
+    saveBtn.disabled = true;
+    try {
+      const userRef = doc(db, 'users', `discord_${currentUser.id}`);
+      await setDoc(userRef, { email, phone, updatedAt: new Date() }, { merge: true });
+      showToast('Informasi kontak berhasil disimpan!', 'success');
+      saveBtn.innerHTML = '<i class="fas fa-check"></i> Tersimpan!';
+      setTimeout(() => { saveBtn.innerHTML = originalText; saveBtn.disabled = false; }, 2000);
+    } catch (error) {
+      showToast('Gagal menyimpan: ' + error.message, 'error');
+      saveBtn.innerHTML = originalText;
+      saveBtn.disabled = false;
+    }
+  }
+  
+  function checkDiscordConnection() {
+    const isLoggedIn = isDiscordLoggedIn();
+    const user = getDiscordUser();
+    const usernameDisplay = document.getElementById('discordUsernameDisplay');
+    const subText = document.getElementById('discordSubText');
+    const statusBadge = document.getElementById('discordStatusBadge');
+    const connectBtn = document.getElementById('discordConnectBtn');
+    
+    if (isLoggedIn && user) {
+      const avatarUrl = user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=32` : null;
+      const avatarHtml = avatarUrl ? `<img src="${avatarUrl}" class="avatar-img">` : `<div class="avatar-placeholder"><i class="fab fa-discord"></i></div>`;
+      usernameDisplay.innerHTML = `${avatarHtml}<strong style="color:#00d4ff;">${user.globalName || user.username}</strong> <span style="font-size:10px; background:rgba(0,212,255,0.2); padding:2px 8px; border-radius:20px;">✓ Terverifikasi</span>`;
+      
+      (async () => {
+        let verifiedDate = 'Belum tersedia';
+        try {
+          const userRef = doc(db, 'users', `discord_${user.id}`);
+          const userSnap = await getDoc(userRef);
+          if (userSnap.exists()) {
+            const data = userSnap.data();
+            let verifiedAt = data.discordVerifiedAt;
+            if (verifiedAt) {
+              let date;
+              if (typeof verifiedAt === 'string') date = new Date(verifiedAt);
+              else if (verifiedAt.seconds) date = new Date(verifiedAt.seconds * 1000);
+              else if (verifiedAt.toDate) date = verifiedAt.toDate();
+              else date = new Date(verifiedAt);
+              if (!isNaN(date.getTime())) verifiedDate = date.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+            }
+          }
+        } catch(e) { console.error(e); }
+        subText.innerHTML = `<div><i class="fas fa-id-card"></i> ID: ${user.id}</div><div style="margin-top:4px;"><i class="fas fa-calendar-check"></i> Terverifikasi: ${verifiedDate}</div>`;
+      })();
+      
+      statusBadge.textContent = 'Connected';
+      statusBadge.className = 'status-badge connected';
+      connectBtn.textContent = 'Logout';
+      connectBtn.classList.add('logout');
+      connectBtn.classList.remove('discord');
+      connectBtn.onclick = () => {
+        localStorage.removeItem('discord_session_token');
+        localStorage.removeItem('discord_user');
+        window.location.reload();
+      };
+    } else {
+      usernameDisplay.innerHTML = '<span><i class="fab fa-discord"></i> Tidak terhubung</span>';
+      subText.innerHTML = '<i class="fas fa-info-circle"></i> Login untuk mengakses akun';
+      statusBadge.textContent = 'Disconnected';
+      statusBadge.className = 'status-badge disconnected';
+      connectBtn.textContent = 'Login Discord';
+      connectBtn.classList.add('discord');
+      connectBtn.classList.remove('logout');
+      connectBtn.onclick = () => window.location.href = '/api/discord-login';
+    }
+  }
+  
+  checkDiscordConnection();
+  loadUserData().then(() => checkRobloxConnection());
+  handleOAuthCallback();
+  document.getElementById('saveContactBtn').addEventListener('click', saveContactInfo);
+</script>
+</body>
+</html>

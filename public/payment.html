@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
   <title>Pilih Pembayaran - R STORE</title>
   <link rel="icon" type="image/png" href="/images/favicon.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
@@ -41,7 +41,9 @@
       text-decoration: none;
       color: #fff;
       font-size: 13px;
+      transition: all 0.3s;
     }
+    .btn-home:hover { background: rgba(102,126,234,0.4); transform: translateY(-2px); }
     .payment-container {
       max-width: 500px;
       margin: 0 auto;
@@ -99,6 +101,8 @@
       background: #1a1a30;
       padding: 6px 12px;
       border-radius: 8px;
+      font-size: 12px;
+      word-break: break-all;
     }
     .copy-btn {
       background: rgba(102,126,234,0.2);
@@ -107,6 +111,7 @@
       padding: 4px 12px;
       border-radius: 20px;
       cursor: pointer;
+      font-size: 12px;
     }
     .username-display {
       background: rgba(102,126,234,0.12);
@@ -119,9 +124,17 @@
       display: flex;
       justify-content: space-between;
       padding: 10px 0;
+      flex-wrap: wrap;
+      gap: 8px;
     }
     .order-details-row:not(:last-child) {
       border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .discount-row {
+      color: #28a745;
+    }
+    .discount-row .order-details-value {
+      color: #28a745;
     }
     .total-amount {
       margin-top: 8px;
@@ -142,7 +155,7 @@
       border: 1px solid rgba(255,193,7,0.3);
     }
     .timer-value {
-      font-size: 32px;
+      font-size: 28px;
       font-weight: 800;
       font-family: monospace;
       color: #ffc107;
@@ -155,13 +168,88 @@
       text-align: center;
     }
     .unique-code-value {
-      font-size: 28px;
+      font-size: 24px;
       font-weight: 800;
       color: #00d4ff;
       letter-spacing: 4px;
     }
 
-    /* 🔥 METODE PEMBAYARAN SECTION */
+    /* VOUCHER SECTION */
+    .voucher-section {
+      background: rgba(255,193,7,0.05);
+      border-radius: 16px;
+      padding: 16px;
+      margin: 15px 0;
+      border: 1px solid rgba(255,193,7,0.2);
+    }
+    .voucher-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #ffc107;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .voucher-input-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .voucher-input {
+      flex: 1;
+      background: #1a1a30;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 12px 16px;
+      color: white;
+      font-size: 14px;
+      outline: none;
+      min-width: 150px;
+    }
+    .voucher-input:focus {
+      border-color: #ffc107;
+    }
+    .btn-apply-voucher {
+      background: linear-gradient(135deg, #ffc107, #ff9800);
+      border: none;
+      border-radius: 12px;
+      padding: 0 20px;
+      color: #000;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      white-space: nowrap;
+    }
+    .btn-apply-voucher:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.05);
+    }
+    .btn-remove-voucher {
+      background: rgba(220,53,69,0.2);
+      border: none;
+      border-radius: 12px;
+      padding: 8px 16px;
+      color: #dc3545;
+      font-size: 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .voucher-info {
+      font-size: 12px;
+      color: #a0a0b0;
+      margin-top: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    /* METODE PEMBAYARAN SECTION */
     .payment-methods-section {
       margin-bottom: 20px;
     }
@@ -198,10 +286,6 @@
       border-color: #667eea;
       background: rgba(102,126,234,0.15);
     }
-    .payment-method-option.disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
     .payment-method-icon {
       width: 48px;
       height: 48px;
@@ -211,6 +295,7 @@
       align-items: center;
       justify-content: center;
       font-size: 24px;
+      flex-shrink: 0;
     }
     .payment-method-info {
       flex: 1;
@@ -230,6 +315,7 @@
       border: 2px solid #a0a0b0;
       border-radius: 50%;
       position: relative;
+      flex-shrink: 0;
     }
     .payment-method-option.selected .payment-method-radio {
       border-color: #667eea;
@@ -245,7 +331,7 @@
       border-radius: 50%;
     }
 
-    /* 🔥 BALANCE INFO */
+    /* BALANCE INFO */
     .balance-info {
       background: linear-gradient(135deg, rgba(102,126,234,0.1), rgba(118,75,162,0.05));
       border-radius: 16px;
@@ -259,6 +345,8 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 10px;
+      flex-wrap: wrap;
+      gap: 8px;
     }
     .balance-label {
       font-size: 13px;
@@ -283,9 +371,6 @@
       color: #667eea;
       text-decoration: none;
       font-size: 12px;
-    }
-    .topup-link:hover {
-      text-decoration: underline;
     }
 
     .btn-pay {
@@ -316,6 +401,7 @@
       margin-bottom: 20px;
       display: none;
       color: #f87171;
+      font-size: 13px;
     }
     .loading-overlay {
       position: fixed;
@@ -354,6 +440,101 @@
       color: #a0a0b0;
       font-size: 12px;
     }
+
+    /* ========== RESPONSIVE MOBILE ========== */
+    @media (max-width: 640px) {
+      .payment-card {
+        padding: 24px 20px;
+      }
+      .payment-header h2 {
+        font-size: 24px;
+      }
+      .order-summary {
+        padding: 16px;
+      }
+      .order-summary-title {
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+      }
+      .order-id-display {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .order-id-value {
+        font-size: 11px;
+        word-break: break-all;
+      }
+      .order-details-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+      }
+      .order-details-value {
+        font-size: 16px;
+      }
+      .total-amount .order-details-value {
+        font-size: 22px;
+      }
+      .timer-value {
+        font-size: 24px;
+      }
+      .unique-code-value {
+        font-size: 20px;
+        letter-spacing: 2px;
+      }
+      .voucher-input-group {
+        flex-direction: column;
+      }
+      .btn-apply-voucher {
+        padding: 10px 16px;
+        width: 100%;
+      }
+      .payment-method-option {
+        padding: 14px 16px;
+        gap: 12px;
+      }
+      .payment-method-icon {
+        width: 42px;
+        height: 42px;
+        font-size: 20px;
+      }
+      .payment-method-name {
+        font-size: 14px;
+      }
+      .payment-method-desc {
+        font-size: 11px;
+      }
+      .balance-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .balance-amount {
+        font-size: 18px;
+      }
+      .btn-pay {
+        padding: 14px;
+        font-size: 15px;
+      }
+      .error-badge {
+        font-size: 12px;
+        padding: 10px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .payment-card {
+        padding: 20px 16px;
+      }
+      .order-id-value {
+        font-size: 10px;
+      }
+      .timer-value {
+        font-size: 20px;
+      }
+      .unique-code-value {
+        font-size: 18px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -385,7 +566,7 @@
       
       <div class="order-id-display">
         <span>🆔 Order ID</span>
-        <div style="display: flex; gap: 10px;">
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
           <span class="order-id-value" id="orderIdValue">-</span>
           <button class="copy-btn" id="copyOrderIdBtn">Copy</button>
         </div>
@@ -398,12 +579,32 @@
       
       <div class="order-details-row">
         <span>🎮 Jumlah Robux</span>
-        <span id="payRobux">0</span>
+        <span class="order-details-value" id="payRobux">0</span>
       </div>
       
       <div class="order-details-row">
         <span>💰 Harga</span>
-        <span id="basePrice">Rp 0</span>
+        <span class="order-details-value" id="basePrice">Rp 0</span>
+      </div>
+
+      <!-- Voucher Section -->
+      <div id="voucherSectionWrapper">
+        <div class="voucher-section" id="voucherSection" style="display: none;">
+          <div class="voucher-title">
+            <i class="fas fa-ticket-alt"></i> Punya Kode Voucher?
+          </div>
+          <div class="voucher-input-group">
+            <input type="text" id="voucherCode" class="voucher-input" placeholder="Masukkan kode voucher" autocomplete="off">
+            <button id="applyVoucherBtn" class="btn-apply-voucher">Terapkan</button>
+          </div>
+          <div id="voucherInfo" class="voucher-info"></div>
+        </div>
+      </div>
+
+      <!-- Discount Row -->
+      <div class="order-details-row discount-row" id="discountRow" style="display: none;">
+        <span><i class="fas fa-tag"></i> Diskon Voucher</span>
+        <span class="order-details-value" id="discountAmount" style="color:#28a745;">-Rp 0</span>
       </div>
 
       <div class="unique-code-box">
@@ -413,7 +614,7 @@
       
       <div class="order-details-row total-amount">
         <span>💰 Total yang harus dibayar</span>
-        <span id="payTotal">Rp 0</span>
+        <span class="order-details-value" id="payTotal">Rp 0</span>
       </div>
     </div>
 
@@ -423,13 +624,12 @@
       <div style="font-size: 11px; margin-top: 5px;">⚠️ Pesanan akan otomatis dibatalkan jika melebihi waktu</div>
     </div>
 
-    <!-- 🔥 METODE PEMBAYARAN -->
+    <!-- METODE PEMBAYARAN -->
     <div class="payment-methods-section" id="paymentMethodsSection">
       <div class="payment-methods-title">
         <i class="fas fa-credit-card"></i> Pilih Metode Pembayaran
       </div>
       <div class="payment-methods-grid" id="paymentMethodsGrid">
-        <!-- QRIS Option -->
         <div class="payment-method-option selected" id="methodQRIS">
           <div class="payment-method-icon" style="color: #00a6e0;"><i class="fas fa-qrcode"></i></div>
           <div class="payment-method-info">
@@ -439,7 +639,6 @@
           <div class="payment-method-radio"></div>
         </div>
 
-        <!-- Balance Option (hanya tampil untuk topup Robux, BUKAN deposit) -->
         <div class="payment-method-option" id="methodBalance" style="display: none;">
           <div class="payment-method-icon" style="color: #ffc107;"><i class="fas fa-wallet"></i></div>
           <div class="payment-method-info">
@@ -451,7 +650,7 @@
       </div>
     </div>
 
-    <!-- 🔥 INFO SALDO (hanya untuk topup Robux) -->
+    <!-- INFO SALDO -->
     <div id="balanceInfo" class="balance-info">
       <div class="balance-row">
         <span class="balance-label"><i class="fas fa-wallet"></i> Saldo Anda</span>
@@ -484,12 +683,12 @@
 </footer>
 
 <script type="module">
-  import { db, doc, getDoc, updateDoc } from './firebase-config.js';
-  import { isDiscordLoggedIn, getDiscordUser, getUserBalance, fetchUserDataFromFirestore, deductUserBalance, addUserBalance } from './js/discord-auth.js';
+  import { db, doc, getDoc, updateDoc, collection, query, getDocs, where } from './firebase-config.js';
+  import { isDiscordLoggedIn, getDiscordUser, getUserBalance, fetchUserDataFromFirestore, deductUserBalance } from './js/discord-auth.js';
 
   const urlParams = new URLSearchParams(window.location.search);
   const orderId = urlParams.get('orderId');
-  const type = urlParams.get('type'); // 'deposit' atau undefined/null
+  const type = urlParams.get('type');
 
   let isDeposit = type === 'deposit' || (orderId && orderId.startsWith('DEP-'));
 
@@ -506,6 +705,9 @@
   let timerInterval = null;
   let selectedMethod = 'qris';
   let userBalance = 0;
+  let appliedVoucher = null;
+  let discountAmount = 0;
+  let finalTotal = 0;
 
   const methodQRIS = document.getElementById('methodQRIS');
   const methodBalance = document.getElementById('methodBalance');
@@ -515,6 +717,19 @@
   const insufficientWarning = document.getElementById('insufficientWarning');
   const payBtn = document.getElementById('payBtn');
   const paymentMethodsSection = document.getElementById('paymentMethodsSection');
+  const voucherSection = document.getElementById('voucherSection');
+  const voucherCodeInput = document.getElementById('voucherCode');
+  const applyVoucherBtn = document.getElementById('applyVoucherBtn');
+  const voucherInfo = document.getElementById('voucherInfo');
+  const discountRow = document.getElementById('discountRow');
+  const discountAmountSpan = document.getElementById('discountAmount');
+  const payTotalSpan = document.getElementById('payTotal');
+
+  // Sembunyikan voucher untuk deposit
+  if (isDeposit) {
+    const voucherWrapper = document.getElementById('voucherSectionWrapper');
+    if (voucherWrapper) voucherWrapper.style.display = 'none';
+  }
 
   function generateUniqueCode() {
     return Math.floor(Math.random() * 159) + 59;
@@ -538,11 +753,7 @@
       if (remaining <= 0 && !isProcessing) {
         if (timerInterval) clearInterval(timerInterval);
         alert('⏰ Waktu pembayaran habis! Pesanan akan dibatalkan.');
-        if (isDeposit) {
-          window.location.href = 'deposit.html';
-        } else {
-          window.location.href = 'index.html';
-        }
+        window.location.href = 'index.html';
       }
     }
     updateTimer();
@@ -565,6 +776,141 @@
     setTimeout(() => { errorBadge.style.display = 'none'; }, 5000);
   }
 
+  async function loadVouchersFromFirestore() {
+    try {
+      const vouchersRef = collection(db, 'vouchers');
+      const vouchersSnap = await getDocs(vouchersRef);
+      const validVouchers = {};
+      for (const doc of vouchersSnap.docs) {
+        const data = doc.data();
+        const expiryDate = data.expiryDate?.toDate ? data.expiryDate.toDate() : new Date(data.expiryDate);
+        const now = new Date();
+        const isExpired = expiryDate < now;
+        const usedCount = data.usedCount || 0;
+        const maxUses = data.maxUses || 0;
+        const isAvailable = !isExpired && (maxUses === 0 || usedCount < maxUses);
+        
+        if (isAvailable && data.isActive !== false) {
+          validVouchers[data.code] = {
+            type: data.type,
+            value: data.value,
+            minPurchase: data.minPurchase || 0,
+            maxDiscount: data.maxDiscount || 0,
+            requiredMethod: data.requiredMethod || 'any',
+            docId: doc.id,
+            description: `${data.type === 'percentage' ? data.value + '%' : 'Rp ' + data.value.toLocaleString('id-ID')} diskon`
+          };
+        }
+      }
+      return validVouchers;
+    } catch (error) {
+      console.error('Error loading vouchers:', error);
+      return {};
+    }
+  }
+
+  async function applyVoucher() {
+    const code = voucherCodeInput.value.trim().toUpperCase();
+    if (!code) {
+      voucherInfo.innerHTML = '<span style="color:#ffc107;"><i class="fas fa-info-circle"></i> Masukkan kode voucher</span>';
+      return;
+    }
+    
+    const validVouchers = await loadVouchersFromFirestore();
+    const voucher = validVouchers[code];
+    
+    if (!voucher) {
+      voucherInfo.innerHTML = '<span style="color:#dc3545;"><i class="fas fa-exclamation-circle"></i> Kode voucher tidak valid atau sudah expired!</span>';
+      discountRow.style.display = 'none';
+      discountAmount = 0;
+      updateTotalDisplay();
+      return;
+    }
+    
+    if (totalWithUnique < voucher.minPurchase) {
+      voucherInfo.innerHTML = `<span style="color:#dc3545;"><i class="fas fa-exclamation-circle"></i> Minimal belanja Rp ${voucher.minPurchase.toLocaleString('id-ID')} untuk menggunakan voucher ini!</span>`;
+      discountRow.style.display = 'none';
+      discountAmount = 0;
+      updateTotalDisplay();
+      return;
+    }
+    
+    if (voucher.requiredMethod && voucher.requiredMethod !== 'any') {
+      if (voucher.requiredMethod === 'qris' && selectedMethod !== 'qris') {
+        voucherInfo.innerHTML = '<span style="color:#dc3545;"><i class="fas fa-exclamation-circle"></i> Voucher ini WAJIB menggunakan metode pembayaran QRIS! Silakan pilih QRIS terlebih dahulu.</span>';
+        discountRow.style.display = 'none';
+        discountAmount = 0;
+        updateTotalDisplay();
+        return;
+      }
+      if (voucher.requiredMethod === 'balance' && selectedMethod !== 'balance') {
+        voucherInfo.innerHTML = '<span style="color:#dc3545;"><i class="fas fa-exclamation-circle"></i> Voucher ini WAJIB menggunakan metode pembayaran Saldo Deposit! Silakan pilih Saldo Deposit terlebih dahulu.</span>';
+        discountRow.style.display = 'none';
+        discountAmount = 0;
+        updateTotalDisplay();
+        return;
+      }
+    }
+    
+    let discount = 0;
+    if (voucher.type === 'percentage') {
+      discount = Math.floor(totalWithUnique * voucher.value / 100);
+      if (voucher.maxDiscount > 0 && discount > voucher.maxDiscount) {
+        discount = voucher.maxDiscount;
+      }
+    } else if (voucher.type === 'fixed') {
+      discount = voucher.value;
+    }
+    
+    discountAmount = discount;
+    appliedVoucher = { code: code, docId: voucher.docId, requiredMethod: voucher.requiredMethod };
+    discountRow.style.display = 'flex';
+    discountAmountSpan.textContent = `-Rp ${discountAmount.toLocaleString('id-ID')}`;
+    
+    const methodText = voucher.requiredMethod === 'qris' ? 'QRIS' : (voucher.requiredMethod === 'balance' ? 'Saldo Deposit' : 'Bebas');
+    voucherInfo.innerHTML = `
+      <span><i class="fas fa-check-circle" style="color:#28a745;"></i> Voucher ${code} diterapkan! Hemat Rp${discountAmount.toLocaleString('id-ID')} (${methodText})</span>
+      <button id="removeVoucherBtn" class="btn-remove-voucher"><i class="fas fa-trash"></i> Hapus</button>
+    `;
+    
+    const removeBtn = document.getElementById('removeVoucherBtn');
+    if (removeBtn) {
+      removeBtn.addEventListener('click', removeVoucher);
+    }
+    
+    updateTotalDisplay();
+  }
+
+  async function removeVoucher() {
+    appliedVoucher = null;
+    discountAmount = 0;
+    discountRow.style.display = 'none';
+    voucherCodeInput.value = '';
+    voucherInfo.innerHTML = '<span><i class="fas fa-info-circle"></i> Kode voucher dihapus</span>';
+    setTimeout(() => {
+      voucherInfo.innerHTML = '';
+    }, 2000);
+    updateTotalDisplay();
+  }
+
+  function updateTotalDisplay() {
+    finalTotal = totalWithUnique - discountAmount;
+    if (finalTotal < 0) finalTotal = 0;
+    payTotalSpan.textContent = `Rp ${finalTotal.toLocaleString('id-ID')}`;
+    
+    if (selectedMethod === 'balance') {
+      const remaining = userBalance - finalTotal;
+      balanceAfterSpan.textContent = `Rp ${remaining.toLocaleString('id-ID')}`;
+      if (userBalance < finalTotal) {
+        insufficientWarning.style.display = 'block';
+        payBtn.disabled = true;
+      } else {
+        insufficientWarning.style.display = 'none';
+        payBtn.disabled = false;
+      }
+    }
+  }
+
   async function updateBalanceDisplay() {
     if (!isDiscordLoggedIn()) {
       methodBalance.style.display = 'none';
@@ -572,32 +918,49 @@
       return;
     }
     
-    // 🔥 TAMPILKAN METHOD BALANCE
     methodBalance.style.display = 'flex';
-    
     await fetchUserDataFromFirestore();
     userBalance = getUserBalance();
     currentBalanceSpan.textContent = `Rp ${userBalance.toLocaleString('id-ID')}`;
     
     if (selectedMethod === 'balance') {
       balanceInfo.style.display = 'block';
-      const remaining = userBalance - totalWithUnique;
+      const remaining = userBalance - finalTotal;
       balanceAfterSpan.textContent = `Rp ${remaining.toLocaleString('id-ID')}`;
-      
-      if (userBalance < totalWithUnique) {
+      if (userBalance < finalTotal) {
         insufficientWarning.style.display = 'block';
         payBtn.disabled = true;
       } else {
         insufficientWarning.style.display = 'none';
         payBtn.disabled = false;
       }
+      
+      if (appliedVoucher && appliedVoucher.requiredMethod === 'qris') {
+        removeVoucher();
+        voucherInfo.innerHTML = '<span style="color:#ffc107;"><i class="fas fa-info-circle"></i> Voucher direset karena metode pembayaran berubah ke Saldo Deposit (voucher wajib QRIS)</span>';
+        setTimeout(() => {
+          if (voucherInfo.innerHTML === '<span style="color:#ffc107;"><i class="fas fa-info-circle"></i> Voucher direset karena metode pembayaran berubah ke Saldo Deposit (voucher wajib QRIS)</span>') {
+            voucherInfo.innerHTML = '';
+          }
+        }, 4000);
+      }
     } else {
       balanceInfo.style.display = 'none';
       payBtn.disabled = false;
+      
+      if (appliedVoucher && appliedVoucher.requiredMethod === 'balance') {
+        removeVoucher();
+        voucherInfo.innerHTML = '<span style="color:#ffc107;"><i class="fas fa-info-circle"></i> Voucher direset karena metode pembayaran berubah ke QRIS (voucher wajib Saldo Deposit)</span>';
+        setTimeout(() => {
+          if (voucherInfo.innerHTML === '<span style="color:#ffc107;"><i class="fas fa-info-circle"></i> Voucher direset karena metode pembayaran berubah ke QRIS (voucher wajib Saldo Deposit)</span>') {
+            voucherInfo.innerHTML = '';
+          }
+        }, 4000);
+      }
     }
   }
 
-  // Method selection (hanya untuk topup Robux)
+  // Method selection
   if (!isDeposit) {
     methodQRIS.addEventListener('click', () => {
       methodQRIS.classList.add('selected');
@@ -626,7 +989,7 @@
         showError('Silakan login untuk menggunakan saldo!');
         return;
       }
-      if (userBalance < totalWithUnique) {
+      if (userBalance < finalTotal) {
         showError('Saldo tidak mencukupi!');
         return;
       }
@@ -638,36 +1001,115 @@
     
     try {
       if (isDeposit) {
-      // 🔥 DEPOSIT: Redirect ke QRIS dulu, nanti di qris.html yang update status
         const expireAt = new Date();
         expireAt.setHours(expireAt.getHours() + 2);
-        
         const orderRef = doc(db, 'deposit_orders', orderId);
         await updateDoc(orderRef, {
           status: 'waiting_payment',
           expireAt: expireAt,
           updatedAt: new Date()
         });
-        
-        // Redirect ke qris.html untuk scan QR
         window.location.href = `/qris.html?orderId=${orderId}&amount=${currentAmount}&type=deposit`;
+        
       } else if (selectedMethod === 'balance') {
-        // 🔥 TOPUP ROBUX PAKAI SALDO
-        const deductSuccess = await deductUserBalance(getDiscordUser().id, totalWithUnique);
+        if (finalTotal === 0) {
+          if (appliedVoucher && appliedVoucher.docId) {
+            const voucherRef = doc(db, 'vouchers', appliedVoucher.docId);
+            const voucherSnap = await getDoc(voucherRef);
+            if (voucherSnap.exists()) {
+              const currentCount = voucherSnap.data().usedCount || 0;
+              await updateDoc(voucherRef, {
+                usedCount: currentCount + 1,
+                lastUsedAt: new Date(),
+                lastUsedBy: orderId
+              });
+            }
+          }
+          const orderRef = doc(db, 'orders', orderId);
+          await updateDoc(orderRef, {
+            paymentMethod: 'balance',
+            status: 'paid',
+            paidAt: new Date(),
+            voucherCode: appliedVoucher?.code || null,
+            discountAmount: discountAmount,
+            finalTotal: 0,
+            updatedAt: new Date()
+          });
+          window.location.href = `/done.html?orderId=${orderId}`;
+          return;
+        }
+        
+        if (appliedVoucher && appliedVoucher.docId) {
+          const voucherRef = doc(db, 'vouchers', appliedVoucher.docId);
+          const voucherSnap = await getDoc(voucherRef);
+          if (voucherSnap.exists()) {
+            const currentCount = voucherSnap.data().usedCount || 0;
+            await updateDoc(voucherRef, {
+              usedCount: currentCount + 1,
+              lastUsedAt: new Date(),
+              lastUsedBy: orderId
+            });
+          }
+        }
+        
+        const deductSuccess = await deductUserBalance(getDiscordUser().id, finalTotal);
         if (deductSuccess) {
           const orderRef = doc(db, 'orders', orderId);
           await updateDoc(orderRef, {
             paymentMethod: 'balance',
             status: 'paid',
             paidAt: new Date(),
+            voucherCode: appliedVoucher?.code || null,
+            discountAmount: discountAmount,
+            finalTotal: finalTotal,
             updatedAt: new Date()
           });
           window.location.href = `/done.html?orderId=${orderId}`;
         } else {
           throw new Error('Gagal memproses pembayaran dengan saldo');
         }
+        
       } else {
-        // 🔥 TOPUP ROBUX PAKAI QRIS
+        if (finalTotal === 0) {
+          if (appliedVoucher && appliedVoucher.docId) {
+            const voucherRef = doc(db, 'vouchers', appliedVoucher.docId);
+            const voucherSnap = await getDoc(voucherRef);
+            if (voucherSnap.exists()) {
+              const currentCount = voucherSnap.data().usedCount || 0;
+              await updateDoc(voucherRef, {
+                usedCount: currentCount + 1,
+                lastUsedAt: new Date(),
+                lastUsedBy: orderId
+              });
+            }
+          }
+          const orderRef = doc(db, 'orders', orderId);
+          await updateDoc(orderRef, {
+            paymentMethod: 'qris_free',
+            status: 'paid',
+            paidAt: new Date(),
+            voucherCode: appliedVoucher?.code || null,
+            discountAmount: discountAmount,
+            finalTotal: 0,
+            updatedAt: new Date()
+          });
+          window.location.href = `/done.html?orderId=${orderId}`;
+          return;
+        }
+        
+        if (appliedVoucher && appliedVoucher.docId) {
+          const voucherRef = doc(db, 'vouchers', appliedVoucher.docId);
+          const voucherSnap = await getDoc(voucherRef);
+          if (voucherSnap.exists()) {
+            const currentCount = voucherSnap.data().usedCount || 0;
+            await updateDoc(voucherRef, {
+              usedCount: currentCount + 1,
+              lastUsedAt: new Date(),
+              lastUsedBy: orderId
+            });
+          }
+        }
+        
         const expireAt = new Date();
         expireAt.setHours(expireAt.getHours() + 2);
         
@@ -679,10 +1121,13 @@
           totalWithUnique: totalWithUnique,
           baseAmount: currentAmount,
           expireAt: expireAt,
+          voucherCode: appliedVoucher?.code || null,
+          discountAmount: discountAmount,
+          finalTotal: finalTotal,
           updatedAt: new Date()
         });
         
-        window.location.href = `/qris.html?orderId=${orderId}&amount=${totalWithUnique}`;
+        window.location.href = `/qris.html?orderId=${orderId}&amount=${finalTotal}`;
       }
     } catch (error) {
       console.error('Error:', error);
@@ -696,14 +1141,12 @@
   async function loadOrder() {
     try {
       if (isDeposit) {
-        // 🔥 LOAD DEPOSIT ORDER
         const header = document.querySelector('.payment-header h2');
         const subHeader = document.querySelector('.payment-header p');
         if (header) header.textContent = '💰 Deposit Saldo';
         if (subHeader) subHeader.textContent = 'Isi saldo untuk pembelian Robux';
         if (payBtn) payBtn.innerHTML = '<i class="fas fa-qrcode"></i> Bayar dengan QRIS';
         
-        // Sembunyikan pilihan metode pembayaran (hanya QRIS)
         if (paymentMethodsSection) paymentMethodsSection.style.display = 'none';
         
         const orderRef = doc(db, 'deposit_orders', orderId);
@@ -730,7 +1173,6 @@
         
         currentAmount = data.amount;
         
-        // Sembunyikan elemen yang tidak diperlukan untuk deposit
         const payRobuxRow = document.getElementById('payRobux')?.parentElement;
         const basePriceRow = document.getElementById('basePrice')?.parentElement;
         const uniqueCodeBox = document.getElementById('uniqueCodeBox');
@@ -750,112 +1192,125 @@
         }
         
       } else {
-      // 🔥 LOAD TOPUP ROBUX ORDER
-      const header = document.querySelector('.payment-header h2');
-      const subHeader = document.querySelector('.payment-header p');
-      if (header) header.textContent = '💳 Metode Pembayaran';
-      if (subHeader) subHeader.textContent = 'Pilih metode pembayaran yang tersedia';
-      
-      // Tampilkan pilihan metode pembayaran
-      if (paymentMethodsSection) paymentMethodsSection.style.display = 'block';
-      
-      // 🔥 TAMPILKAN BALANCE OPTION JIKA USER LOGIN
-      if (isDiscordLoggedIn()) {
-        methodBalance.style.display = 'flex';
-      } else {
-        methodBalance.style.display = 'none';
+        const header = document.querySelector('.payment-header h2');
+        const subHeader = document.querySelector('.payment-header p');
+        if (header) header.textContent = '💳 Metode Pembayaran';
+        if (subHeader) subHeader.textContent = 'Pilih metode pembayaran yang tersedia';
+        
+        if (paymentMethodsSection) paymentMethodsSection.style.display = 'block';
+        voucherSection.style.display = 'block';
+        
+        if (isDiscordLoggedIn()) {
+          methodBalance.style.display = 'flex';
+        } else {
+          methodBalance.style.display = 'none';
+        }
+        
+        const orderRef = doc(db, 'orders', orderId);
+        const orderSnap = await getDoc(orderRef);
+        
+        if (!orderSnap.exists()) {
+          showError('Pesanan tidak ditemukan');
+          return;
+        }
+        
+        const data = orderSnap.data();
+        
+        if (data.status === 'cancelled') {
+          alert('❌ Pesanan sudah dibatalkan!');
+          window.location.href = 'index.html';
+          return;
+        }
+        
+        if (data.status === 'paid' || data.status === 'delivered') {
+          alert('✅ Pesanan sudah dibayar/dikirim!');
+          window.location.href = `done.html?orderId=${orderId}`;
+          return;
+        }
+        
+        currentAmount = data.totalPrice;
+        currentRobux = data.robuxAmount || 0;
+        
+        if (data.uniqueCode && data.totalWithUnique) {
+          uniqueCode = data.uniqueCode;
+          totalWithUnique = data.totalWithUnique;
+          if (data.discountAmount) discountAmount = data.discountAmount;
+          if (data.voucherCode) appliedVoucher = { code: data.voucherCode };
+        } else {
+          uniqueCode = generateUniqueCode();
+          totalWithUnique = currentAmount + uniqueCode;
+          await updateDoc(orderRef, {
+            uniqueCode: uniqueCode,
+            totalWithUnique: totalWithUnique,
+            baseAmount: currentAmount,
+            updatedAt: new Date()
+          });
+        }
+        
+        const payRobux = document.getElementById('payRobux');
+        const basePrice = document.getElementById('basePrice');
+        const uniqueCodeValue = document.getElementById('uniqueCodeValue');
+        
+        if (payRobux) payRobux.textContent = currentRobux.toLocaleString('id-ID');
+        if (basePrice) basePrice.textContent = 'Rp ' + currentAmount.toLocaleString('id-ID');
+        if (uniqueCodeValue) uniqueCodeValue.textContent = uniqueCode;
+        
+        finalTotal = totalWithUnique - discountAmount;
+        if (payTotalSpan) payTotalSpan.textContent = `Rp ${finalTotal.toLocaleString('id-ID')}`;
+        
+        const payRobuxRow = document.getElementById('payRobux')?.parentElement;
+        const basePriceRow = document.getElementById('basePrice')?.parentElement;
+        const uniqueCodeBox = document.getElementById('uniqueCodeBox');
+        
+        if (payRobuxRow) payRobuxRow.style.display = 'flex';
+        if (basePriceRow) basePriceRow.style.display = 'flex';
+        if (uniqueCodeBox) uniqueCodeBox.style.display = 'block';
+        
+        const existingExpireAt = data.expireAt?.toDate();
+        if (existingExpireAt && new Date() < existingExpireAt && data.status === 'waiting_payment') {
+          startTimer(existingExpireAt);
+        }
+        
+        const robloxUsername = data.robloxUsername || '';
+        const usernameDisplay = document.getElementById('usernameDisplay');
+        const usernameValue = document.getElementById('usernameValue');
+        
+        if (robloxUsername && usernameDisplay && usernameValue) {
+          usernameDisplay.style.display = 'block';
+          usernameValue.textContent = robloxUsername;
+        }
+        
+        if (discountAmount > 0) {
+          discountRow.style.display = 'flex';
+          discountAmountSpan.textContent = `-Rp ${discountAmount.toLocaleString('id-ID')}`;
+          voucherInfo.innerHTML = `
+            <span><i class="fas fa-check-circle" style="color:#28a745;"></i> Voucher ${appliedVoucher?.code} diterapkan!</span>
+            <button id="removeVoucherBtn" class="btn-remove-voucher"><i class="fas fa-trash"></i> Hapus</button>
+          `;
+          const removeBtn = document.getElementById('removeVoucherBtn');
+          if (removeBtn) removeBtn.addEventListener('click', removeVoucher);
+        }
+        
+        await updateBalanceDisplay();
       }
       
-      const orderRef = doc(db, 'orders', orderId);
-      const orderSnap = await getDoc(orderRef);
+      const orderIdElement = document.getElementById('orderIdValue');
+      if (orderIdElement) orderIdElement.textContent = orderId;
       
-      if (!orderSnap.exists()) {
-        showError('Pesanan tidak ditemukan');
-        return;
+      const copyBtn = document.getElementById('copyOrderIdBtn');
+      if (copyBtn) {
+        copyBtn.addEventListener('click', () => copyToClipboard(orderId));
       }
       
-      const data = orderSnap.data();
-      
-      if (data.status === 'cancelled') {
-        alert('❌ Pesanan sudah dibatalkan!');
-        window.location.href = 'index.html';
-        return;
-      }
-      
-      if (data.status === 'paid' || data.status === 'delivered') {
-        alert('✅ Pesanan sudah dibayar/dikirim!');
-        window.location.href = `done.html?orderId=${orderId}`;
-        return;
-      }
-      
-      currentAmount = data.totalPrice;
-      currentRobux = data.robuxAmount || 0;
-      
-      if (data.uniqueCode && data.totalWithUnique) {
-        uniqueCode = data.uniqueCode;
-        totalWithUnique = data.totalWithUnique;
-      } else {
-        uniqueCode = generateUniqueCode();
-        totalWithUnique = currentAmount + uniqueCode;
-        await updateDoc(orderRef, {
-          uniqueCode: uniqueCode,
-          totalWithUnique: totalWithUnique,
-          baseAmount: currentAmount,
-          updatedAt: new Date()
-        });
-      }
-      
-      const payRobux = document.getElementById('payRobux');
-      const basePrice = document.getElementById('basePrice');
-      const uniqueCodeValue = document.getElementById('uniqueCodeValue');
-      const payTotal = document.getElementById('payTotal');
-      
-      if (payRobux) payRobux.textContent = currentRobux.toLocaleString('id-ID');
-      if (basePrice) basePrice.textContent = 'Rp ' + currentAmount.toLocaleString('id-ID');
-      if (uniqueCodeValue) uniqueCodeValue.textContent = uniqueCode;
-      if (payTotal) payTotal.textContent = 'Rp ' + totalWithUnique.toLocaleString('id-ID');
-      
-      // Tampilkan kembali elemen yang mungkin tersembunyi
-      const payRobuxRow = document.getElementById('payRobux')?.parentElement;
-      const basePriceRow = document.getElementById('basePrice')?.parentElement;
-      const uniqueCodeBox = document.getElementById('uniqueCodeBox');
-      
-      if (payRobuxRow) payRobuxRow.style.display = 'flex';
-      if (basePriceRow) basePriceRow.style.display = 'flex';
-      if (uniqueCodeBox) uniqueCodeBox.style.display = 'block';
-      
-      const existingExpireAt = data.expireAt?.toDate();
-      if (existingExpireAt && new Date() < existingExpireAt && data.status === 'waiting_payment') {
-        startTimer(existingExpireAt);
-      }
-      
-      const robloxUsername = data.robloxUsername || '';
-      const usernameDisplay = document.getElementById('usernameDisplay');
-      const usernameValue = document.getElementById('usernameValue');
-      
-      if (robloxUsername && usernameDisplay && usernameValue) {
-        usernameDisplay.style.display = 'block';
-        usernameValue.textContent = robloxUsername;
-      }
-      
-      // 🔥 UPDATE BALANCE DISPLAY UNTUK TOPUP ROBUX
-      await updateBalanceDisplay();
+    } catch (error) {
+      console.error('Error loading order:', error);
+      showError('Gagal memuat data pesanan: ' + error.message);
     }
-    
-    const orderIdElement = document.getElementById('orderIdValue');
-    if (orderIdElement) orderIdElement.textContent = orderId;
-    
-    const copyBtn = document.getElementById('copyOrderIdBtn');
-    if (copyBtn) {
-      copyBtn.addEventListener('click', () => copyToClipboard(orderId));
-    }
-    
-  } catch (error) {
-    console.error('Error loading order:', error);
-    showError('Gagal memuat data pesanan: ' + error.message);
   }
-}
 
+  if (!isDeposit) {
+    applyVoucherBtn.addEventListener('click', applyVoucher);
+  }
   payBtn.addEventListener('click', processPayment);
   loadOrder();
 </script>

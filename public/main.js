@@ -1,7 +1,163 @@
 import { db, doc, getDoc, setDoc, addDoc, collection, serverTimestamp } from './firebase-config.js';
 import { getDiscordUser, updateUserAfterOrder, isDiscordLoggedIn, fetchUserDataFromFirestore, getUserBalance, deductUserBalance } from './js/discord-auth.js';
 
-// DOM Elements - dengan pengecekan
+// ==================== TOAST NOTIFICATION SYSTEM ====================
+function showToast(message, type = 'error') {
+  // Hapus toast lama
+  const oldToast = document.querySelector('.custom-toast');
+  if (oldToast) oldToast.remove();
+  
+  const toast = document.createElement('div');
+  toast.className = `custom-toast ${type}`;
+  toast.innerHTML = `
+    <div class="toast-icon">
+      <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-exclamation-circle'}"></i>
+    </div>
+    <div class="toast-message">${message}</div>
+    <div class="toast-close">
+      <i class="fas fa-times"></i>
+    </div>
+  `;
+  
+  document.body.appendChild(toast);
+  
+  // Animasi masuk
+  setTimeout(() => toast.classList.add('show'), 10);
+  
+  // Auto close setelah 3 detik
+  const timeout = setTimeout(() => {
+    closeToast(toast);
+  }, 3000);
+  
+  // Close button
+  const closeBtn = toast.querySelector('.toast-close');
+  closeBtn.addEventListener('click', () => {
+    clearTimeout(timeout);
+    closeToast(toast);
+  });
+  
+  // Klik di luar
+  toast.addEventListener('click', (e) => {
+    if (e.target === toast) {
+      clearTimeout(timeout);
+      closeToast(toast);
+    }
+  });
+}
+
+function closeToast(toast) {
+  toast.classList.remove('show');
+  setTimeout(() => toast.remove(), 300);
+}
+
+// Style untuk toast
+const toastStyle = document.createElement('style');
+toastStyle.textContent = `
+  .custom-toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: rgba(26, 26, 48, 0.98);
+    backdrop-filter: blur(12px);
+    border-radius: 16px;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    z-index: 10000;
+    transform: translateX(450px);
+    transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    border-left: 4px solid;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    min-width: 280px;
+    max-width: 400px;
+  }
+  
+  .custom-toast.show {
+    transform: translateX(0);
+  }
+  
+  .custom-toast.error {
+    border-left-color: #dc3545;
+  }
+  .custom-toast.error .toast-icon i {
+    color: #dc3545;
+  }
+  
+  .custom-toast.success {
+    border-left-color: #28a745;
+  }
+  .custom-toast.success .toast-icon i {
+    color: #28a745;
+  }
+  
+  .custom-toast.warning {
+    border-left-color: #ffc107;
+  }
+  .custom-toast.warning .toast-icon i {
+    color: #ffc107;
+  }
+  
+  .custom-toast.info {
+    border-left-color: #00d4ff;
+  }
+  .custom-toast.info .toast-icon i {
+    color: #00d4ff;
+  }
+  
+  .toast-icon i {
+    font-size: 22px;
+  }
+  
+  .toast-message {
+    flex: 1;
+    font-size: 13px;
+    color: #e0e0e0;
+    line-height: 1.4;
+  }
+  
+  .toast-close {
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+  }
+  
+  .toast-close:hover {
+    opacity: 1;
+  }
+  
+  .toast-close i {
+    font-size: 14px;
+    color: #a0a0b0;
+  }
+  
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+  }
+  
+  .shake-animation {
+    animation: shake 0.5s ease;
+  }
+  
+  @media (max-width: 640px) {
+    .custom-toast {
+      bottom: 16px;
+      right: 16px;
+      left: 16px;
+      transform: translateY(100px);
+      min-width: auto;
+    }
+    .custom-toast.show {
+      transform: translateY(0);
+    }
+  }
+`;
+document.head.appendChild(toastStyle);
+// ==================== END TOAST SYSTEM ====================
+
+// DOM Elements
 const getElement = (id) => {
   const el = document.getElementById(id);
   if (!el) console.warn(`⚠️ Element dengan id "${id}" tidak ditemukan di halaman ini`);
@@ -20,14 +176,9 @@ const stockReady = getElement('stockReady');
 const poAvailable = getElement('poAvailable');
 const btnBuy = getElement('btnBuy');
 const robuxError = getElement('robuxError');
-
-// 🔥 ELEMEN YANG TIDAK ADA - DIKOMENTARI
-// const detailRobux = getElement('detailRobux');
-// const detailRate = getElement('detailRate');
-// const detailTotal = getElement('detailTotal');
-// const paymentMethodSelect = getElement('paymentMethod');
-// const balanceInfo = getElement('balanceInfo');
-// const currentBalanceDisplay = getElement('currentBalanceDisplay');
+const robloxUsernameInput = getElement('robloxUsername');
+const customerEmailInput = getElement('customerEmail');
+const customerPhoneInput = getElement('customerPhone');
 
 // Config variables
 let PRICE_PER_ROBUX = 115;
@@ -41,6 +192,73 @@ function formatNumber(num) {
   return num.toLocaleString('id-ID');
 }
 
+// 🔥 AMBIL USERNAME ROBLOX DARI FIRESTORE
+async function loadRobloxUsernameFromFirestore() {
+  if (!isDiscordLoggedIn()) return null;
+  
+  const user = getDiscordUser();
+  if (!user || !user.id) return null;
+  
+  try {
+    const userRef = doc(db, 'users', `discord_${user.id}`);
+    const userSnap = await getDoc(userRef);
+    
+    if (userSnap.exists()) {
+      const data = userSnap.data();
+      if (data.robloxData?.username) return data.robloxData.username;
+      if (data.robloxUsername) return data.robloxUsername;
+    }
+    return null;
+  } catch (error) {
+    console.error('Error loading Roblox username:', error);
+    return null;
+  }
+}
+
+// 🔥 AMBIL INFORMASI KONTAK DARI FIRESTORE
+async function loadContactInfoFromFirestore() {
+  if (!isDiscordLoggedIn()) return { email: '', phone: '' };
+  
+  const user = getDiscordUser();
+  if (!user || !user.id) return { email: '', phone: '' };
+  
+  try {
+    const userRef = doc(db, 'users', `discord_${user.id}`);
+    const userSnap = await getDoc(userRef);
+    
+    if (userSnap.exists()) {
+      const data = userSnap.data();
+      return {
+        email: data.email || '',
+        phone: data.phone || ''
+      };
+    }
+    return { email: '', phone: '' };
+  } catch (error) {
+    console.error('Error loading contact info:', error);
+    return { email: '', phone: '' };
+  }
+}
+
+// 🔥 UPDATE UI - Isi otomatis semua data dari Firestore
+async function updateUserDataFromFirestore() {
+  const savedRobloxUsername = await loadRobloxUsernameFromFirestore();
+  if (savedRobloxUsername && robloxUsernameInput && !robloxUsernameInput.value.trim()) {
+    robloxUsernameInput.value = savedRobloxUsername;
+    console.log('✅ Roblox username auto-filled:', savedRobloxUsername);
+  }
+  
+  const contactInfo = await loadContactInfoFromFirestore();
+  if (contactInfo.email && customerEmailInput && !customerEmailInput.value.trim()) {
+    customerEmailInput.value = contactInfo.email;
+    console.log('✅ Email auto-filled:', contactInfo.email);
+  }
+  if (contactInfo.phone && customerPhoneInput && !customerPhoneInput.value.trim()) {
+    customerPhoneInput.value = contactInfo.phone;
+    console.log('✅ Phone auto-filled:', contactInfo.phone);
+  }
+}
+
 function updateUI() {
   if (!robuxInput) return;
   
@@ -48,14 +266,11 @@ function updateUI() {
   const total = robux * PRICE_PER_ROBUX;
   
   if (totalPrice) totalPrice.textContent = 'Rp ' + formatNumber(total);
-  // if (detailRobux) detailRobux.textContent = formatNumber(robux);
-  // if (detailRate) detailRate.textContent = 'Rp ' + formatNumber(PRICE_PER_ROBUX);
-  // if (detailTotal) detailTotal.textContent = 'Rp ' + formatNumber(total);
   
   if (robuxError) robuxError.classList.remove('show');
   
   if (btnBuy) {
-    if (robux < 10) {
+    if (robux < 50) {
       btnBuy.disabled = true;
       if (robux > 0 && robuxError) {
         robuxError.classList.add('show');
@@ -134,6 +349,8 @@ async function loadConfig() {
     updateStockDisplay();
     updateUI();
     
+    await updateUserDataFromFirestore();
+    
     if (loadingScreen) loadingScreen.style.display = 'none';
     
   } catch (error) {
@@ -175,20 +392,39 @@ function closeModal() {
   confirmModal.classList.remove('active');
 }
 
+function highlightElement(element) {
+  if (!element) return;
+  element.classList.add('shake-animation');
+  setTimeout(() => {
+    element.classList.remove('shake-animation');
+  }, 500);
+}
+
 async function proceedSubmitOrder() {
-  const robloxUsername = document.getElementById('robloxUsername')?.value?.trim() || '';
+  let robloxUsername = document.getElementById('robloxUsername')?.value?.trim() || '';
   const usernameError = document.getElementById('usernameError');
   
   if (!robloxUsername) {
+    const savedUsername = await loadRobloxUsernameFromFirestore();
+    if (savedUsername) {
+      robloxUsername = savedUsername;
+      if (robloxUsernameInput) robloxUsernameInput.value = savedUsername;
+      showToast(`Username Roblox terisi otomatis: ${savedUsername}`, 'info');
+    }
+  }
+  
+  if (!robloxUsername) {
     if (usernameError) usernameError.classList.add('show');
-    alert('❌ Username Roblox wajib diisi!');
+    highlightElement(robloxUsernameInput);
+    showToast('❌ Username Roblox wajib diisi!', 'error');
     return;
   }
   
   if (usernameError) usernameError.classList.remove('show');
   
   if (!validateUsername(robloxUsername)) {
-    alert('❌ Username Roblox tidak valid!');
+    highlightElement(robloxUsernameInput);
+    showToast('❌ Username Roblox tidak valid!', 'error');
     return;
   }
   
@@ -197,7 +433,8 @@ async function proceedSubmitOrder() {
   
   if (!termsCheckbox || !termsCheckbox.checked) {
     if (termsError) termsError.classList.add('show');
-    alert('❌ Anda harus menyetujui Syarat & Ketentuan dan Kebijakan Privasi untuk melanjutkan.');
+    highlightElement(document.querySelector('.terms-checkbox'));
+    showToast('❌ Anda harus menyetujui Syarat & Ketentuan untuk melanjutkan.', 'error');
     return;
   }
   
@@ -207,32 +444,31 @@ async function proceedSubmitOrder() {
   const customerPhone = document.getElementById('customerPhone')?.value?.trim() || '';
   
   if (!customerEmail && !customerPhone) {
-    alert('❌ Anda wajib mengisi minimal salah satu: Email atau Nomor WhatsApp untuk konfirmasi order.');
+    showToast('❌ Anda wajib mengisi minimal salah satu: Email atau WhatsApp', 'error');
     return;
   }
   
   if (customerEmail && !isValidEmail(customerEmail)) {
-    alert('❌ Format Email tidak valid. Contoh: nama@domain.com');
+    showToast('❌ Format Email tidak valid. Contoh: nama@domain.com', 'error');
     return;
   }
   
   if (customerPhone && !isValidPhone(customerPhone)) {
-    alert('❌ Format Nomor WhatsApp/Telepon tidak valid. Contoh: 081234567890');
+    showToast('❌ Format Nomor WhatsApp tidak valid. Contoh: 081234567890', 'error');
     return;
   }
   
   const robux = Number(robuxInput.value);
   
-  if (robux < 10) {
-    alert('❌ Minimal pembelian 10 Robux');
+  if (robux < 50) {
+    showToast('❌ Minimal pembelian 50 Robux', 'error');
     return;
   }
   
-  const total = robux * PRICE_PER_ROBUX;
   const maxAvailable = CURRENT_STOCK + CURRENT_PO;
   
   if (robux > maxAvailable) {
-    alert(`❌ Maksimal pembelian saat ini: ${formatNumber(maxAvailable)} Robux`);
+    showToast(`❌ Maksimal pembelian saat ini: ${formatNumber(maxAvailable)} Robux`, 'error');
     return;
   }
   
@@ -280,7 +516,7 @@ async function proceedSubmitOrder() {
     window.location.href = `payment.html?orderId=${orderId}`;
   } catch (error) {
     console.error('Error creating order:', error);
-    alert('Gagal membuat pesanan. Silakan coba lagi.');
+    showToast('❌ Gagal membuat pesanan. Silakan coba lagi.', 'error');
     if (btnBuy) {
       btnBuy.disabled = false;
       btnBuy.innerHTML = '<i class="fas fa-arrow-right"></i> Lanjutkan Pembayaran';
@@ -289,19 +525,30 @@ async function proceedSubmitOrder() {
 }
 
 async function submitOrder() {
-  const robloxUsername = document.getElementById('robloxUsername')?.value?.trim() || '';
+  let robloxUsername = document.getElementById('robloxUsername')?.value?.trim() || '';
   const usernameError = document.getElementById('usernameError');
   
   if (!robloxUsername) {
+    const savedUsername = await loadRobloxUsernameFromFirestore();
+    if (savedUsername) {
+      robloxUsername = savedUsername;
+      if (robloxUsernameInput) robloxUsernameInput.value = savedUsername;
+      showToast(`Username Roblox terisi otomatis: ${savedUsername}`, 'info');
+    }
+  }
+  
+  if (!robloxUsername) {
     if (usernameError) usernameError.classList.add('show');
-    alert('❌ Username Roblox wajib diisi!');
+    highlightElement(robloxUsernameInput);
+    showToast('❌ Username Roblox wajib diisi!', 'error');
     return;
   }
   
   if (usernameError) usernameError.classList.remove('show');
   
   if (!validateUsername(robloxUsername)) {
-    alert('❌ Username Roblox tidak valid!');
+    highlightElement(robloxUsernameInput);
+    showToast('❌ Username Roblox tidak valid!', 'error');
     return;
   }
   
@@ -310,7 +557,8 @@ async function submitOrder() {
   
   if (!termsCheckbox || !termsCheckbox.checked) {
     if (termsError) termsError.classList.add('show');
-    alert('❌ Anda harus menyetujui Syarat & Ketentuan untuk melanjutkan.');
+    highlightElement(document.querySelector('.terms-checkbox'));
+    showToast('❌ Anda harus menyetujui Syarat & Ketentuan untuk melanjutkan.', 'error');
     return;
   }
   
@@ -320,24 +568,24 @@ async function submitOrder() {
   const customerPhone = document.getElementById('customerPhone')?.value?.trim() || '';
   
   if (!customerEmail && !customerPhone) {
-    alert('❌ Anda wajib mengisi minimal salah satu: Email atau WhatsApp');
+    showToast('❌ Anda wajib mengisi minimal salah satu: Email atau WhatsApp', 'error');
     return;
   }
   
   if (customerEmail && !isValidEmail(customerEmail)) {
-    alert('❌ Format Email tidak valid.');
+    showToast('❌ Format Email tidak valid. Contoh: nama@domain.com', 'error');
     return;
   }
   
   if (customerPhone && !isValidPhone(customerPhone)) {
-    alert('❌ Format Nomor WhatsApp tidak valid.');
+    showToast('❌ Format Nomor WhatsApp tidak valid. Contoh: 081234567890', 'error');
     return;
   }
   
   const robux = Number(robuxInput.value);
   
-  if (robux < 10) {
-    alert('❌ Minimal pembelian 10 Robux');
+  if (robux < 50) {
+    showToast('❌ Minimal pembelian 50 Robux', 'error');
     return;
   }
   
@@ -382,6 +630,18 @@ if (robuxInput) {
 
 if (btnBuy) {
   btnBuy.addEventListener('click', submitOrder);
+}
+
+if (robloxUsernameInput) {
+  robloxUsernameInput.addEventListener('focus', async () => {
+    if (!robloxUsernameInput.value.trim()) {
+      const savedUsername = await loadRobloxUsernameFromFirestore();
+      if (savedUsername) {
+        robloxUsernameInput.value = savedUsername;
+        showToast(`Username terisi dari koneksi Roblox`, 'info');
+      }
+    }
+  });
 }
 
 setInterval(() => {

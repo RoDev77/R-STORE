@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard - R STORE</title>
+  <meta name="description" content="Ringkasan akun Anda di R STORE" />
+  <link rel="icon" type="image/png" href="/images/favicon.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #0a0a14 0%, #0f0f1a 100%);
+      min-height: 100vh;
+      color: #fff;
+    }
+
+    .navbar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: rgba(10,10,20,0.95);
+      backdrop-filter: blur(20px);
+      padding: 16px 24px;
+      z-index: 1000;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 22px;
+      font-weight: 800;
+    }
+
+    .nav-logo i, .nav-logo span {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .btn-back {
+      background: rgba(102,126,234,0.2);
+      color: #667eea;
+      padding: 8px 20px;
+      border-radius: 30px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .btn-back:hover {
+      background: rgba(102,126,234,0.4);
+      transform: translateY(-2px);
+    }
+
+    .dashboard-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 100px 24px 60px;
+    }
+
+    .welcome-card {
+      background: rgba(19,19,42,0.8);
+      backdrop-filter: blur(10px);
+      border-radius: 28px;
+      padding: 28px;
+      margin-bottom: 30px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .welcome-card h1 {
+      font-size: 28px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #fff, #667eea);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: rgba(19,19,42,0.6);
+      border-radius: 20px;
+      padding: 20px;
+      border: 1px solid rgba(255,255,255,0.08);
+      transition: all 0.3s;
+    }
+
+    .stat-card:hover {
+      border-color: rgba(102,126,234,0.3);
+      transform: translateY(-3px);
+    }
+
+    .stat-icon {
+      font-size: 32px;
+      color: #667eea;
+      margin-bottom: 12px;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 800;
+      color: #00d4ff;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: #a0a0b0;
+      margin-top: 5px;
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .order-list {
+      background: rgba(19,19,42,0.6);
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 30px;
+    }
+
+    .order-item-dash {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .order-item-dash:last-child {
+      border-bottom: none;
+    }
+
+    .order-id-dash {
+      font-family: monospace;
+      font-size: 12px;
+      color: #667eea;
+    }
+
+    .order-status-dash {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .status-completed {
+      background: #28a745;
+      color: white;
+    }
+
+    .status-paid {
+      background: #ffc107;
+      color: #000;
+    }
+
+    .status-delivered {
+      background: #17a2b8;
+      color: white;
+    }
+
+    .status-cancelled {
+      background: #dc3545;
+      color: white;
+    }
+
+    .btn-dashboard {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border: none;
+      padding: 10px 24px;
+      border-radius: 40px;
+      color: white;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s;
+    }
+
+    .btn-dashboard:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102,126,234,0.3);
+    }
+
+    .login-required {
+      text-align: center;
+      padding: 60px;
+      background: rgba(19,19,42,0.8);
+      border-radius: 32px;
+      max-width: 500px;
+      margin: 100px auto;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 30px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      color: #a0a0b0;
+      font-size: 12px;
+      margin-top: 40px;
+    }
+
+    @media (max-width: 640px) {
+      .dashboard-container {
+        padding: 80px 16px 40px;
+      }
+      .stats-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .order-item-dash {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-container">
+    <div class="nav-logo"><i class="fas fa-gamepad"></i><span>R STORE</span></div>
+    <a href="index.html" class="btn-back"><i class="fas fa-arrow-left"></i> Kembali</a>
+  </div>
+</nav>
+
+<div class="dashboard-container" id="dashboardContainer">
+  <div id="loginRequired" class="login-required" style="display: none;">
+    <i class="fab fa-discord" style="font-size: 64px; color: #5865F2;"></i>
+    <h3 style="margin: 20px 0 10px;">Login Diperlukan</h3>
+    <p>Silakan login dengan Discord untuk melihat dashboard Anda.</p>
+    <button id="discordLoginBtn" class="btn-dashboard" style="background: #5865F2;">
+      <i class="fab fa-discord"></i> Login dengan Discord
+    </button>
+  </div>
+
+  <div id="dashboardContent" style="display: none;">
+    <div class="welcome-card">
+      <h1 id="welcomeName">Selamat datang, User!</h1>
+      <p style="color: #a0a0b0; margin-top: 5px;">Ini adalah ringkasan aktivitas akun Anda.</p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-wallet"></i></div>
+        <div class="stat-value" id="balanceValue">Rp 0</div>
+        <div class="stat-label">Saldo Deposit</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-shopping-cart"></i></div>
+        <div class="stat-value" id="totalOrders">0</div>
+        <div class="stat-label">Total Pesanan</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-users"></i></div>
+        <div class="stat-value" id="totalReferrals">0</div>
+        <div class="stat-label">Total Referral</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-gift"></i></div>
+        <div class="stat-value" id="referralBonus">Rp 0</div>
+        <div class="stat-label">Bonus Referral</div>
+      </div>
+    </div>
+
+    <div class="section-title"><i class="fas fa-history"></i> Pesanan Terbaru</div>
+    <div class="order-list" id="recentOrders">
+      <div class="empty-state" style="text-align: center; padding: 40px;">
+        <i class="fas fa-spinner fa-pulse"></i> Memuat...
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;">
+      <a href="referral.html" class="btn-dashboard"><i class="fas fa-link"></i> Program Referral</a>
+      <a href="deposit.html" class="btn-dashboard"><i class="fas fa-wallet"></i> Top Up Saldo</a>
+      <a href="index.html" class="btn-dashboard"><i class="fas fa-gamepad"></i> Beli Robux</a>
+      <a href="track.html" class="btn-dashboard"><i class="fas fa-search"></i> Lacak Pesanan</a>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <p>&copy; 2025 R STORE — Unofficial Roblox Store</p>
+</footer>
+
+<script type="module">
+  import { db, doc, getDoc, collection, query, where, getDocs, orderBy, limit } from './firebase-config.js';
+  import { isDiscordLoggedIn, getDiscordUser, getUserBalance, fetchUserDataFromFirestore } from './js/discord-auth.js';
+
+  const DISCORD_LOGIN_URL = '/api/discord-login';
+
+  async function loadDashboard() {
+    const isLoggedIn = isDiscordLoggedIn();
+    if (!isLoggedIn) {
+      document.getElementById('loginRequired').style.display = 'block';
+      document.getElementById('dashboardContent').style.display = 'none';
+      document.getElementById('discordLoginBtn').onclick = () => window.location.href = DISCORD_LOGIN_URL;
+      return;
+    }
+
+    document.getElementById('loginRequired').style.display = 'none';
+    document.getElementById('dashboardContent').style.display = 'block';
+
+    const user = getDiscordUser();
+    if (!user) return;
+    document.getElementById('welcomeName').textContent = `Selamat datang, ${user.globalName || user.username}!`;
+
+    // Ambil saldo
+    await fetchUserDataFromFirestore();
+    const balance = getUserBalance();
+    document.getElementById('balanceValue').textContent = `Rp ${balance.toLocaleString('id-ID')}`;
+
+    // Ambil data referral
+    const referralRef = doc(db, 'referrals', user.id);
+    const referralSnap = await getDoc(referralRef);
+    let totalReferrals = 0;
+    let bonusReferral = 0;
+    if (referralSnap.exists()) {
+      const data = referralSnap.data();
+      totalReferrals = data.totalReferred || 0;
+      bonusReferral = data.totalBonus || 0;
+    }
+    document.getElementById('totalReferrals').textContent = totalReferrals;
+    document.getElementById('referralBonus').textContent = `Rp ${bonusReferral.toLocaleString('id-ID')}`;
+
+    // Ambil semua pesanan (orders) milik user
+    const ordersQuery = query(collection(db, 'orders'), where('discordId', '==', user.id), orderBy('createdAt', 'desc'), limit(5));
+    const ordersSnap = await getDocs(ordersQuery);
+    const orders = [];
+    ordersSnap.forEach(doc => orders.push({ id: doc.id, ...doc.data() }));
+    document.getElementById('totalOrders').textContent = orders.length;
+
+    const container = document.getElementById('recentOrders');
+    if (orders.length === 0) {
+      container.innerHTML = `<div class="empty-state" style="text-align: center; padding: 40px;"><i class="fas fa-inbox"></i><p>Belum ada pesanan</p></div>`;
+    } else {
+      container.innerHTML = orders.map(order => {
+        let statusClass = '';
+        if (order.status === 'delivered') statusClass = 'status-delivered';
+        else if (order.status === 'paid') statusClass = 'status-paid';
+        else if (order.status === 'cancelled') statusClass = 'status-cancelled';
+        else if (order.status === 'completed') statusClass = 'status-completed';
+        else statusClass = 'status-paid';
+        let statusText = order.status === 'delivered' ? 'Terkirim' : (order.status === 'paid' ? 'Dibayar' : (order.status === 'cancelled' ? 'Dibatalkan' : order.status));
+        return `
+          <div class="order-item-dash">
+            <div class="order-id-dash">${order.id}</div>
+            <div>${order.robuxAmount ? order.robuxAmount.toLocaleString('id-ID') + ' Robux' : 'Deposit'}</div>
+            <div>Rp ${(order.totalPrice || order.amount || 0).toLocaleString('id-ID')}</div>
+            <div><span class="order-status-dash ${statusClass}">${statusText}</span></div>
+          </div>
+        `;
+      }).join('');
+    }
+  }
+
+  function checkDiscordCallback() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionToken = urlParams.get('discord_token'), userData = urlParams.get('user'), error = urlParams.get('error');
+    if (error) return;
+    if (sessionToken && userData) {
+      try {
+        const user = JSON.parse(decodeURIComponent(userData));
+        localStorage.setItem('discord_session_token', sessionToken);
+        localStorage.setItem('discord_user', JSON.stringify(user));
+        window.history.replaceState({}, document.title, window.location.pathname);
+        window.location.reload();
+      } catch(e) {}
+    }
+  }
+
+  checkDiscordCallback();
+  loadDashboard();
+</script>
+</body>
+</html>

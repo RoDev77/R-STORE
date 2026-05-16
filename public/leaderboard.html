@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Leaderboard Referral - R STORE</title>
+  <link rel="icon" type="image/png" href="/images/favicon.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #0a0a14 0%, #0f0f1a 100%);
+      min-height: 100vh;
+      color: #fff;
+    }
+    .navbar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: rgba(10,10,20,0.95);
+      backdrop-filter: blur(20px);
+      padding: 16px 24px;
+      z-index: 1000;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .nav-logo { display: flex; align-items: center; gap: 10px; font-size: 22px; font-weight: 800; }
+    .nav-logo i, .nav-logo span { background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .btn-back {
+      background: rgba(102,126,234,0.2);
+      color: #667eea;
+      padding: 8px 20px;
+      border-radius: 30px;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .leaderboard-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 100px 20px 60px;
+    }
+    .leaderboard-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .leaderboard-header h1 {
+      font-size: 36px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #fff, #667eea);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .leaderboard-card {
+      background: rgba(19,19,42,0.8);
+      border-radius: 28px;
+      padding: 24px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .leaderboard-item {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 15px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .rank {
+      width: 40px;
+      font-size: 24px;
+      font-weight: 800;
+    }
+    .rank-1 { color: gold; }
+    .rank-2 { color: silver; }
+    .rank-3 { color: #cd7f32; }
+    .user-info { flex: 1; }
+    .user-name { font-weight: 600; }
+    .user-stats { font-size: 12px; color: #a0a0b0; }
+    .bonus-value { font-weight: 700; color: #00d4ff; }
+    .empty-state { text-align: center; padding: 40px; color: #a0a0b0; }
+    .footer { text-align: center; padding: 30px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 40px; }
+    @media (max-width: 640px) {
+      .leaderboard-item { flex-wrap: wrap; }
+      .rank { width: auto; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-container">
+    <div class="nav-logo"><i class="fas fa-gamepad"></i><span>R STORE</span></div>
+    <a href="index.html" class="btn-back"><i class="fas fa-arrow-left"></i> Kembali</a>
+  </div>
+</nav>
+
+<div class="leaderboard-container">
+  <div class="leaderboard-header">
+    <h1>🏆 Leaderboard Referral</h1>
+    <p>Top 10 pengguna dengan referral terbanyak</p>
+  </div>
+
+  <div class="leaderboard-card">
+    <div id="leaderboardList">
+      <div class="empty-state"><i class="fas fa-spinner fa-pulse"></i> Memuat leaderboard...</div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <p>&copy; 2025 R STORE — Unofficial Roblox Store</p>
+</footer>
+
+<script type="module">
+  import { db, collection, query, getDocs, orderBy, limit } from './firebase-config.js';
+
+  async function loadLeaderboard() {
+    const referralsRef = collection(db, 'referrals');
+    const q = query(referralsRef, orderBy('totalReferred', 'desc'), limit(10));
+    const snapshot = await getDocs(q);
+    const leaders = [];
+    snapshot.forEach(doc => leaders.push({ id: doc.id, ...doc.data() }));
+
+    const container = document.getElementById('leaderboardList');
+    if (leaders.length === 0) {
+      container.innerHTML = '<div class="empty-state"><i class="fas fa-users"></i><p>Belum ada data referral</p></div>';
+      return;
+    }
+
+    container.innerHTML = leaders.map((user, idx) => {
+      let rankClass = '';
+      if (idx === 0) rankClass = 'rank-1';
+      else if (idx === 1) rankClass = 'rank-2';
+      else if (idx === 2) rankClass = 'rank-3';
+      return `
+        <div class="leaderboard-item">
+          <div class="rank ${rankClass}">#${idx+1}</div>
+          <div class="user-info">
+            <div class="user-name">${user.globalName || user.username || 'User'}</div>
+            <div class="user-stats">${user.totalReferred || 0} referral · Bonus Rp ${(user.totalBonus || 0).toLocaleString('id-ID')}</div>
+          </div>
+          <div class="bonus-value">+${user.totalReferred || 0}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  loadLeaderboard();
+</script>
+</body>
+</html>

@@ -1,9 +1,9 @@
-// Firebase Konfigurasi
+// File: firebase-config.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { 
   getFirestore, 
   doc, 
-  getDoc, 
+  getDoc,    // ← TAMBAHKAN INI
   setDoc, 
   updateDoc, 
   addDoc, 
@@ -15,7 +15,8 @@ import {
   deleteDoc, 
   serverTimestamp,
   onSnapshot,
-  limit
+  limit,
+  increment
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -35,7 +36,7 @@ const db = getFirestore(app);
 export { 
   db, 
   doc, 
-  getDoc, 
+  getDoc,   // ← TAMBAHKAN INI
   setDoc, 
   updateDoc, 
   addDoc, 
@@ -47,5 +48,6 @@ export {
   deleteDoc, 
   serverTimestamp,
   onSnapshot,
-  limit
+  limit,
+  increment
 };
